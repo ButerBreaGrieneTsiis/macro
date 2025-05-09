@@ -1,6 +1,9 @@
-from .macrotype import MacroType
+from pathlib import Path
+from uuid import uuid4
 
-from grienetsiis import open_json, opslaan_json
+from grienetsiis import open_json, opslaan_json, invoer_kiezen, invoer_validatie
+
+from .macrotype import MacroType
 
 
 class Hoofdcategorie(MacroType):
@@ -27,36 +30,89 @@ class Categorie(MacroType):
 
 class Hoofdcategorieën(dict):
     
-    bestandsmap: str = "gegevens"
-    bestandsnaam: str = "hoofdcategorieën"
-    extensie: str = "json"
-    
-    @classmethod
-    def instantiëren(cls):
-        cls().opslaan()
-        return cls()
+    bestandsmap:    str = "gegevens"
+    bestandsnaam:   str = "hoofdcategorieën"
+    extensie:       str = "json"
     
     @classmethod
     def openen(cls):
-        return cls(**open_json(cls.bestandsmap, cls.bestandsnaam, cls.extensie, (Hoofdcategorie, Hoofdcategorie.frozenset, "van_json")))
+        bestandspad = Path(f"{cls.bestandsmap}\\{cls.bestandsnaam}.{cls.extensie}")
+        if bestandspad.is_file():
+            return cls(**open_json(cls.bestandsmap, cls.bestandsnaam, cls.extensie, (Hoofdcategorie, Hoofdcategorie.frozenset, "van_json")))
+        else:
+            return cls()
     
     def opslaan(self):
         opslaan_json(self, self.bestandsmap, self.bestandsnaam, self.extensie)
+    
+    def opdracht(self):
+        
+        while True:
+        
+            opdracht = invoer_kiezen("opdracht", ["toevoegen"], stoppen = True)
+            
+            if not bool(opdracht):
+                break
+            
+            elif opdracht == "toevoegen":
+                
+                self.toevoegen()
+            
+        return self
+    
+    def toevoegen(self):
+        
+        hoofdcategorie_naam = invoer_validatie("naam", str, valideren = True)
+        hoofdcategorie = Hoofdcategorie(hoofdcategorie_naam)
+        
+        uuid = str(uuid4())
+        self[uuid] = hoofdcategorie
+        
+        return self
+    
+    def kiezen(self) -> str:
+        return invoer_kiezen("hoofdcategorie", {hoofdcategorie.hoofdcategorie_naam: hoofdcategorie_uuid for hoofdcategorie_uuid, hoofdcategorie in self.items()})
 
 class Categorieën(dict):
     
-    bestandsmap: str = "gegevens"
-    bestandsnaam: str = "categorieën"
-    extensie: str = "json"
-    
-    @classmethod
-    def instantiëren(cls):
-        cls().opslaan()
-        return cls()
+    bestandsmap:    str = "gegevens"
+    bestandsnaam:   str = "categorieën"
+    extensie:       str = "json"
     
     @classmethod
     def openen(cls):
-        return cls(**open_json(cls.bestandsmap, cls.bestandsnaam, cls.extensie, (Categorie, Categorie.frozenset, "van_json")))
+        bestandspad = Path(f"{cls.bestandsmap}\\{cls.bestandsnaam}.{cls.extensie}")
+        if bestandspad.is_file():
+            return cls(**open_json(cls.bestandsmap, cls.bestandsnaam, cls.extensie, (Categorie, Categorie.frozenset, "van_json")))
+        else:
+            return cls()
     
     def opslaan(self):
         opslaan_json(self, self.bestandsmap, self.bestandsnaam, self.extensie)
+    
+    def opdracht(self, hoofdcategorieën):
+        
+        while True:
+        
+            opdracht = invoer_kiezen("opdracht", ["toevoegen"], stoppen = True)
+            
+            if not bool(opdracht):
+                break
+            
+            elif opdracht == "toevoegen":
+                
+                self.toevoegen(hoofdcategorieën)
+            
+        return self
+    
+    def toevoegen(self, hoofdcategorieën):
+        
+        categorie_naam = invoer_validatie("naam", str, valideren = True)
+        hoofdcategorie_uuid = hoofdcategorieën.kiezen()
+        
+        categorie = Categorie(categorie_naam, hoofdcategorie_uuid)
+        
+        uuid = str(uuid4())
+        self[uuid] = categorie
+        
+        return self
