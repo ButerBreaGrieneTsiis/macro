@@ -92,23 +92,3 @@ class Voedingswaarde(MacroType):
             int(round(10 * vezels)),
             int(round(10 * zout)),
             )
-    
-    @classmethod
-    def van_json(
-        cls,
-        *lijst: List[int],
-        ) -> "Voedingswaarde":
-        
-        return cls(*lijst)
-    
-    def naar_json(self) -> List[int]:
-        return [
-            self.calorieen,
-            self.vetten,
-            self.verzadigd,
-            self.koolhydraten,
-            self.suikers,
-            self.eiwitten,
-            self.vezels,
-            self.zout,
-            ]

@@ -1,78 +1,99 @@
-from copy import deepcopy
-from typing import Any, Dict, List, Tuple
+from uuid import uuid4
 
-from grienetsiis import invoer_validatie, invoer_kiezen
+from grienetsiis import invoer_kiezen, invoer_validatie
 
-from .hoeveelheid import Eenheid, Hoeveelheid
-from .macrotype import MacroType
-from .voedingswaarde import Voedingswaarde
+from .categorie import Categorieën
+from .macrotype import MacroType, MacroTypeDatabank
 
-class Ingredient(MacroType):
+class Ingrediënt(MacroType):
+    
+    frozenset = frozenset(("ingrediënt_naam", "categorie_uuid"))
     
     def __init__(
         self,
-        ingredient_naam: str,
+        ingrediënt_naam: str,
         categorie_uuid: str,
-        # producten_uuid: List[str] = None, # maken bij het inlezen, niet opslaan
-        ) -> "Ingredient":
+        ) -> "Ingrediënt":
         
-        self.ingredient_naam = ingredient_naam
+        self.ingrediënt_naam = ingrediënt_naam
         self.categorie_uuid = categorie_uuid
-
-class Product(MacroType):
-    
-    def __init__(
-        self,
-        product_naam: str,
-        merk_naam: str,
-        opmerking: str,
-        voedingswaarde: Voedingswaarde,
-        eenheid: Eenheid,
-        ingredient_uuid: str,
-        hoeveelheden: Dict[Eenheid, float] = None,
-        ) -> "Product":
-        
-        self.product_naam       = product_naam
-        self.merk_naam          = merk_naam
-        self.opmerking          = opmerking
-        self.voedingswaarde     = voedingswaarde
-        self.eenheid            = eenheid
-        self.ingredient_uuid    = ingredient_uuid
-        self.hoeveelheden       = dict() if hoeveelheden is None else hoeveelheden
-    
-    def __repr__(self) -> str:
-        return f"Product \"{self.product_naam} ({self.merk_naam})\""
     
     @classmethod
-    def nieuw(
-        cls,
-        ingredient_uuid: str,
-        ) -> "Product":
+    def nieuw(cls):
         
-        product_naam = invoer_validatie("productnaam", str, valideren = True)
-        merk_naam = invoer_validatie("merknaam", str, valideren = True)
-        opmerking = invoer_validatie("opmerking", str)
-        eenheid = Eenheid(invoer_kiezen("eenheid", ["g", "ml"]))
-        voedingswaarde = Voedingswaarde.nieuw(eenheid)
+        categorieën = Categorieën.openen()
+        categorie_uuid = categorieën.kiezen()
+        
+        ingrediënt_naam = invoer_validatie("naam", str, valideren = True, kleine_letters = True)
         
         return cls(
-            product_naam,
-            merk_naam,
-            opmerking,
-            voedingswaarde,
-            eenheid,
-            ingredient_uuid,
+            ingrediënt_naam,
+            categorie_uuid,
             )
+
+class Ingrediënten(MacroTypeDatabank):
     
-    def toevoegen_hoeveelheid(self):
+    bestandsnaam: str = "ingrediënten"
+    object = Ingrediënt
+    
+    def opdracht(self):
         
-        ...
+        while True:
+            
+            opdracht = invoer_kiezen("opdracht ingrediënt", ["nieuw ingrediënt"], stoppen = True)
+            
+            if not bool(opdracht):
+                break
+            
+            elif opdracht == "nieuw ingrediënt":
+                
+                self.nieuw()
         
         return self
     
-    # def bereken_voedingswaarde(
-    #     self,
-    #     hoeveelheid: Tuple[float, str],
-    #     ) -> Voedingswaarde:
-    #     # iets anders voor 100 g/ml?
-    #     return deepcopy(self.voedingswaarde) * self.hoeveelheden[hoeveelheid[1]] * hoeveelheid[0]
+    def nieuw(self):
+        
+        ingrediënt = Ingrediënt.nieuw()
+        
+        uuid = str(uuid4())
+        self[uuid] = ingrediënt
+        self.opslaan()
+        
+        return uuid
+    
+    def kiezen(self) -> str:
+        
+        while True:
+        
+            print("\nkies een ingrediënt op naam of categorie of maak een nieuwe")
+            kies_optie = invoer_kiezen("optie", ["naam", "categorie", "nieuw"])
+            
+            if kies_optie == "naam" or kies_optie == "categorie":
+                
+                if kies_optie == "naam":
+                    print("\ngeef een zoekterm op")
+                    zoekterm = invoer_validatie("zoekterm", str, kleine_letters = True)
+                    ingrediënten_mogelijk = [ingrediënt_uuid for ingrediënt_uuid, ingrediënt in self.items() if zoekterm in ingrediënt.ingrediënt_naam]
+                    if len(ingrediënten_mogelijk) == 0:
+                        print(f">>> zoekterm \"{zoekterm}\" levert geen ingrediënten op")
+                        continue
+                    
+                else:
+                    categorieën = Categorieën.openen()
+                    categorie_uuid = categorieën.kiezen()
+                    ingrediënten_mogelijk = [ingrediënt_uuid for ingrediënt_uuid, ingrediënt in self.items() if ingrediënt.categorie_uuid == categorie_uuid]
+                    if len(ingrediënten_mogelijk) == 0:
+                        print(f">>> geen ingrediënten onder categorie \"{categorieën[categorie_uuid].categorie_naam}\"")
+                        continue
+                
+                ingrediënt_uuid = invoer_kiezen("ingrediënt", {ingrediënt.ingrediënt_naam: ingrediënt_uuid for ingrediënt_uuid, ingrediënt in self.items()}, stoppen = True)
+                
+                if not bool(ingrediënt_uuid):
+                    continue
+                
+                print(f"ingrediënt \"{self[ingrediënt_uuid].ingrediënt_naam}\" gekozen")
+                
+                return ingrediënt_uuid
+                        
+            else:
+                return self.nieuw()

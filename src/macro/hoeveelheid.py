@@ -3,14 +3,6 @@ from enum import Enum
 
 class Eenheid(Enum):
     
-    # https://stackoverflow.com/questions/75384124/how-to-initialize-named-tuple-in-python-enum
-    def __new__(cls, enkelvoud, meervoud):
-        veld = object.__new__(cls)
-        veld._value_    = enkelvoud
-        veld.enkelvoud  = enkelvoud
-        veld.meervoud   = meervoud
-        return veld
-    
     STUK        =   "stuk",         "stuks"
     FLES        =   "fles",         "flessen"
     BLIK        =   "blik",         "blikken"
@@ -23,6 +15,14 @@ class Eenheid(Enum):
     VERPAKKING  =   "verpakking",   "verpakkingen"
     GRAM        =   "g",            "g"
     MILLILITER  =   "ml",           "ml"
+    
+    # https://stackoverflow.com/questions/75384124/how-to-initialize-named-tuple-in-python-enum
+    def __new__(cls, enkelvoud, meervoud):
+        veld = object.__new__(cls)
+        veld._value_    = enkelvoud
+        veld.enkelvoud  = enkelvoud
+        veld.meervoud   = meervoud
+        return veld
 
 class Hoeveelheid:
     
