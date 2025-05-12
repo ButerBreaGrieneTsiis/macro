@@ -43,7 +43,6 @@ class Categorie(MacroType):
     def nieuw(cls) -> "Categorie":
         
         hoofdcategorieën = Hoofdcategorieën.openen()
-        print(hoofdcategorieën)
         hoofdcategorie_uuid = hoofdcategorieën.kiezen()
         categorie_naam = invoer_validatie("naam", str, valideren = True, kleine_letters = True)
         

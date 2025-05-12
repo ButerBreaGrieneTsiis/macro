@@ -18,6 +18,9 @@ class Ingrediënt(MacroType):
         self.ingrediënt_naam = ingrediënt_naam
         self.categorie_uuid = categorie_uuid
     
+    def __repr__(self) -> "str":
+        return f"Ingrediënt {self.ingrediënt_naam}"
+    
     @classmethod
     def nieuw(cls):
         
@@ -65,12 +68,12 @@ class Ingrediënten(MacroTypeDatabank):
         
         while True:
         
-            print("\nkies een ingrediënt op naam of categorie of maak een nieuwe")
-            kies_optie = invoer_kiezen("optie", ["naam", "categorie", "nieuw"])
+            print("\nkies een ingrediënt op naam of categorie, of maak een nieuwe")
+            kies_optie = invoer_kiezen("optie", ["ingrediëntnaam", "categorie", "nieuw"])
             
-            if kies_optie == "naam" or kies_optie == "categorie":
+            if kies_optie == "ingrediëntnaam" or kies_optie == "categorie":
                 
-                if kies_optie == "naam":
+                if kies_optie == "ingrediëntnaam":
                     print("\ngeef een zoekterm op")
                     zoekterm = invoer_validatie("zoekterm", str, kleine_letters = True)
                     ingrediënten_mogelijk = [ingrediënt_uuid for ingrediënt_uuid, ingrediënt in self.items() if zoekterm in ingrediënt.ingrediënt_naam]
@@ -86,12 +89,12 @@ class Ingrediënten(MacroTypeDatabank):
                         print(f">>> geen ingrediënten onder categorie \"{categorieën[categorie_uuid].categorie_naam}\"")
                         continue
                 
-                ingrediënt_uuid = invoer_kiezen("ingrediënt", {ingrediënt.ingrediënt_naam: ingrediënt_uuid for ingrediënt_uuid, ingrediënt in self.items()}, stoppen = True)
+                ingrediënt_uuid = invoer_kiezen("ingrediënt", {ingrediënt.ingrediënt_naam: ingrediënt_uuid for ingrediënt_uuid, ingrediënt in self.items() if ingrediënt_uuid in ingrediënten_mogelijk}, stoppen = True)
                 
                 if not bool(ingrediënt_uuid):
                     continue
                 
-                print(f"ingrediënt \"{self[ingrediënt_uuid].ingrediënt_naam}\" gekozen")
+                print(f"\"{self[ingrediënt_uuid]}\" gekozen")
                 
                 return ingrediënt_uuid
                         

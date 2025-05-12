@@ -11,10 +11,12 @@ class Dag:
         self,
         datum: dt.Date,
         producten: Dict[str, List[Hoeveelheid]] = None,
+        gerechten: Dict[str, Hoeveelheid] = None,
         ) -> "Dag":
         
         self.datum = datum
-        self.producten = Dict() if producten is None else producten
+        self.producten = dict() if producten is None else producten
+        self.gerechten = dict() if gerechten is None else gerechten
     
     @property
     def voedingswaarde(self) -> Voedingswaarde:

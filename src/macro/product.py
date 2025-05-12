@@ -3,6 +3,7 @@ from uuid import uuid4
 
 from grienetsiis import invoer_kiezen, invoer_validatie
 
+from .categorie import Categorieën
 from .hoeveelheid import Eenheid, Hoeveelheid
 from .ingredient import Ingrediënten
 from .macrotype import MacroType, MacroTypeDatabank
@@ -77,7 +78,7 @@ class Producten(MacroTypeDatabank):
         
         while True:
         
-            opdracht = invoer_kiezen("opdracht product", ["nieuw product"], stoppen = True)
+            opdracht = invoer_kiezen("opdracht product", ["nieuw product", "nieuwe hoeveelheid", "weergeven product"], stoppen = True)
             
             if not bool(opdracht):
                 break
@@ -85,7 +86,14 @@ class Producten(MacroTypeDatabank):
             elif opdracht == "nieuw product":
                 
                 self.nieuw()
-                
+            
+            elif opdracht == "nieuwe hoeveelheid":
+                ...
+            
+            elif opdracht == "weergeven product":
+                ...
+            
+        
         return self
     
     def nieuw(self):
@@ -97,3 +105,63 @@ class Producten(MacroTypeDatabank):
         self.opslaan()
         
         return self
+    
+    def kiezen(self) -> str:
+        
+        while True:
+        
+            kies_optie = invoer_kiezen("product op naam of categorie, of maak een nieuwe", ["ingrediëntnaam", "productnaam", "categorie", "nieuw"])
+            
+            if kies_optie == "ingrediëntnaam" or kies_optie == "productnaam" or kies_optie == "categorie":
+                
+                if kies_optie == "ingrediëntnaam" or kies_optie == "categorie":
+                    
+                    if kies_optie == "ingrediëntnaam":
+                    
+                        print("\ngeef een zoekterm op voor een ingrediënt")
+                        zoekterm = invoer_validatie("zoekterm", str, kleine_letters = True)
+                        
+                        ingrediënten = Ingrediënten.openen()
+                        ingrediënten_mogelijk = [ingrediënt_uuid for ingrediënt_uuid, ingrediënt in ingrediënten.items() if zoekterm in ingrediënt.ingrediënt_naam]
+                    
+                    else:
+                        
+                        categorieën = Categorieën.openen()
+                        categorie_uuid = categorieën.kiezen()
+                        
+                        ingrediënten = Ingrediënten.openen()
+                        ingrediënten_mogelijk = [ingrediënt_uuid for ingrediënt_uuid, ingrediënt in ingrediënten.items() if ingrediënt.categorie_uuid == categorie_uuid]
+                    
+                    if len(ingrediënten_mogelijk) == 0:
+                        print(f">>> geen ingrediënten gevonden")
+                        continue
+                    
+                    ingrediënt_uuid = invoer_kiezen("ingrediënt", {ingrediënt.ingrediënt_naam: ingrediënt_uuid for ingrediënt_uuid, ingrediënt in ingrediënten.items() if ingrediënt_uuid in ingrediënten_mogelijk}, stoppen = True)
+                    
+                    if not bool(ingrediënt_uuid):
+                        continue
+                    
+                    producten_mogelijk = [product_uuid for product_uuid, product in self.items() if product.ingrediënt_uuid == ingrediënt_uuid]
+                
+                else:
+                    
+                    print("\ngeef een zoekterm op voor een product")
+                    zoekterm = invoer_validatie("zoekterm", str, kleine_letters = True)
+                    
+                    producten_mogelijk = [product_uuid for product_uuid, product in self.items() if zoekterm in product.product_naam]
+                
+                if len(producten_mogelijk) == 0:
+                    print(f">>> geen producten gevonden")
+                    continue
+                
+                product_uuid = invoer_kiezen("product", {product.product_naam: product_uuid for product_uuid, product in self.items() if product_uuid in producten_mogelijk}, stoppen = True)
+                
+                if not bool(product_uuid):
+                    continue
+                
+                print(f"\"{self[product_uuid]}\" gekozen")
+                
+                return ingrediënt_uuid
+                        
+            else:
+                return self.nieuw()
