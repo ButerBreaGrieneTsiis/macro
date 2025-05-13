@@ -7,6 +7,8 @@ from .macrotype import MacroType
 
 class Voedingswaarde(MacroType):
     
+    frozenset = frozenset(("calorieën", "vetten", "verzadigd", "koolhydraten", "suikers", "eiwitten", "vezels", "zout", ))
+    
     calorie_per_gram_vet            =   9
     calorie_per_gram_koolhydraat    =   4
     calorie_per_gram_eiwit          =   4
@@ -14,7 +16,7 @@ class Voedingswaarde(MacroType):
     
     def __init__(
         self,
-        calorieen: int      = 0,
+        calorieën: int      = 0,
         vetten: int         = 0,
         verzadigd: int      = 0,
         koolhydraten: int   = 0,
@@ -24,7 +26,7 @@ class Voedingswaarde(MacroType):
         zout: int           = 0,
         ) -> "Voedingswaarde":
         
-        self.calorieen      =   calorieen
+        self.calorieën      =   calorieën
         self.vetten         =   vetten
         self.verzadigd      =   verzadigd
         self.koolhydraten   =   koolhydraten
@@ -36,15 +38,15 @@ class Voedingswaarde(MacroType):
     def __repr__(self):
         
         return (
-            f"\t{"calorieën":<21}{self.calorieen:>6.0f} kcal\n"
-            f"\t{f"({int(self.kilojoule_per_kilocalorie*self.calorieen)}":>27} kJ)\n"
-            f"\t{"vetten":<21}{self.vetten/10:>6.1f} g\n"
-            f"\t\t{"waarvan verzadigd":<17}{self.verzadigd/10:>6.1f} g\n"
-            f"\t{"koolydraten":<21}{self.koolhydraten/10:>6.1f} g\n"
-            f"\t\t{"waarvan suikers":<17}{self.suikers/10:>6.1f} g\n"
-            f"\t{"eiwitten":<21}{self.eiwitten/10:>6.1f} g\n"
-            f"\t{"vezels":<21}{self.vezels/10:>6.1f} g\n"
-            f"\t{"zout":<21}{self.zout/10:>6.1f} g"
+            f"    {"calorieën":<21}{self.calorieën:>6.0f} kcal\n"
+            f"    {f"({int(self.kilojoule_per_kilocalorie*self.calorieën)}":>27} kJ)\n"
+            f"    {"vetten":<21}{self.vetten/10:>6.1f} g\n"
+            f"        {"waarvan verzadigd":<17}{self.verzadigd/10:>6.1f} g\n"
+            f"    {"koolydraten":<21}{self.koolhydraten/10:>6.1f} g\n"
+            f"        {"waarvan suikers":<17}{self.suikers/10:>6.1f} g\n"
+            f"    {"eiwitten":<21}{self.eiwitten/10:>6.1f} g\n"
+            f"    {"vezels":<21}{self.vezels/10:>6.1f} g\n"
+            f"    {"zout":<21}{self.zout/10:>6.1f} g"
             )
     
     def __mul__(
@@ -64,7 +66,7 @@ class Voedingswaarde(MacroType):
             
             print(f"vul de voedingswaarde in per 100 {eenheid.enkelvoud}")
             
-            calorieen = invoer_validatie("calorieën", int, bereik = (0, 900))
+            calorieën = invoer_validatie("calorieën", int, bereik = (0, 900))
             vetten = invoer_validatie("vetten", float, bereik = (0.0, 100.0))
             verzadigd = invoer_validatie("waarvan verzadigd", float, bereik = (0.0, vetten)) if not vetten == 0.0 else 0
             koolhydraten = invoer_validatie("koolhydraten", float, bereik = (0.0, 100.0))
@@ -73,17 +75,17 @@ class Voedingswaarde(MacroType):
             vezels = invoer_validatie("vezels", float, bereik = (0.0, 100.0))
             zout = invoer_validatie("zout", float, bereik = (0.0, 100.0))
             
-            calorieen_berekend = vetten * cls.calorie_per_gram_vet + koolhydraten * cls.calorie_per_gram_koolhydraat + eiwitten * cls.calorie_per_gram_eiwit
+            calorieën_berekend = vetten * cls.calorie_per_gram_vet + koolhydraten * cls.calorie_per_gram_koolhydraat + eiwitten * cls.calorie_per_gram_eiwit
             
-            if abs(calorieen - calorieen_berekend) / ((calorieen + calorieen_berekend)/2) > 0.1:
-                print(f"calorieën ingevuld ({calorieen} kcal) en berekend ({calorieen_berekend} kcal) verschillen meer dan 10%")
+            if abs(calorieën - calorieën_berekend) / ((calorieën + calorieën_berekend)/2) > 0.1:
+                print(f"calorieën ingevuld ({calorieën} kcal) en berekend ({calorieën_berekend} kcal) verschillen meer dan 10%")
                 if invoer_kiezen("doorgaan", {"ja": False, "nee": True}):
                     continue
             
             break
         
         return cls(
-            calorieen,
+            calorieën,
             int(round(10 * vetten)),
             int(round(10 * verzadigd)),
             int(round(10 * koolhydraten)),

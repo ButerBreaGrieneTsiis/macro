@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Any, Dict
 
-from grienetsiis import open_json, opslaan_json
+from grienetsiis import openen_json, opslaan_json
 
 from .hoeveelheid import Eenheid
 
@@ -35,6 +35,8 @@ class MacroType:
                 continue
             elif isinstance(waarde, str) and waarde == "":
                 continue
+            elif isinstance(waarde, int) and waarde == 0:
+                continue
             elif isinstance(waarde, Eenheid):
                 dict_naar_json[veld] = waarde.value
             else:
@@ -46,25 +48,24 @@ class MacroTypeDatabank(dict):
     
     bestandsmap:    str = "gegevens"
     extensie:       str = "json"
+    encoder_dict:   Dict[str, str] = {
+        "Voedingswaarde":   "naar_json",
+        "Hoofdcategorie":   "naar_json",
+        "Categorie":        "naar_json",
+        "Ingrediënt":       "naar_json",
+        "Product":          "naar_json",
+        "Gerecht":          "naar_json",
+        "Dag":              "naar_json",
+        }
     
     @classmethod
     def openen(cls) -> "MacroTypeDatabank":
         bestandspad = Path(f"{cls.bestandsmap}\\{cls.bestandsnaam}.{cls.extensie}")
         if bestandspad.is_file():
-            return cls(**open_json(cls.bestandsmap, cls.bestandsnaam, cls.extensie, (cls.object, cls.object.frozenset, "van_json")))
+            return cls(**openen_json(cls.bestandsmap, cls.bestandsnaam, cls.extensie, cls.class_mappers))
         else:
             return cls()
     
     def opslaan(self):
         
-        encoder_dict = {
-            "Voedingswaarde":   "naar_json",
-            "Hoofdcategorie":   "naar_json",
-            "Categorie":        "naar_json",
-            "Ingrediënt":       "naar_json",
-            "Product":          "naar_json",
-            "Gerecht":          "naar_json",
-            "Dag":              "naar_json",
-            }
-        
-        opslaan_json(self, self.bestandsmap, self.bestandsnaam, self.extensie, encoder_dict = encoder_dict)
+        opslaan_json(self, self.bestandsmap, self.bestandsnaam, self.extensie, encoder_dict = self.encoder_dict)

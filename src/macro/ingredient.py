@@ -1,3 +1,4 @@
+from typing import FrozenSet, List, Tuple
 from uuid import uuid4
 
 from grienetsiis import invoer_kiezen, invoer_validatie
@@ -7,7 +8,7 @@ from .macrotype import MacroType, MacroTypeDatabank
 
 class Ingrediënt(MacroType):
     
-    frozenset = frozenset(("ingrediënt_naam", "categorie_uuid"))
+    frozenset = frozenset(("ingrediënt_naam", "categorie_uuid",))
     
     def __init__(
         self,
@@ -37,7 +38,9 @@ class Ingrediënt(MacroType):
 class Ingrediënten(MacroTypeDatabank):
     
     bestandsnaam: str = "ingrediënten"
-    object = Ingrediënt
+    class_mappers: List[Tuple[object, FrozenSet, str]] = [
+        (Ingrediënt, Ingrediënt.frozenset, "van_json"),
+        ]
     
     def opdracht(self):
         
@@ -64,7 +67,10 @@ class Ingrediënten(MacroTypeDatabank):
         
         return uuid
     
-    def kiezen(self) -> str:
+    def kiezen(
+        self,
+        kies_bevestiging: bool = True,
+        ) -> str:
         
         while True:
         
@@ -94,7 +100,7 @@ class Ingrediënten(MacroTypeDatabank):
                 if not bool(ingrediënt_uuid):
                     continue
                 
-                print(f"\"{self[ingrediënt_uuid]}\" gekozen")
+                if kies_bevestiging: print(f">>> ingrediënt \"{self[ingrediënt_uuid].ingrediënt_naam}\" gekozen")
                 
                 return ingrediënt_uuid
                         

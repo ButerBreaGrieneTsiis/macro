@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, FrozenSet, List, Tuple
 from uuid import uuid4
 
 from grienetsiis import invoer_kiezen, invoer_validatie
@@ -12,7 +12,7 @@ from .voedingswaarde import Voedingswaarde
 
 class Product(MacroType):
     
-    frozenset = frozenset(("product_naam", "merk_naam", "opmerking", "voedingswaarde", "eenheid", "ingrediënt_uuid", "hoeveelheden"))
+    frozenset = frozenset(("product_naam", "merk_naam", "opmerking", "voedingswaarde", "eenheid", "ingrediënt_uuid", "hoeveelheden",))
     
     def __init__(
         self,
@@ -34,7 +34,9 @@ class Product(MacroType):
         self.hoeveelheden       = dict() if hoeveelheden is None else hoeveelheden
     
     def __repr__(self) -> str:
-        return f"Product \"{self.product_naam} ({self.merk_naam})\""
+        return f"product \"{self.product_naam} ({self.merk_naam})\"" \
+        + f"\nvoedingswaarde per 100 {self.eenheid.enkelvoud}:" \
+        + f"\n{self.voedingswaarde}"
     
     @classmethod
     def nieuw(cls) -> "Product":
@@ -72,7 +74,10 @@ class Product(MacroType):
 class Producten(MacroTypeDatabank):
     
     bestandsnaam: str = "producten"
-    object = Product
+    class_mappers: List[Tuple[object, FrozenSet, str]] = [
+        (Product, Product.frozenset, "van_json"),
+        (Voedingswaarde, Voedingswaarde.frozenset, "van_json"),
+        ]
     
     def opdracht(self):
         
@@ -84,15 +89,15 @@ class Producten(MacroTypeDatabank):
                 break
             
             elif opdracht == "nieuw product":
-                
                 self.nieuw()
             
             elif opdracht == "nieuwe hoeveelheid":
                 ...
             
             elif opdracht == "weergeven product":
-                ...
-            
+                product_uuid = self.kiezen(kies_bevestiging = False)
+                print()
+                print(self[product_uuid])
         
         return self
     
@@ -106,7 +111,10 @@ class Producten(MacroTypeDatabank):
         
         return self
     
-    def kiezen(self) -> str:
+    def kiezen(
+        self,
+        kies_bevestiging: bool = True,
+        ) -> str:
         
         while True:
         
@@ -141,6 +149,8 @@ class Producten(MacroTypeDatabank):
                     if not bool(ingrediënt_uuid):
                         continue
                     
+                    print(f">>> ingrediënt \"{ingrediënten[ingrediënt_uuid].ingrediënt_naam}\" gekozen")
+                    
                     producten_mogelijk = [product_uuid for product_uuid, product in self.items() if product.ingrediënt_uuid == ingrediënt_uuid]
                 
                 else:
@@ -159,9 +169,9 @@ class Producten(MacroTypeDatabank):
                 if not bool(product_uuid):
                     continue
                 
-                print(f"\"{self[product_uuid]}\" gekozen")
+                if kies_bevestiging: print(f">>> product \"{self[product_uuid].product_naam}\" gekozen")
                 
-                return ingrediënt_uuid
+                return product_uuid
                         
             else:
                 return self.nieuw()

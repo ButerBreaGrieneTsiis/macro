@@ -1,7 +1,8 @@
 from pathlib import Path
+from typing import FrozenSet, List, Tuple
 from uuid import uuid4
 
-from grienetsiis import open_json, opslaan_json, invoer_kiezen, invoer_validatie
+from grienetsiis import invoer_kiezen, invoer_validatie
 
 from .macrotype import MacroType, MacroTypeDatabank
 
@@ -28,7 +29,7 @@ class Hoofdcategorie(MacroType):
 
 class Categorie(MacroType):
     
-    frozenset = frozenset(("categorie_naam", "hoofdcategorie_uuid"))
+    frozenset = frozenset(("categorie_naam", "hoofdcategorie_uuid",))
     
     def __init__(
         self,
@@ -54,7 +55,9 @@ class Categorie(MacroType):
 class Hoofdcategorieën(MacroTypeDatabank):
     
     bestandsnaam: str = "hoofdcategorieën"
-    object = Hoofdcategorie
+    class_mappers: List[Tuple[object, FrozenSet, str]] = [
+        (Hoofdcategorie, Hoofdcategorie.frozenset, "van_json"),
+        ]
     
     def opdracht(self):
         
@@ -81,13 +84,22 @@ class Hoofdcategorieën(MacroTypeDatabank):
         
         return self
     
-    def kiezen(self) -> str:
-        return invoer_kiezen("hoofdcategorie", {hoofdcategorie.hoofdcategorie_naam: hoofdcategorie_uuid for hoofdcategorie_uuid, hoofdcategorie in self.items()})
+    def kiezen(
+        self,
+        kies_bevestiging: bool = True,
+        ) -> str:
+        
+        hoofdcategorie_uuid = invoer_kiezen("hoofdcategorie", {hoofdcategorie.hoofdcategorie_naam: hoofdcategorie_uuid for hoofdcategorie_uuid, hoofdcategorie in self.items()})
+        if kies_bevestiging: print(f">>> hoofdcategorie \"{self[hoofdcategorie_uuid].hoofdcategorie_naam}\" gekozen")
+        
+        return hoofdcategorie_uuid
 
 class Categorieën(MacroTypeDatabank):
     
     bestandsnaam: str = "categorieën"
-    object = Categorie
+    class_mappers: List[Tuple[object, FrozenSet, str]] = [
+        (Categorie, Categorie.frozenset, "van_json"),
+        ]
     
     def opdracht(self):
         
@@ -114,8 +126,15 @@ class Categorieën(MacroTypeDatabank):
         
         return self
     
-    def kiezen(self) -> str:
+    def kiezen(
+        self,
+        kies_bevestiging: bool = True,
+        ) -> str:
         
         hoofdcategorieën = Hoofdcategorieën.openen()
         hoofdcategorie_uuid = hoofdcategorieën.kiezen()
-        return invoer_kiezen("categorie", {categorie.categorie_naam: categorie_uuid for categorie_uuid, categorie in self.items() if categorie.hoofdcategorie_uuid == hoofdcategorie_uuid})
+        
+        categorie_uuid = invoer_kiezen("categorie", {categorie.categorie_naam: categorie_uuid for categorie_uuid, categorie in self.items() if categorie.hoofdcategorie_uuid == hoofdcategorie_uuid})
+        if kies_bevestiging: print(f">>> categorie \"{self[categorie_uuid].categorie_naam}\" gekozen")
+        
+        return categorie_uuid
