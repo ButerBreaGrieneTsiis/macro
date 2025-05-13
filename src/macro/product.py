@@ -92,7 +92,8 @@ class Producten(MacroTypeDatabank):
                 self.nieuw()
             
             elif opdracht == "nieuwe hoeveelheid":
-                ...
+                self.nieuwe_hoeveelheid()
+                
             
             elif opdracht == "weergeven product":
                 product_uuid = self.kiezen(kies_bevestiging = False)
@@ -101,19 +102,28 @@ class Producten(MacroTypeDatabank):
         
         return self
     
-    def nieuw(self):
+    def nieuw(
+        self,
+        geef_uuid: bool = True,
+        ):
         
         product = Product.nieuw()
         
-        uuid = str(uuid4())
-        self[uuid] = product
+        product_uuid = str(uuid4())
+        self[product_uuid] = product
+        
         self.opslaan()
         
-        return self
+        return product_uuid if geef_uuid else product
+    
+    def nieuwe_hoeveelheid(self):
+        
+        product = self.kiezen(geef_uuid = False)
     
     def kiezen(
         self,
         kies_bevestiging: bool = True,
+        geef_uuid: bool =  True,
         ) -> str:
         
         while True:
@@ -171,7 +181,7 @@ class Producten(MacroTypeDatabank):
                 
                 if kies_bevestiging: print(f">>> product \"{self[product_uuid].product_naam}\" gekozen")
                 
-                return product_uuid
+                return product_uuid if geef_uuid else self[product_uuid]
                         
             else:
-                return self.nieuw()
+                return self.nieuw(geef_uuid)

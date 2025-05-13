@@ -52,24 +52,28 @@ class Ingrediënten(MacroTypeDatabank):
                 break
             
             elif opdracht == "nieuw ingrediënt":
-                
                 self.nieuw()
         
         return self
     
-    def nieuw(self):
+    def nieuw(
+        self,
+        geef_uuid: bool = True,
+        ):
         
         ingrediënt = Ingrediënt.nieuw()
         
-        uuid = str(uuid4())
-        self[uuid] = ingrediënt
+        ingrediënt_uuid = str(uuid4())
+        self[ingrediënt_uuid] = ingrediënt
+        
         self.opslaan()
         
-        return uuid
+        return ingrediënt_uuid if geef_uuid else ingrediënt
     
     def kiezen(
         self,
         kies_bevestiging: bool = True,
+        geef_uuid: bool =  True,
         ) -> str:
         
         while True:
@@ -102,7 +106,7 @@ class Ingrediënten(MacroTypeDatabank):
                 
                 if kies_bevestiging: print(f">>> ingrediënt \"{self[ingrediënt_uuid].ingrediënt_naam}\" gekozen")
                 
-                return ingrediënt_uuid
+                return ingrediënt_uuid if geef_uuid else self[ingrediënt_uuid]
                         
             else:
-                return self.nieuw()
+                return self.nieuw(geef_uuid)
