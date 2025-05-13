@@ -1,4 +1,3 @@
-from pathlib import Path
 from typing import FrozenSet, List, Tuple
 from uuid import uuid4
 
@@ -62,7 +61,7 @@ class Hoofdcategorieën(MacroTypeDatabank):
     def opdracht(self):
         
         while True:
-        
+            
             opdracht = invoer_kiezen("opdracht hoofdcategorie", ["nieuwe hoofdcategorie"], stoppen = True)
             
             if not bool(opdracht):
@@ -71,7 +70,7 @@ class Hoofdcategorieën(MacroTypeDatabank):
             elif opdracht == "nieuwe hoofdcategorie":
                 
                 self.nieuw()
-            
+        
         return self
     
     def nieuw(
@@ -91,12 +90,13 @@ class Hoofdcategorieën(MacroTypeDatabank):
     def kiezen(
         self,
         kies_bevestiging: bool = True,
-        ) -> str:
+        geef_uuid: bool =  True,
+        ) -> str | Hoofdcategorie:
         
         hoofdcategorie_uuid = invoer_kiezen("hoofdcategorie", {hoofdcategorie.hoofdcategorie_naam: hoofdcategorie_uuid for hoofdcategorie_uuid, hoofdcategorie in self.items()})
         if kies_bevestiging: print(f">>> hoofdcategorie \"{self[hoofdcategorie_uuid].hoofdcategorie_naam}\" gekozen")
         
-        return hoofdcategorie_uuid
+        return hoofdcategorie_uuid if geef_uuid else self[hoofdcategorie_uuid]
 
 class Categorieën(MacroTypeDatabank):
     
@@ -138,7 +138,7 @@ class Categorieën(MacroTypeDatabank):
         self,
         kies_bevestiging: bool = True,
         geef_uuid: bool =  True,
-        ) -> str:
+        ) -> str | Categorie:
         
         hoofdcategorieën = Hoofdcategorieën.openen()
         hoofdcategorie_uuid = hoofdcategorieën.kiezen()
