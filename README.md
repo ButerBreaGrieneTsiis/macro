@@ -1,4 +1,4 @@
-# macro
-Bijhouden van calorieën en voedingswaarden met ingebouwde recepten
+*ONDER ONTWIKKELING EN NOG NIET TE GEBRUIKEN*
 
-*ONDER ONTWIKKELING*
+# macro
+Bijhouden dagelijkse inname van calorieën en voedingswaarden op basis van producten, ingrediënten, categorieën en gerechten gedefinieerd bij de eindgebruiker. 
