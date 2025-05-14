@@ -44,14 +44,14 @@ class Hoeveelheid:
         else:
             return f"{self.waarde:{formaat}} {self.eenheid.meervoud}"
     
-    @classmethod
-    def van_tekst(
-        cls,
-        waarde: float,
-        eenheid: str,
-        ) -> "Hoeveelheid":
+    # @classmethod
+    # def van_tekst(
+    #     cls,
+    #     waarde: float,
+    #     eenheid: str,
+    #     ) -> "Hoeveelheid":
         
-        return cls(
-            waarde,
-            Eenheid(eenheid),
-            )
+    #     return cls(
+    #         waarde,
+    #         Eenheid(eenheid),
+    #         )

@@ -6,6 +6,7 @@ from grienetsiis import invoer_kiezen, invoer_validatie
 from .categorie import Categorieën
 from .macrotype import MacroType, MacroTypeDatabank
 
+
 class Ingrediënt(MacroType):
     
     frozenset = frozenset(("ingrediënt_naam", "categorie_uuid",))
@@ -27,8 +28,8 @@ class Ingrediënt(MacroType):
         
         categorieën = Categorieën.openen()
         categorie_uuid = categorieën.kiezen()
-        
-        ingrediënt_naam = invoer_validatie("naam", str, valideren = True, kleine_letters = True)
+        print(f"\ninvullen gegevens nieuw ingrediënt onder categorie \"{categorieën[categorie_uuid].categorie_naam}\"")
+        ingrediënt_naam = invoer_validatie("ingrediëntnaam", str, valideren = True, kleine_letters = True)
         
         return cls(
             ingrediënt_naam,
@@ -78,17 +79,16 @@ class Ingrediënten(MacroTypeDatabank):
         
         while True:
         
-            print("\nkies een ingrediënt op naam of categorie, of maak een nieuwe")
-            kies_optie = invoer_kiezen("optie", ["ingrediëntnaam", "categorie", "nieuw"])
+            kies_optie = invoer_kiezen("ingrediënt op naam of categorie, of maak een nieuwe", ["ingrediëntnaam", "categorie", "nieuw"])
             
             if kies_optie == "ingrediëntnaam" or kies_optie == "categorie":
                 
                 if kies_optie == "ingrediëntnaam":
                     print("\ngeef een zoekterm op")
-                    zoekterm = invoer_validatie("zoekterm", str, kleine_letters = True)
+                    zoekterm = invoer_validatie("ingrediëntnaam", str, kleine_letters = True)
                     ingrediënten_mogelijk = [ingrediënt_uuid for ingrediënt_uuid, ingrediënt in self.items() if zoekterm in ingrediënt.ingrediënt_naam]
                     if len(ingrediënten_mogelijk) == 0:
-                        print(f">>> zoekterm \"{zoekterm}\" levert geen ingrediënten op")
+                        print(f"\n>>> zoekterm \"{zoekterm}\" levert geen ingrediënten op")
                         continue
                     
                 else:
@@ -96,15 +96,16 @@ class Ingrediënten(MacroTypeDatabank):
                     categorie_uuid = categorieën.kiezen()
                     ingrediënten_mogelijk = [ingrediënt_uuid for ingrediënt_uuid, ingrediënt in self.items() if ingrediënt.categorie_uuid == categorie_uuid]
                     if len(ingrediënten_mogelijk) == 0:
-                        print(f">>> geen ingrediënten onder categorie \"{categorieën[categorie_uuid].categorie_naam}\"")
+                        print(f"\n>>> geen ingrediënten onder categorie \"{categorieën[categorie_uuid].categorie_naam}\"")
                         continue
                 
+                print(f"\n>>> {len(ingrediënten_mogelijk)} ingrediënt{"en" if len(ingrediënten_mogelijk) > 1 else ""} gevonden")
                 ingrediënt_uuid = invoer_kiezen("ingrediënt", {ingrediënt.ingrediënt_naam: ingrediënt_uuid for ingrediënt_uuid, ingrediënt in self.items() if ingrediënt_uuid in ingrediënten_mogelijk}, stoppen = True)
                 
                 if not bool(ingrediënt_uuid):
                     continue
                 
-                if kies_bevestiging: print(f">>> ingrediënt \"{self[ingrediënt_uuid].ingrediënt_naam}\" gekozen")
+                if kies_bevestiging: print(f"\n>>> ingrediënt \"{self[ingrediënt_uuid].ingrediënt_naam}\" gekozen")
                 
                 return ingrediënt_uuid if geef_uuid else self[ingrediënt_uuid]
                         

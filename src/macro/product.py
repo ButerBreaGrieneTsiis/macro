@@ -43,6 +43,7 @@ class Product(MacroType):
         
         ingrediënten = Ingrediënten.openen()
         ingrediënt_uuid = ingrediënten.kiezen()
+        print(f"\ninvullen gegevens nieuw product onder ingrediënt \"{ingrediënten[ingrediënt_uuid].ingrediënt_naam}\"")
         product_naam = invoer_validatie("productnaam", str, valideren = True, kleine_letters = True)
         merk_naam = invoer_validatie("merknaam", str, valideren = True, kleine_letters = True)
         opmerking = invoer_validatie("opmerking", str, kleine_letters = True)
@@ -159,7 +160,7 @@ class Producten(MacroTypeDatabank):
                     if not bool(ingrediënt_uuid):
                         continue
                     
-                    print(f">>> ingrediënt \"{ingrediënten[ingrediënt_uuid].ingrediënt_naam}\" gekozen")
+                    print(f"\n>>> ingrediënt \"{ingrediënten[ingrediënt_uuid].ingrediënt_naam}\" gekozen")
                     
                     producten_mogelijk = [product_uuid for product_uuid, product in self.items() if product.ingrediënt_uuid == ingrediënt_uuid]
                 
@@ -171,7 +172,7 @@ class Producten(MacroTypeDatabank):
                     producten_mogelijk = [product_uuid for product_uuid, product in self.items() if zoekterm in product.product_naam]
                 
                 if len(producten_mogelijk) == 0:
-                    print(f">>> geen producten gevonden")
+                    print(f"\n>>> geen producten gevonden")
                     continue
                 
                 product_uuid = invoer_kiezen("product", {product.product_naam: product_uuid for product_uuid, product in self.items() if product_uuid in producten_mogelijk}, stoppen = True)
@@ -179,7 +180,7 @@ class Producten(MacroTypeDatabank):
                 if not bool(product_uuid):
                     continue
                 
-                if kies_bevestiging: print(f">>> product \"{self[product_uuid].product_naam}\" gekozen")
+                if kies_bevestiging: print(f"\n>>> product \"{self[product_uuid].product_naam}\" gekozen")
                 
                 return product_uuid if geef_uuid else self[product_uuid]
                         

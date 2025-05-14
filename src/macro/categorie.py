@@ -20,7 +20,8 @@ class Hoofdcategorie(MacroType):
     @classmethod
     def nieuw(cls) -> "Hoofdcategorie":
         
-        hoofdcategorie_naam = invoer_validatie("naam", str, valideren = True, kleine_letters = True)
+        print(f"\ninvullen gegevens nieuwe hoofdcategorie")
+        hoofdcategorie_naam = invoer_validatie("hoofdcategorienaam", str, valideren = True, kleine_letters = True)
         
         return cls(
             hoofdcategorie_naam
@@ -44,7 +45,9 @@ class Categorie(MacroType):
         
         hoofdcategorieën = Hoofdcategorieën.openen()
         hoofdcategorie_uuid = hoofdcategorieën.kiezen()
-        categorie_naam = invoer_validatie("naam", str, valideren = True, kleine_letters = True)
+        
+        print(f"\ninvullen gegevens nieuwe categorie onder hoofdcategorie \"{hoofdcategorieën[hoofdcategorie_uuid].hoofdcategorie_naam}\"")
+        categorie_naam = invoer_validatie("categorienaam", str, valideren = True, kleine_letters = True)
         
         return cls(
             categorie_naam,
@@ -94,7 +97,7 @@ class Hoofdcategorieën(MacroTypeDatabank):
         ) -> str | Hoofdcategorie:
         
         hoofdcategorie_uuid = invoer_kiezen("hoofdcategorie", {hoofdcategorie.hoofdcategorie_naam: hoofdcategorie_uuid for hoofdcategorie_uuid, hoofdcategorie in self.items()})
-        if kies_bevestiging: print(f">>> hoofdcategorie \"{self[hoofdcategorie_uuid].hoofdcategorie_naam}\" gekozen")
+        if kies_bevestiging: print(f"\n>>> hoofdcategorie \"{self[hoofdcategorie_uuid].hoofdcategorie_naam}\" gekozen")
         
         return hoofdcategorie_uuid if geef_uuid else self[hoofdcategorie_uuid]
 
@@ -144,6 +147,6 @@ class Categorieën(MacroTypeDatabank):
         hoofdcategorie_uuid = hoofdcategorieën.kiezen()
         
         categorie_uuid = invoer_kiezen("categorie", {categorie.categorie_naam: categorie_uuid for categorie_uuid, categorie in self.items() if categorie.hoofdcategorie_uuid == hoofdcategorie_uuid})
-        if kies_bevestiging: print(f">>> categorie \"{self[categorie_uuid].categorie_naam}\" gekozen")
+        if kies_bevestiging: print(f"\n>>> categorie \"{self[categorie_uuid].categorie_naam}\" gekozen")
         
         return categorie_uuid if geef_uuid else self[categorie_uuid]

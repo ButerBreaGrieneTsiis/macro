@@ -1,15 +1,17 @@
 from typing import Any, Dict, List
 
-from .macrotype import Voedingswaarde
+from .hoeveelheid import Hoeveelheid
+from .macrotype import MacroType, MacroTypeDatabank
+from .voedingswaarde import Voedingswaarde
 
 
-class Gerecht:
+class Gerecht(MacroType):
     
     def __init__(
         self,
         gerecht_naam: str,
         categorie_uuid: str, # dezelfde class kan gebruikt worden als voor product
-        producten: Dict[str, float], #  uuid: aantal 100 g/ml
+        producten: Dict[str, List[Hoeveelheid]], #  uuid: aantal 100 g/ml
         porties: int,
         recept: str,
         versies: List[Dict[str, Any]], # uitvoeringen van het recept met een dictionary met een naam, [{"versie_naam": "standaard", "toegevoegd": {}, "verwijderd": [], "vervangen": {}, "hoeveelheid": {}}]
@@ -21,7 +23,10 @@ class Gerecht:
         self.porties = porties
         self.recept = recept
         self.versies = versies
-        
+    
+    def __repr__(self):
+        ...
+    
     @property
     def voedingswaarde(self) -> Voedingswaarde:
         ...
@@ -30,3 +35,6 @@ class Gerecht:
     def ingrediënten(self) -> Dict[str, str]: # mapping van product_uuid: ingredient_uuid
         
         ...
+
+class Gerechten(MacroTypeDatabank):
+    ...
