@@ -53,6 +53,17 @@ class Categorie(MacroType):
             categorie_naam,
             hoofdcategorie_uuid,
             )
+    
+    @property
+    def hoofdcategorie(self):
+        hoofdcategorieën = Hoofdcategorieën.openen()
+        return hoofdcategorieën[self.hoofdcategorie_uuid]
+    
+    # @property
+    # def ingrediënten(self):
+    #     from .ingrediënten import Ingrediënten
+    #     ingrediënten = Ingrediënten.openen()
+    #     return {ingrediënt_uuid: ingrediënt for ingrediënt_uuid, ingrediënt in ingrediënten.items() if ingrediënt.categorie_uuid == self.hoofdcategorie_uuid}
 
 class Hoofdcategorieën(MacroTypeDatabank):
     
