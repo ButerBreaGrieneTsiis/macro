@@ -18,7 +18,7 @@ class Hoofdcategorie(MacroType):
         self.hoofdcategorie_naam = hoofdcategorie_naam
     
     def __repr__(self) -> str:
-        return f"categorie \"{self.hoofdcategorie_naam}\""
+        return f"hoofdcategorie \"{self.hoofdcategorie_naam}\""
     
     @classmethod
     def nieuw(cls) -> "Hoofdcategorie":
