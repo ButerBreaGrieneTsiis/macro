@@ -17,6 +17,9 @@ class Hoofdcategorie(MacroType):
         
         self.hoofdcategorie_naam = hoofdcategorie_naam
     
+    def __repr__(self) -> str:
+        return f"categorie \"{self.hoofdcategorie_naam}\""
+    
     @classmethod
     def nieuw(cls) -> "Hoofdcategorie":
         
@@ -39,6 +42,9 @@ class Categorie(MacroType):
         
         self.categorie_naam = categorie_naam
         self.hoofdcategorie_uuid = hoofdcategorie_uuid
+    
+    def __repr__(self) -> str:
+        return f"categorie \"{self.categorie_naam}\""
     
     @classmethod
     def nieuw(cls) -> "Categorie":
