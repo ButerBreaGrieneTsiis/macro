@@ -1,4 +1,4 @@
-from typing import Dict, FrozenSet, List, Tuple
+from typing import Dict, List
 from uuid import uuid4
 
 from grienetsiis import invoer_kiezen, invoer_validatie
@@ -6,7 +6,7 @@ from grienetsiis import invoer_kiezen, invoer_validatie
 from .categorie import Categorieën
 from .hoeveelheid import Eenheid, Hoeveelheid
 from .ingredient import Ingrediënten
-from .macrotype import MacroType, MacroTypeDatabank
+from .macrotype import ClassMapper, MacroType, MacroTypeDatabank
 from .voedingswaarde import Voedingswaarde
 
 
@@ -75,9 +75,9 @@ class Product(MacroType):
 class Producten(MacroTypeDatabank):
     
     bestandsnaam: str = "producten"
-    class_mappers: List[Tuple[object, FrozenSet, str]] = [
-        (Product, Product.frozenset, "van_json"),
-        (Voedingswaarde, Voedingswaarde.frozenset, "van_json"),
+    class_mappers: List[ClassMapper] = [
+        ClassMapper(Product.van_json, Product.frozenset),
+        ClassMapper(Voedingswaarde.van_json, Voedingswaarde.frozenset),
         ]
     
     def opdracht(self):

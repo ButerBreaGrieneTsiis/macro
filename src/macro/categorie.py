@@ -1,9 +1,9 @@
-from typing import FrozenSet, List, Tuple
+from typing import List
 from uuid import uuid4
 
 from grienetsiis import invoer_kiezen, invoer_validatie
 
-from .macrotype import MacroType, MacroTypeDatabank
+from .macrotype import ClassMapper, MacroType, MacroTypeDatabank
 
 
 class Hoofdcategorie(MacroType):
@@ -68,8 +68,8 @@ class Categorie(MacroType):
 class Hoofdcategorieën(MacroTypeDatabank):
     
     bestandsnaam: str = "hoofdcategorieën"
-    class_mappers: List[Tuple[object, FrozenSet, str]] = [
-        (Hoofdcategorie, Hoofdcategorie.frozenset, "van_json"),
+    class_mappers: List[ClassMapper] = [
+        ClassMapper(Hoofdcategorie.van_json, Hoofdcategorie.frozenset),
         ]
     
     def opdracht(self):
@@ -115,8 +115,8 @@ class Hoofdcategorieën(MacroTypeDatabank):
 class Categorieën(MacroTypeDatabank):
     
     bestandsnaam: str = "categorieën"
-    class_mappers: List[Tuple[object, FrozenSet, str]] = [
-        (Categorie, Categorie.frozenset, "van_json"),
+    class_mappers: List[ClassMapper] = [
+        ClassMapper(Categorie.van_json, Categorie.frozenset),
         ]
     
     def opdracht(self):

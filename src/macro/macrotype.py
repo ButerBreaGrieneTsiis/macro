@@ -1,10 +1,14 @@
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Callable, Dict, FrozenSet, NamedTuple
 
 from grienetsiis import openen_json, opslaan_json
 
 from .hoeveelheid import Eenheid
 
+
+class ClassMapper(NamedTuple):
+    van_json: Callable
+    velden: FrozenSet
 
 class MacroType:
     
@@ -25,6 +29,7 @@ class MacroType:
         
         for veld, waarde in self.__dict__.items():
             
+            # alle velden uitsluiten die standaardwaardes hebben; nutteloos om op te slaan
             if waarde is None:
                 continue
             elif isinstance(waarde, bool) and not waarde:
@@ -39,10 +44,20 @@ class MacroType:
                 continue
             elif isinstance(waarde, Eenheid):
                 dict_naar_json[veld] = waarde.value
+            elif veld == "_uuid":
+                continue
             else:
                 dict_naar_json[veld] = waarde
         
         return dict_naar_json
+    
+    @property
+    def uuid(self):
+        return self._uuid
+    
+    @uuid.setter
+    def uuid(self, waarde):
+        self._uuid = waarde
 
 class MacroTypeDatabank(dict):
     
@@ -62,10 +77,18 @@ class MacroTypeDatabank(dict):
     def openen(cls) -> "MacroTypeDatabank":
         bestandspad = Path(f"{cls.bestandsmap}\\{cls.bestandsnaam}.{cls.extensie}")
         if bestandspad.is_file():
-            return cls(**openen_json(cls.bestandsmap, cls.bestandsnaam, cls.extensie, cls.class_mappers))
+            def toevoegen_uuid(macrotype, uuid): 
+                macrotype.uuid = uuid
+                return macrotype
+            
+            return cls(**{uuid: toevoegen_uuid(macrotype, uuid) for uuid, macrotype in openen_json(
+                cls.bestandsmap,
+                cls.bestandsnaam,
+                cls.extensie,
+                cls.class_mappers,
+                ).items()})
         else:
             return cls()
     
     def opslaan(self):
-        
         opslaan_json(self, self.bestandsmap, self.bestandsnaam, self.extensie, encoder_dict = self.encoder_dict)
