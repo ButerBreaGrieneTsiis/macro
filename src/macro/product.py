@@ -61,7 +61,13 @@ class Product(MacroType):
     
     def toevoegen_hoeveelheid(self):
         
-        ...
+        eenheid = invoer_kiezen("eenheid", {Eenheid[eenheid].enkelvoud: Eenheid[eenheid] for eenheid in Eenheid._member_names_ if eenheid not in ["GRAM", "MILLILITER"]})
+        
+        print(f"hoeveel 100 {self.eenheid.enkelvoud} is 1 {eenheid.enkelvoud}?")
+        aantal_ons = invoer_validatie(f"hoeveel 100 {self.eenheid.enkelvoud}", type = float)
+        
+        print(f">>> hoeveelheid 1 {eenheid.enkelvoud} toegevoegd van {aantal_ons:.2f} {self.eenheid.enkelvoud}")
+        self.hoeveelheden[eenheid.enkelvoud] = aantal_ons
         
         return self
     
@@ -97,7 +103,7 @@ class Producten(MacroTypeDatabank):
         
         while True:
         
-            opdracht = invoer_kiezen("opdracht product", ["nieuw product", "nieuwe hoeveelheid", "weergeven product"], stoppen = True)
+            opdracht = invoer_kiezen("opdracht product", ["nieuw product", "toevoegen hoeveelheid", "weergeven product"], stoppen = True)
             
             if not bool(opdracht):
                 break
@@ -105,9 +111,8 @@ class Producten(MacroTypeDatabank):
             elif opdracht == "nieuw product":
                 self.nieuw()
             
-            elif opdracht == "nieuwe hoeveelheid":
-                self.nieuwe_hoeveelheid()
-                
+            elif opdracht == "toevoegen hoeveelheid":
+                self.toevoegen_hoeveelheid()
             
             elif opdracht == "weergeven product":
                 product_uuid = self.kiezen(kies_bevestiging = False)
@@ -126,13 +131,18 @@ class Producten(MacroTypeDatabank):
         product_uuid = str(uuid4())
         self[product_uuid] = product
         
+        if invoer_kiezen("toevoegen nieuwe hoeveelheid", {"ja": True, "nee": False}, kies_een = False):
+            self[product_uuid].toevoegen_hoeveelheid()
+        
         self.opslaan()
         
         return product_uuid if geef_uuid else product
     
-    def nieuwe_hoeveelheid(self):
+    def toevoegen_hoeveelheid(self):
         
-        product = self.kiezen(geef_uuid = False)
+        product_uuid = self.kiezen()
+        self[product_uuid].toevoegen_hoeveelheid()
+        self.opslaan()
     
     def kiezen(
         self,
@@ -142,7 +152,7 @@ class Producten(MacroTypeDatabank):
         
         while True:
         
-            kies_optie = invoer_kiezen("product op naam of categorie, of maak een nieuwe", ["ingrediëntnaam", "productnaam", "categorie", "nieuw"])
+            kies_optie = invoer_kiezen("product op naam of categorie, of maak een nieuwe", ["productnaam", "ingrediëntnaam", "categorie", "nieuw"])
             
             if kies_optie == "ingrediëntnaam" or kies_optie == "productnaam" or kies_optie == "categorie":
                 
