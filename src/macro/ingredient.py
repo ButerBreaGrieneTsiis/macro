@@ -3,7 +3,7 @@ from uuid import uuid4
 
 from grienetsiis import invoer_kiezen, invoer_validatie
 
-from .categorie import Categorieën
+from .categorie import Categorie, Categorieën, Hoofdcategorie
 from .macrotype import ClassMapper, MacroType, MacroTypeDatabank
 
 
@@ -35,6 +35,15 @@ class Ingrediënt(MacroType):
             ingrediënt_naam,
             categorie_uuid,
             )
+    
+    @property
+    def categorie(self) -> Categorie:
+        categorieën = Categorieën.openen()
+        return categorieën[self.categorie_uuid]
+    
+    @property
+    def hoofdcategorie(self) -> Hoofdcategorie:
+        return self.categorie.hoofdcategorie
 
 class Ingrediënten(MacroTypeDatabank):
     

@@ -3,9 +3,9 @@ from uuid import uuid4
 
 from grienetsiis import invoer_kiezen, invoer_validatie
 
-from .categorie import Categorieën
+from .categorie import Categorie, Categorieën, Hoofdcategorie
 from .hoeveelheid import Eenheid, Hoeveelheid
-from .ingredient import Ingrediënten
+from .ingredient import Ingrediënt, Ingrediënten
 from .macrotype import ClassMapper, MacroType, MacroTypeDatabank
 from .voedingswaarde import Voedingswaarde
 
@@ -71,7 +71,20 @@ class Product(MacroType):
     #     ) -> Voedingswaarde:
     #     # iets anders voor 100 g/ml?
     #     return deepcopy(self.voedingswaarde) * self.hoeveelheden[hoeveelheid[1]] * hoeveelheid[0]
-
+    
+    @property
+    def ingrediënt(self) -> Ingrediënt:
+        ingrediënten = Ingrediënten.openen()
+        return ingrediënten[self.ingrediënt_uuid]
+    
+    @property
+    def categorie(self) -> Categorie:
+        return self.ingrediënt.categorie
+    
+    @property
+    def hoofdcategorie(self) -> Hoofdcategorie:
+        return self.ingrediënt.categorie.hoofdcategorie
+    
 class Producten(MacroTypeDatabank):
     
     bestandsnaam: str = "producten"
