@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Callable, Dict, FrozenSet, NamedTuple
+from typing import Any, Callable, Dict, FrozenSet, List, NamedTuple
 
 from grienetsiis import openen_json, opslaan_json
 
@@ -90,5 +90,9 @@ class MacroTypeDatabank(dict):
         else:
             return cls()
     
-    def opslaan(self):
+    def opslaan(self) -> None:
         opslaan_json(self, self.bestandsmap, self.bestandsnaam, self.extensie, encoder_dict = self.encoder_dict)
+    
+    @property
+    def lijst(self) -> List[MacroType]:
+        return list(self.values())
