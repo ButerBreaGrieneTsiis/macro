@@ -7,7 +7,7 @@ from .macrotype import MacroType
 
 class Voedingswaarde(MacroType):
     
-    frozenset = frozenset(("calorieën", "vetten", "verzadigd", "koolhydraten", "suikers", "eiwitten", "vezels", "zout", ))
+    velden = frozenset(("calorieën", "vetten", "verzadigd", "koolhydraten", "suikers", "eiwitten", "vezels", "zout", ))
     
     calorie_per_gram_vet            =   9
     calorie_per_gram_koolhydraat    =   4

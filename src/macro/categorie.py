@@ -8,7 +8,7 @@ from .macrotype import MacroType, MacroTypeDatabank
 
 class Hoofdcategorie(MacroType):
     
-    frozenset = frozenset(("hoofdcategorie_naam", ))
+    velden = frozenset(("hoofdcategorie_naam", ))
     
     def __init__(
         self,
@@ -32,7 +32,7 @@ class Hoofdcategorie(MacroType):
 
 class Categorie(MacroType):
     
-    frozenset = frozenset(("categorie_naam", "hoofdcategorie_uuid",))
+    velden = frozenset(("categorie_naam", "hoofdcategorie_uuid",))
     
     def __init__(
         self,
@@ -69,7 +69,7 @@ class Hoofdcategorieën(MacroTypeDatabank):
     
     bestandsnaam: str = "hoofdcategorieën"
     object_wijzers: List[ObjectWijzer] = [
-        ObjectWijzer(Hoofdcategorie.van_json, Hoofdcategorie.frozenset),
+        ObjectWijzer(Hoofdcategorie.van_json, Hoofdcategorie.velden),
         ]
     
     def opdracht(self):
@@ -125,7 +125,7 @@ class Categorieën(MacroTypeDatabank):
     
     bestandsnaam: str = "categorieën"
     object_wijzers: List[ObjectWijzer] = [
-        ObjectWijzer(Categorie.van_json, Categorie.frozenset),
+        ObjectWijzer(Categorie.van_json, Categorie.velden),
         ]
     
     def opdracht(self):

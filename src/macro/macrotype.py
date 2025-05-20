@@ -9,6 +9,10 @@ from .hoeveelheid import Eenheid
 
 class MacroType:
     
+    encoder_dict:   Dict[str, str] = {
+        "Dag": "naar_json",
+        }
+    
     @classmethod
     def van_json(
         cls,
@@ -53,6 +57,11 @@ class MacroType:
         
         return dict_naar_json
     
+    def opslaan(self) -> None:
+        bestandspad = self.bestandsmap / f"{self.bestandsnaam}.{self.extensie}"
+        
+        opslaan_json(self, bestandspad, encoder_dict = self.encoder_dict)
+    
     @property
     def uuid(self):
         return self._uuid
@@ -72,7 +81,6 @@ class MacroTypeDatabank(dict):
         "Ingrediënt":       "naar_json",
         "Product":          "naar_json",
         "Gerecht":          "naar_json",
-        "Dag":              "naar_json",
         }
     
     @classmethod
@@ -96,7 +104,9 @@ class MacroTypeDatabank(dict):
             return cls()
     
     def opslaan(self) -> None:
-        opslaan_json(self, self.bestandsmap, self.bestandsnaam, self.extensie, encoder_dict = self.encoder_dict)
+        bestandspad = self.bestandsmap / f"{self.bestandsnaam}.{self.extensie}"
+        
+        opslaan_json(self, bestandspad, encoder_dict = self.encoder_dict)
     
     @property
     def lijst(self) -> List[MacroType]:

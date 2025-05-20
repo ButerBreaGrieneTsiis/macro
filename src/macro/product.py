@@ -12,7 +12,7 @@ from .voedingswaarde import Voedingswaarde
 
 class Product(MacroType):
     
-    frozenset = frozenset(("product_naam", "merk_naam", "opmerking", "voedingswaarde", "eenheid", "ingrediënt_uuid", "hoeveelheden",))
+    velden = frozenset(("product_naam", "merk_naam", "opmerking", "voedingswaarde", "eenheid", "ingrediënt_uuid", "hoeveelheden",))
     
     def __init__(
         self,
@@ -95,8 +95,8 @@ class Producten(MacroTypeDatabank):
     
     bestandsnaam: str = "producten"
     object_wijzers: List[ObjectWijzer] = [
-        ObjectWijzer(Product.van_json, Product.frozenset),
-        ObjectWijzer(Voedingswaarde.van_json, Voedingswaarde.frozenset),
+        ObjectWijzer(Product.van_json, Product.velden),
+        ObjectWijzer(Voedingswaarde.van_json, Voedingswaarde.velden),
         ]
     
     def opdracht(self):
