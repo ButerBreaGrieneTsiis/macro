@@ -107,10 +107,19 @@ class Hoofdcategorieën(MacroTypeDatabank):
         geef_uuid: bool =  True,
         ) -> str | Hoofdcategorie:
         
-        hoofdcategorie_uuid = invoer_kiezen("hoofdcategorie", {hoofdcategorie.hoofdcategorie_naam: hoofdcategorie_uuid for hoofdcategorie_uuid, hoofdcategorie in self.items()})
-        if kies_bevestiging: print(f"\n>>> hoofdcategorie \"{self[hoofdcategorie_uuid].hoofdcategorie_naam}\" gekozen")
-        
-        return hoofdcategorie_uuid if geef_uuid else self[hoofdcategorie_uuid]
+        while True:
+            
+            kies_optie = invoer_kiezen("bestaande hoofdcategorie of maak een nieuwe", ["bestaande hoofdcategorie", "nieuwe hoofdcategorie"])
+            
+            if kies_optie == "bestaande hoofdcategorie":
+                
+                hoofdcategorie_uuid = invoer_kiezen("hoofdcategorie", {hoofdcategorie.hoofdcategorie_naam: hoofdcategorie_uuid for hoofdcategorie_uuid, hoofdcategorie in self.items()})
+                if kies_bevestiging: print(f"\n>>> hoofdcategorie \"{self[hoofdcategorie_uuid].hoofdcategorie_naam}\" gekozen")
+                
+                return hoofdcategorie_uuid if geef_uuid else self[hoofdcategorie_uuid]
+            
+            else:
+                return self.nieuw(geef_uuid)
 
 class Categorieën(MacroTypeDatabank):
     
@@ -154,10 +163,19 @@ class Categorieën(MacroTypeDatabank):
         geef_uuid: bool =  True,
         ) -> str | Categorie:
         
-        hoofdcategorieën = Hoofdcategorieën.openen()
-        hoofdcategorie_uuid = hoofdcategorieën.kiezen()
-        
-        categorie_uuid = invoer_kiezen("categorie", {categorie.categorie_naam: categorie_uuid for categorie_uuid, categorie in self.items() if categorie.hoofdcategorie_uuid == hoofdcategorie_uuid})
-        if kies_bevestiging: print(f"\n>>> categorie \"{self[categorie_uuid].categorie_naam}\" gekozen")
-        
-        return categorie_uuid if geef_uuid else self[categorie_uuid]
+        while True:
+            
+            kies_optie = invoer_kiezen("bestaande categorie of maak een nieuwe", ["bestaande categorie", "nieuwe categorie"])
+            
+            if kies_optie == "bestaande categorie":
+                
+                hoofdcategorieën = Hoofdcategorieën.openen()
+                hoofdcategorie_uuid = hoofdcategorieën.kiezen()
+                
+                categorie_uuid = invoer_kiezen("categorie", {categorie.categorie_naam: categorie_uuid for categorie_uuid, categorie in self.items() if categorie.hoofdcategorie_uuid == hoofdcategorie_uuid})
+                if kies_bevestiging: print(f"\n>>> categorie \"{self[categorie_uuid].categorie_naam}\" gekozen")
+                
+                return categorie_uuid if geef_uuid else self[categorie_uuid]
+            
+            else:
+                return self.nieuw(geef_uuid)
