@@ -1,12 +1,12 @@
 from typing import Dict, List
 from uuid import uuid4
 
-from grienetsiis import invoer_kiezen, invoer_validatie
+from grienetsiis import invoer_kiezen, invoer_validatie, ObjectWijzer
 
 from .categorie import Categorie, Categorieën, Hoofdcategorie
 from .hoeveelheid import Eenheid, Hoeveelheid
 from .ingredient import Ingrediënt, Ingrediënten
-from .macrotype import ClassMapper, MacroType, MacroTypeDatabank
+from .macrotype import MacroType, MacroTypeDatabank
 from .voedingswaarde import Voedingswaarde
 
 
@@ -94,15 +94,15 @@ class Product(MacroType):
 class Producten(MacroTypeDatabank):
     
     bestandsnaam: str = "producten"
-    class_mappers: List[ClassMapper] = [
-        ClassMapper(Product.van_json, Product.frozenset),
-        ClassMapper(Voedingswaarde.van_json, Voedingswaarde.frozenset),
+    object_wijzers: List[ObjectWijzer] = [
+        ObjectWijzer(Product.van_json, Product.frozenset),
+        ObjectWijzer(Voedingswaarde.van_json, Voedingswaarde.frozenset),
         ]
     
     def opdracht(self):
         
         while True:
-        
+            
             opdracht = invoer_kiezen("opdracht product", ["nieuw product", "toevoegen hoeveelheid", "weergeven product"], stoppen = True)
             
             if not bool(opdracht):
@@ -151,7 +151,7 @@ class Producten(MacroTypeDatabank):
         ) -> str:
         
         while True:
-        
+            
             kies_optie = invoer_kiezen("product op naam of categorie, of maak een nieuwe", ["productnaam", "ingrediëntnaam", "categorie", "nieuw"])
             
             if kies_optie == "ingrediëntnaam" or kies_optie == "productnaam" or kies_optie == "categorie":
@@ -159,7 +159,7 @@ class Producten(MacroTypeDatabank):
                 if kies_optie == "ingrediëntnaam" or kies_optie == "categorie":
                     
                     if kies_optie == "ingrediëntnaam":
-                    
+                        
                         print("\ngeef een zoekterm op voor een ingrediënt")
                         zoekterm = invoer_validatie("zoekterm", str, kleine_letters = True)
                         
@@ -206,6 +206,6 @@ class Producten(MacroTypeDatabank):
                 if kies_bevestiging: print(f"\n>>> product \"{self[product_uuid].product_naam}\" gekozen")
                 
                 return product_uuid if geef_uuid else self[product_uuid]
-                        
+            
             else:
                 return self.nieuw(geef_uuid)

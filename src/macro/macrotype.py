@@ -1,14 +1,11 @@
+import datetime as dt
 from pathlib import Path
-from typing import Any, Callable, Dict, FrozenSet, List, NamedTuple
+from typing import Any, Dict, List
 
-from grienetsiis import openen_json, opslaan_json
+from grienetsiis import openen_json, opslaan_json, ObjectWijzer
 
 from .hoeveelheid import Eenheid
 
-
-class ClassMapper(NamedTuple):
-    van_json: Callable
-    velden: FrozenSet
 
 class MacroType:
     
@@ -20,6 +17,9 @@ class MacroType:
         
         if "eenheid" in dict.keys():
             dict["eenheid"] = Eenheid(dict["eenheid"])
+        
+        if "datum" in dict.keys():
+            dict["datum"] = dt.datetime.strptime(dict["datum"], "%Y-%m-%d").date()
         
         return cls(**dict)
     
@@ -44,6 +44,8 @@ class MacroType:
                 continue
             elif isinstance(waarde, Eenheid):
                 dict_naar_json[veld] = waarde.value
+            elif isinstance(waarde, dt.date):
+                dict_naar_json[veld] = waarde.strftime("%Y-%m-%d")
             elif veld == "_uuid":
                 continue
             else:
@@ -61,8 +63,8 @@ class MacroType:
 
 class MacroTypeDatabank(dict):
     
-    bestandsmap:    str = "gegevens"
-    extensie:       str = "macro"
+    bestandsmap:    Path = Path("gegevens")
+    extensie:       str = "json"
     encoder_dict:   Dict[str, str] = {
         "Voedingswaarde":   "naar_json",
         "Hoofdcategorie":   "naar_json",
@@ -76,11 +78,10 @@ class MacroTypeDatabank(dict):
     @classmethod
     def openen(cls) -> "MacroTypeDatabank":
         
-        bestandsmap = Path(f"{cls.bestandsmap}")
-        if not bestandsmap.is_dir():
-            bestandsmap.mkdir()
+        if not cls.bestandsmap.is_dir():
+            cls.bestandsmap.mkdir()
         
-        bestandspad = bestandsmap / f"{cls.bestandsnaam}.{cls.extensie}"
+        bestandspad = cls.bestandsmap / f"{cls.bestandsnaam}.{cls.extensie}"
         
         if bestandspad.is_file():
             def toevoegen_uuid(macrotype, uuid): 
@@ -88,10 +89,8 @@ class MacroTypeDatabank(dict):
                 return macrotype
             
             return cls(**{uuid: toevoegen_uuid(macrotype, uuid) for uuid, macrotype in openen_json(
-                cls.bestandsmap,
-                cls.bestandsnaam,
-                cls.extensie,
-                cls.class_mappers,
+                bestandspad,
+                object_wijzers = cls.object_wijzers,
                 ).items()})
         else:
             return cls()

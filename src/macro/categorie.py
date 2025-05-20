@@ -1,9 +1,9 @@
 from typing import List
 from uuid import uuid4
 
-from grienetsiis import invoer_kiezen, invoer_validatie
+from grienetsiis import invoer_kiezen, invoer_validatie, ObjectWijzer
 
-from .macrotype import ClassMapper, MacroType, MacroTypeDatabank
+from .macrotype import MacroType, MacroTypeDatabank
 
 
 class Hoofdcategorie(MacroType):
@@ -68,8 +68,8 @@ class Categorie(MacroType):
 class Hoofdcategorieën(MacroTypeDatabank):
     
     bestandsnaam: str = "hoofdcategorieën"
-    class_mappers: List[ClassMapper] = [
-        ClassMapper(Hoofdcategorie.van_json, Hoofdcategorie.frozenset),
+    object_wijzers: List[ObjectWijzer] = [
+        ObjectWijzer(Hoofdcategorie.van_json, Hoofdcategorie.frozenset),
         ]
     
     def opdracht(self):
@@ -124,8 +124,8 @@ class Hoofdcategorieën(MacroTypeDatabank):
 class Categorieën(MacroTypeDatabank):
     
     bestandsnaam: str = "categorieën"
-    class_mappers: List[ClassMapper] = [
-        ClassMapper(Categorie.van_json, Categorie.frozenset),
+    object_wijzers: List[ObjectWijzer] = [
+        ObjectWijzer(Categorie.van_json, Categorie.frozenset),
         ]
     
     def opdracht(self):

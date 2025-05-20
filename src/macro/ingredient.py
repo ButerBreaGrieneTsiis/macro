@@ -1,10 +1,10 @@
 from typing import List
 from uuid import uuid4
 
-from grienetsiis import invoer_kiezen, invoer_validatie
+from grienetsiis import invoer_kiezen, invoer_validatie, ObjectWijzer
 
 from .categorie import Categorie, Categorieën, Hoofdcategorie
-from .macrotype import ClassMapper, MacroType, MacroTypeDatabank
+from .macrotype import MacroType, MacroTypeDatabank
 
 
 class Ingrediënt(MacroType):
@@ -48,8 +48,8 @@ class Ingrediënt(MacroType):
 class Ingrediënten(MacroTypeDatabank):
     
     bestandsnaam: str = "ingrediënten"
-    class_mappers: List[ClassMapper] = [
-        ClassMapper(Ingrediënt.van_json, Ingrediënt.frozenset),
+    object_wijzers: List[ObjectWijzer] = [
+        ObjectWijzer(Ingrediënt.van_json, Ingrediënt.frozenset),
         ]
     
     def opdracht(self):
@@ -87,7 +87,7 @@ class Ingrediënten(MacroTypeDatabank):
         ) -> str:
         
         while True:
-        
+            
             kies_optie = invoer_kiezen("ingrediënt op naam of categorie, of maak een nieuwe", ["ingrediëntnaam", "categorie", "nieuw"])
             
             if kies_optie == "ingrediëntnaam" or kies_optie == "categorie":
@@ -99,7 +99,7 @@ class Ingrediënten(MacroTypeDatabank):
                     if len(ingrediënten_mogelijk) == 0:
                         print(f"\n>>> zoekterm \"{zoekterm}\" levert geen ingrediënten op")
                         continue
-                    
+                
                 else:
                     categorieën = Categorieën.openen()
                     categorie_uuid = categorieën.kiezen()
@@ -117,6 +117,6 @@ class Ingrediënten(MacroTypeDatabank):
                 if kies_bevestiging: print(f"\n>>> ingrediënt \"{self[ingrediënt_uuid].ingrediënt_naam}\" gekozen")
                 
                 return ingrediënt_uuid if geef_uuid else self[ingrediënt_uuid]
-                        
+            
             else:
                 return self.nieuw(geef_uuid)
