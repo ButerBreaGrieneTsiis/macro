@@ -62,7 +62,7 @@ class MacroType:
 class MacroTypeDatabank(dict):
     
     bestandsmap:    str = "gegevens"
-    extensie:       str = "json"
+    extensie:       str = "macro"
     encoder_dict:   Dict[str, str] = {
         "Voedingswaarde":   "naar_json",
         "Hoofdcategorie":   "naar_json",
@@ -75,7 +75,13 @@ class MacroTypeDatabank(dict):
     
     @classmethod
     def openen(cls) -> "MacroTypeDatabank":
-        bestandspad = Path(f"{cls.bestandsmap}\\{cls.bestandsnaam}.{cls.extensie}")
+        
+        bestandsmap = Path(f"{cls.bestandsmap}")
+        if not bestandsmap.is_dir():
+            bestandsmap.mkdir()
+        
+        bestandspad = bestandsmap / f"{cls.bestandsnaam}.{cls.extensie}"
+        
         if bestandspad.is_file():
             def toevoegen_uuid(macrotype, uuid): 
                 macrotype.uuid = uuid
