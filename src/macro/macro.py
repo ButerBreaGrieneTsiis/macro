@@ -1,4 +1,4 @@
-from grienetsiis import invoer_kiezen
+from grienetsiis import invoer_kiezen, STOP
 
 from .categorie import Categorieën, Hoofdcategorieën
 from .dag import Dag
@@ -11,7 +11,8 @@ def uitvoeren():
     while True:
         
         opdracht = invoer_kiezen("opdracht hoofdmenu", ["invullen dag", "gegevens bewerken"], stoppen = True)
-        if not bool(opdracht):
+        
+        if opdracht is STOP:
             break
         
         elif opdracht == "invullen dag":
@@ -20,7 +21,10 @@ def uitvoeren():
                 
                 opdracht_dag = invoer_kiezen("invullen dag", ["vandaag"], stoppen = True)
                 
-                if opdracht_dag == "vandaag":
+                if opdracht_dag is STOP:
+                    break
+                
+                elif opdracht_dag == "vandaag":
                     
                     dag = Dag.openen("vandaag")
                     dag.opdracht()
@@ -31,7 +35,8 @@ def uitvoeren():
             while True:
                 
                 opdracht_gegevens = invoer_kiezen("opdracht gegevens", ["hoofdcategorieën", "categorieën", "ingrediënten", "producten"], stoppen = True)
-                if not bool(opdracht_gegevens):
+                
+                if opdracht_gegevens is STOP:
                     break
                 
                 elif opdracht_gegevens == "hoofdcategorieën":
@@ -57,3 +62,5 @@ def uitvoeren():
                     producten = Producten.openen()
                     producten.opdracht()
                     producten.opslaan()
+    
+    print("tot ziens")
