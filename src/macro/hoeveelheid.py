@@ -15,6 +15,7 @@ class Eenheid(Enum):
     VERPAKKING  =   "verpakking",   "verpakkingen"
     GRAM        =   "g",            "g"
     MILLILITER  =   "ml",           "ml"
+    KILOCALORIE =   "kcal",         "kcal"
     
     # https://stackoverflow.com/questions/75384124/how-to-initialize-named-tuple-in-python-enum
     def __new__(cls, enkelvoud, meervoud):
