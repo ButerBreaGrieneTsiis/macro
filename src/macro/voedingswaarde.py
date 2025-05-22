@@ -51,9 +51,15 @@ class Voedingswaarde(MacroType):
     
     def __mul__(
         self,
-        factor,
+        factor: float | int,
         ) -> "Voedingswaarde":
         
+        ...
+    
+    def __iadd__(
+        self,
+        ander: "Voedingswaarde",
+        ) -> "Voedingswaarde":
         ...
     
     @classmethod

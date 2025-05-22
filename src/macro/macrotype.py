@@ -22,6 +22,15 @@ class MacroType:
         if "eenheid" in dict.keys():
             dict["eenheid"] = Eenheid(dict["eenheid"])
         
+        # for eenheid in Eenheid._member_names_:
+        #     print(Eenheid[eenheid].enkelvoud, dict.keys())
+        #     if Eenheid[eenheid].enkelvoud in dict.keys():
+        #         dict[Eenheid[eenheid]] = dict.pop(Eenheid[eenheid].enkelvoud)
+        
+        if "eenheden" in dict.keys():
+            for eenheid in list(dict["eenheden"].keys()):
+                dict["eenheden"][Eenheid(eenheid)] =  dict["eenheden"].pop(eenheid)
+                
         if "datum" in dict.keys():
             dict["datum"] = dt.datetime.strptime(dict["datum"], "%Y-%m-%d").date()
         

@@ -44,7 +44,7 @@ class Hoeveelheid:
             return f"{self.waarde:{formaat}} {self.eenheid.enkelvoud}"
         else:
             return f"{self.waarde:{formaat}} {self.eenheid.meervoud}"
-    
+    VERDERGAAN MET HOEVEELHEID.NAAR_JSON/VAN_JSON
     # @classmethod
     # def van_tekst(
     #     cls,

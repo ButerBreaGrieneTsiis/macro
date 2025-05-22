@@ -84,7 +84,7 @@ class Ingrediënten(MacroTypeDatabank):
         self,
         kies_bevestiging: bool = True,
         geef_uuid: bool =  True,
-        ) -> str:
+        ) -> str | Ingrediënt:
         
         while True:
             

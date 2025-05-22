@@ -1,0 +1,54 @@
+is het nodig om voedinsgswaarde apart te maken voor 
+een los product t.o.v. een totale voedingswaarde voor een dag/recept?
+
+TOEVOEGINGEN
+    
+    Macro/Algemeen
+        [v] verduidelijken menu-opties
+        [v] toevoegen >>> waar missend
+    
+    MacroType
+        [ ] verwijderen uuid attribute?
+    
+    Categorie
+        [ ] onderzoeken uitbreiden voor gerechten
+        [v] @property hoofdcategorie() die Hoofdcategorie teruggeeft
+        [x] @property ingrediënten() die lijst van Ingrediënt teruggeeft
+        [x] @property producten() die lijst van Producten teruggeeft
+    
+    Dag
+        [ ] toevoegen producten + hoeveelheid
+        [ ] toevoegen gerechten
+        [ ] berekenen voedingswaarde
+        [ ] weergeven dag: producten, gerechten, voedingswaarde
+        [ ] kopiëren van andere dagen d.m.v. indices producten/gerechten
+    
+    Gerecht
+        [ ] onderzoeken gebruikmaken van Categorie/Hoofdcategorie
+        [ ] toevoegen producten en diens hoeveelheden
+        [ ] toevoegen recept
+        [ ] toevoegen bewerkingen, en deze een naam geven
+    
+    Ingrediënt
+        [x] @property producten() die lijst van producten genereert
+        [v] @property categorie() die Categorie teruggeeft
+        [v] @property hoofdcategorie() die Hoofdcategorie teruggeeft -> subclassen aan property Ingrediënt.categorie()
+    
+    Product
+        [v] toevoegen hoeveelheid, automatisch opgeroepen bij aanmaken
+        [v] @property ingrediënt()
+        [v] @property categorie()
+        [v] @property hoofdcategorie()
+        [ ] berekenen voedingswaarde aan de hand van hoeveelheid
+        [ ] merk_naam vervangen door merk_uuid
+        [ ] @property Product.merk()
+    
+    Merk
+        [ ] Merk MacroType
+            [ ] Merk.nieuw()
+        [ ] Merken MacroTypeDatabank
+            [ ] Merken.kiezen()
+            [ ] Merken.nieuw()
+        
+    Voedingswaarde
+        [ ] veranderen van attributes naar hoeveelheden ? kcal toevoegen als Eenheid?

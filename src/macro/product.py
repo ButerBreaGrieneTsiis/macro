@@ -1,7 +1,7 @@
-from typing import Dict, List
+from typing import Dict, List, Tuple
 from uuid import uuid4
 
-from grienetsiis import invoer_kiezen, invoer_validatie, ObjectWijzer
+from grienetsiis import invoer_kiezen, invoer_validatie, ObjectWijzer, STOP, Stop
 
 from .categorie import Categorie, Categorieën, Hoofdcategorie
 from .hoeveelheid import Eenheid, Hoeveelheid
@@ -12,17 +12,17 @@ from .voedingswaarde import Voedingswaarde
 
 class Product(MacroType):
     
-    velden = frozenset(("product_naam", "merk_naam", "opmerking", "voedingswaarde", "eenheid", "ingrediënt_uuid", "hoeveelheden",))
+    velden = frozenset(("product_naam", "merk_naam", "voedingswaarde", "eenheid", "ingrediënt_uuid", "opmerking", "eenheden",))
     
     def __init__(
         self,
-        product_naam: str,
-        merk_naam: str,
-        voedingswaarde: Voedingswaarde,
-        eenheid: Eenheid,
-        ingrediënt_uuid: str,
-        opmerking: str = None,
-        hoeveelheden: Dict[Eenheid, float] = None,
+        product_naam:       str,
+        merk_naam:          str,
+        voedingswaarde:     Voedingswaarde,
+        eenheid:            Eenheid,
+        ingrediënt_uuid:    str,
+        opmerking:          str                     = None,
+        eenheden:           Dict[Eenheid, float]    = None,
         ) -> "Product":
         
         self.product_naam       = product_naam
@@ -31,7 +31,7 @@ class Product(MacroType):
         self.voedingswaarde     = voedingswaarde
         self.eenheid            = eenheid
         self.ingrediënt_uuid    = ingrediënt_uuid
-        self.hoeveelheden       = dict() if hoeveelheden is None else hoeveelheden
+        self.eenheden           = dict() if eenheden is None else eenheden
     
     def __repr__(self) -> str:
         return f"product \"{self.product_naam} ({self.merk_naam})\"" \
@@ -41,14 +41,14 @@ class Product(MacroType):
     @classmethod
     def nieuw(cls) -> "Product":
         
-        ingrediënten = Ingrediënten.openen()
+        ingrediënten    = Ingrediënten.openen()
         ingrediënt_uuid = ingrediënten.kiezen()
         print(f"\ninvullen gegevens nieuw product onder ingrediënt \"{ingrediënten[ingrediënt_uuid].ingrediënt_naam}\"")
-        product_naam = invoer_validatie("productnaam", str, valideren = True, kleine_letters = True)
-        merk_naam = invoer_validatie("merknaam", str, valideren = True, kleine_letters = True)
-        opmerking = invoer_validatie("opmerking", str, kleine_letters = True)
-        eenheid = Eenheid(invoer_kiezen("eenheid", ["g", "ml"]))
-        voedingswaarde = Voedingswaarde.nieuw(eenheid)
+        product_naam    = invoer_validatie("productnaam", str, valideren = True, kleine_letters = True)
+        merk_naam       = invoer_validatie("merknaam", str, valideren = True, kleine_letters = True)
+        opmerking       = invoer_validatie("opmerking", str, kleine_letters = True)
+        eenheid         = Eenheid(invoer_kiezen("eenheid", ["g", "ml"]))
+        voedingswaarde  = Voedingswaarde.nieuw(eenheid)
         
         return cls(
             product_naam,
@@ -59,24 +59,17 @@ class Product(MacroType):
             opmerking,
             )
     
-    def toevoegen_hoeveelheid(self):
+    def nieuwe_eenheid(self) -> Eenheid:
         
-        eenheid = invoer_kiezen("eenheid", {Eenheid[eenheid].enkelvoud: Eenheid[eenheid] for eenheid in Eenheid._member_names_ if eenheid not in ["GRAM", "MILLILITER"]})
+        eenheid = invoer_kiezen("eenheid", {Eenheid[eenheid].enkelvoud: Eenheid[eenheid] for eenheid in Eenheid._member_names_ if eenheid not in ["GRAM", "MILLILITER", "KILOCALORIE"]})
         
         print(f"hoeveel 100 {self.eenheid.enkelvoud} is 1 {eenheid.enkelvoud}?")
         aantal_ons = invoer_validatie(f"hoeveel 100 {self.eenheid.enkelvoud}", type = float)
         
-        print(f">>> hoeveelheid 1 {eenheid.enkelvoud} toegevoegd van {aantal_ons:.2f} {self.eenheid.enkelvoud}")
+        print(f">>> eenheid {eenheid.meervoud} toegevoegd van {aantal_ons:.2f} {self.eenheid.enkelvoud}")
         self.hoeveelheden[eenheid.enkelvoud] = aantal_ons
         
-        return self
-    
-    # def bereken_voedingswaarde(
-    #     self,
-    #     hoeveelheid: Tuple[float, str],
-    #     ) -> Voedingswaarde:
-    #     # iets anders voor 100 g/ml?
-    #     return deepcopy(self.voedingswaarde) * self.hoeveelheden[hoeveelheid[1]] * hoeveelheid[0]
+        return eenheid
     
     @property
     def ingrediënt(self) -> Ingrediënt:
@@ -93,8 +86,8 @@ class Product(MacroType):
     
 class Producten(MacroTypeDatabank):
     
-    bestandsnaam: str = "producten"
-    object_wijzers: List[ObjectWijzer] = [
+    bestandsnaam:   str                 = "producten"
+    object_wijzers: List[ObjectWijzer]  = [
         ObjectWijzer(Product.van_json, Product.velden),
         ObjectWijzer(Voedingswaarde.van_json, Voedingswaarde.velden),
         ]
@@ -103,7 +96,7 @@ class Producten(MacroTypeDatabank):
         
         while True:
             
-            opdracht = invoer_kiezen("opdracht product", ["nieuw product", "toevoegen hoeveelheid", "weergeven product"], stoppen = True)
+            opdracht = invoer_kiezen("opdracht product", ["nieuw product", "nieuwe eenheid", "weergeven product"], stoppen = True)
             
             if not bool(opdracht):
                 break
@@ -111,8 +104,8 @@ class Producten(MacroTypeDatabank):
             elif opdracht == "nieuw product":
                 self.nieuw()
             
-            elif opdracht == "toevoegen hoeveelheid":
-                self.toevoegen_hoeveelheid()
+            elif opdracht == "nieuwe eenheid":
+                self.nieuwe_eenheid()
             
             elif opdracht == "weergeven product":
                 product_uuid = self.kiezen(kies_bevestiging = False)
@@ -128,31 +121,41 @@ class Producten(MacroTypeDatabank):
         
         product = Product.nieuw()
         
-        product_uuid = str(uuid4())
-        self[product_uuid] = product
+        if invoer_kiezen("toevoegen nieuwe eenheid", {"ja": True, "nee": False}, kies_een = False):
+            product.nieuwe_eenheid()
         
-        if invoer_kiezen("toevoegen nieuwe hoeveelheid", {"ja": True, "nee": False}, kies_een = False):
-            self[product_uuid].toevoegen_hoeveelheid()
+        product_uuid = str(uuid4())
+        self[product_uuid] = product\
         
         self.opslaan()
         
         return product_uuid if geef_uuid else product
     
-    def toevoegen_hoeveelheid(self):
-        
-        product_uuid = self.kiezen()
-        self[product_uuid].toevoegen_hoeveelheid()
-        self.opslaan()
-    
-    def kiezen(
+    def nieuwe_eenheid(
         self,
-        kies_bevestiging: bool = True,
-        geef_uuid: bool =  True,
-        ) -> str:
+        product_uuid: str = None,
+        ):
+        
+        product_uuid = self.kiezen_product() if product_uuid is None else product_uuid
+        eenheid = self[product_uuid].nieuwe_eenheid()
+        
+        self.opslaan()
+        
+        return eenheid
+    
+    def kiezen_product(
+        self,
+        kies_bevestiging:   bool    = True,
+        geef_uuid:          bool    = True,
+        stoppen:            bool    = False,
+        ) -> Product | str | Stop:
         
         while True:
             
-            kies_optie = invoer_kiezen("product op naam of categorie, of maak een nieuwe", ["productnaam", "ingrediëntnaam", "categorie", "nieuw"])
+            kies_optie = invoer_kiezen("product op naam of categorie, of maak een nieuwe", ["productnaam", "ingrediëntnaam", "categorie", "nieuw"], stoppen = stoppen)
+            
+            if kies_optie is STOP:
+                return STOP
             
             if kies_optie == "ingrediëntnaam" or kies_optie == "productnaam" or kies_optie == "categorie":
                 
@@ -209,3 +212,49 @@ class Producten(MacroTypeDatabank):
             
             else:
                 return self.nieuw(geef_uuid)
+    
+    def kiezen_eenheid(
+        self,
+        product_uuid:       str,
+        kies_bevestiging:   bool    = True,
+        stoppen:            bool    = False,
+        ) -> Eenheid | Stop:
+        
+        optie_dict = {"nieuwe eenheid": "nieuwe eenheid", f"eenheid \"{self[product_uuid].eenheid.enkelvoud}\"": "eigen eenheid"} | {f"eenheid \"{eenheid.enkelvoud}\"": eenheid for eenheid in self[product_uuid].eenheden.keys()}
+        
+        kies_optie = invoer_kiezen("bestaande eenheid of maakt een nieuwe", optie_dict, stoppen = stoppen)
+        
+        if kies_optie is STOP:
+            return STOP
+        
+        elif kies_optie == "nieuwe eenheid":
+            eenheid =  self.nieuwe_eenheid(product_uuid)
+                        
+        elif kies_optie == "eigen eenheid":
+            eenheid = self[product_uuid].eenheid
+        
+        else:
+            eenheid = kies_optie
+        
+        if kies_bevestiging: print(f"\n>>> eenheid \"{eenheid.meervoud}\" gekozen")
+        
+        return eenheid
+        
+    def kiezen_product_eenheid(
+        self,
+        kies_bevestiging:   bool    = True,
+        geef_uuid:          bool    = True,
+        stoppen:            bool    = False,
+        ) -> Tuple[Product | Stop, Eenheid | Stop]:
+        
+        product_uuid = self.kiezen_product(kies_bevestiging, stoppen)
+        
+        if product_uuid is STOP:
+            return STOP, ...
+        
+        eenheid = self.kiezen_eenheid(product_uuid, kies_bevestiging, stoppen)
+        
+        if eenheid is STOP:
+            return product_uuid if geef_uuid else self[product_uuid], STOP
+        
+        return product_uuid if geef_uuid else self[product_uuid], eenheid
