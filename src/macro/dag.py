@@ -5,8 +5,7 @@ from typing import Dict, List
 
 from grienetsiis import invoer_kiezen, invoer_validatie, openen_json, ObjectWijzer, STOP
 
-from .hoeveelheid import Hoeveelheid
-from .macrotype import MacroType
+from .macrotype import MacroType, Hoeveelheid
 from .product import Producten
 from .voedingswaarde import Voedingswaarde
 
@@ -63,7 +62,10 @@ class Dag(MacroType):
         if bestandspad.is_file():
             return openen_json(
                 bestandspad,
-                object_wijzers = [ObjectWijzer(cls.van_json, frozenset(("datum", "producten", "gerechten")))],
+                object_wijzers = [
+                    ObjectWijzer(cls.van_json, frozenset(("datum", "producten", "gerechten"))),
+                    ObjectWijzer(Hoeveelheid.van_json, Hoeveelheid.velden),
+                    ],
                 )
         
         else:

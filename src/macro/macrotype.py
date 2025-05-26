@@ -8,8 +8,9 @@ from grienetsiis import openen_json, opslaan_json, ObjectWijzer
 
 class MacroType:
     
-    encoder_dict:   Dict[str, str] = {
+    encoder_dict: Dict[str, str] = {
         "Dag": "naar_json",
+        "Hoeveelheid": "naar_json",
         }
     
     @classmethod
@@ -21,15 +22,10 @@ class MacroType:
         if "eenheid" in dict.keys():
             dict["eenheid"] = Eenheid(dict["eenheid"])
         
-        # for eenheid in Eenheid._member_names_:
-        #     print(Eenheid[eenheid].enkelvoud, dict.keys())
-        #     if Eenheid[eenheid].enkelvoud in dict.keys():
-        #         dict[Eenheid[eenheid]] = dict.pop(Eenheid[eenheid].enkelvoud)
-        
         if "eenheden" in dict.keys():
             for eenheid in list(dict["eenheden"].keys()):
                 dict["eenheden"][Eenheid(eenheid)] =  dict["eenheden"].pop(eenheid)
-                
+        
         if "datum" in dict.keys():
             dict["datum"] = dt.datetime.strptime(dict["datum"], "%Y-%m-%d").date()
         
@@ -66,7 +62,7 @@ class MacroType:
                 continue
             else:
                 dict_naar_json[veld] = waarde
-        
+        print(dict_naar_json)
         return dict_naar_json
     
     def opslaan(self) -> None:
@@ -150,6 +146,8 @@ class Eenheid(Enum):
 
 class Hoeveelheid(MacroType):
     
+    velden = frozenset(("waarde", "eenheid", ))
+    
     def __init__(
         self,
         waarde: float,
@@ -167,18 +165,3 @@ class Hoeveelheid(MacroType):
             return f"{self.waarde:{formaat}} {self.eenheid.enkelvoud}"
         else:
             return f"{self.waarde:{formaat}} {self.eenheid.meervoud}"
-    # VERDERGAAN MET HOEVEELHEID.NAAR_JSON/VAN_JSON
-    
-    # hoeveelheid naar_json -> "eenheid": waarde als sleutel-waarde paar
-    
-    # @classmethod
-    # def van_tekst(
-    #     cls,
-    #     waarde: float,
-    #     eenheid: str,
-    #     ) -> "Hoeveelheid":
-        
-    #     return cls(
-    #         waarde,
-    #         Eenheid(eenheid),
-    #         )
