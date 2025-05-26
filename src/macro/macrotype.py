@@ -50,19 +50,20 @@ class MacroType:
                 continue
             elif isinstance(waarde, int) and waarde == 0:
                 continue
+            elif veld == "_uuid":
+                continue
+            
+            # overige velden deserialiseren
             elif isinstance(waarde, Eenheid):
                 dict_naar_json[veld] = waarde.value
             elif isinstance(waarde, Hoeveelheid):
-                print(waarde)
                 dict_naar_json[waarde.eenheid.value] = waarde.waarde
-                print(dict_naar_json)
             elif isinstance(waarde, dt.date):
                 dict_naar_json[veld] = waarde.strftime("%Y-%m-%d")
-            elif veld == "_uuid":
-                continue
+            
             else:
                 dict_naar_json[veld] = waarde
-        print(dict_naar_json)
+        
         return dict_naar_json
     
     def opslaan(self) -> None:
