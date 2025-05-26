@@ -4,9 +4,8 @@ from uuid import uuid4
 from grienetsiis import invoer_kiezen, invoer_validatie, ObjectWijzer, STOP, Stop
 
 from .categorie import Categorie, Categorieën, Hoofdcategorie
-from .hoeveelheid import Eenheid, Hoeveelheid
 from .ingredient import Ingrediënt, Ingrediënten
-from .macrotype import MacroType, MacroTypeDatabank
+from .macrotype import MacroType, MacroTypeDatabank, Eenheid, Hoeveelheid
 from .voedingswaarde import Voedingswaarde
 
 
@@ -67,7 +66,7 @@ class Product(MacroType):
         aantal_ons = invoer_validatie(f"hoeveel 100 {self.eenheid.enkelvoud}", type = float)
         
         print(f">>> eenheid {eenheid.meervoud} toegevoegd van {aantal_ons:.2f} {self.eenheid.enkelvoud}")
-        self.hoeveelheden[eenheid.enkelvoud] = aantal_ons
+        self.eenheden[eenheid.enkelvoud] = aantal_ons
         
         return eenheid
     

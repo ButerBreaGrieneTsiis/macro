@@ -1,10 +1,9 @@
 import datetime as dt
+from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List
 
 from grienetsiis import openen_json, opslaan_json, ObjectWijzer
-
-from .hoeveelheid import Eenheid
 
 
 class MacroType:
@@ -57,6 +56,10 @@ class MacroType:
                 continue
             elif isinstance(waarde, Eenheid):
                 dict_naar_json[veld] = waarde.value
+            elif isinstance(waarde, Hoeveelheid):
+                print(waarde)
+                dict_naar_json[waarde.eenheid.value] = waarde.waarde
+                print(dict_naar_json)
             elif isinstance(waarde, dt.date):
                 dict_naar_json[veld] = waarde.strftime("%Y-%m-%d")
             elif veld == "_uuid":
@@ -120,3 +123,62 @@ class MacroTypeDatabank(dict):
     @property
     def lijst(self) -> List[MacroType]:
         return list(self.values())
+
+class Eenheid(Enum):
+    
+    STUK        =   "stuk",         "stuks"
+    FLES        =   "fles",         "flessen"
+    BLIK        =   "blik",         "blikken"
+    POT         =   "pot",          "potten"
+    PORTIE      =   "portie",       "porties"
+    ZAK         =   "zak",          "zakken"
+    THEELEPEL   =   "eetlepel",     "eetlepels"
+    EETLEPEL    =   "theelepel",    "theelepels"
+    PLAK        =   "plak",         "plakken"
+    VERPAKKING  =   "verpakking",   "verpakkingen"
+    GRAM        =   "g",            "g"
+    MILLILITER  =   "ml",           "ml"
+    KILOCALORIE =   "kcal",         "kcal"
+    
+    # https://stackoverflow.com/questions/75384124/how-to-initialize-named-tuple-in-python-enum
+    def __new__(cls, enkelvoud, meervoud):
+        veld = object.__new__(cls)
+        veld._value_    = enkelvoud
+        veld.enkelvoud  = enkelvoud
+        veld.meervoud   = meervoud
+        return veld
+
+class Hoeveelheid(MacroType):
+    
+    def __init__(
+        self,
+        waarde: float,
+        eenheid: Eenheid,
+        ) -> "Hoeveelheid":
+        
+        self.waarde = waarde
+        self.eenheid = eenheid
+    
+    def __repr__(self) -> str:
+        
+        formaat = ".0f" if self.waarde.is_integer() else ".2f"
+        
+        if self.waarde == 1.0:
+            return f"{self.waarde:{formaat}} {self.eenheid.enkelvoud}"
+        else:
+            return f"{self.waarde:{formaat}} {self.eenheid.meervoud}"
+    # VERDERGAAN MET HOEVEELHEID.NAAR_JSON/VAN_JSON
+    
+    # hoeveelheid naar_json -> "eenheid": waarde als sleutel-waarde paar
+    
+    # @classmethod
+    # def van_tekst(
+    #     cls,
+    #     waarde: float,
+    #     eenheid: str,
+    #     ) -> "Hoeveelheid":
+        
+    #     return cls(
+    #         waarde,
+    #         Eenheid(eenheid),
+    #         )

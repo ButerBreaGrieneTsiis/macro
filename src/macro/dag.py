@@ -15,8 +15,8 @@ locale.setlocale(locale.LC_ALL, "nl_NL.UTF-8")
 
 class Dag(MacroType):
     
-    bestandsmap:    Path                = Path("gegevens\\dagen")
-    extensie:       str                 = "dag"
+    bestandsmap:    Path    = Path("gegevens\\dagen")
+    extensie:       str     = "dag"
     
     def __init__(
         self,

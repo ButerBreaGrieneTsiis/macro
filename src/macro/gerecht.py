@@ -1,7 +1,6 @@
 from typing import Any, Dict, List
 
-from .hoeveelheid import Hoeveelheid
-from .macrotype import MacroType, MacroTypeDatabank
+from .macrotype import MacroType, MacroTypeDatabank, Hoeveelheid
 from .voedingswaarde import Voedingswaarde
 
 
