@@ -70,7 +70,7 @@ class MacroType:
         return dict_naar_json
     
     def opslaan(self) -> None:
-        bestandspad = self.BESTANDSMAP / f"{self.BESTANDSNAAM}.{self.EXTENSIE}"
+        bestandspad = self.BESTANDSMAP / f"{self.bestandsnaam}.{self.EXTENSIE}"
         
         opslaan_json(self, bestandspad, encoder_dict = self.ENCODER_DICT)
     
