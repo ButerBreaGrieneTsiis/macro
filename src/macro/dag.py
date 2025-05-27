@@ -146,7 +146,7 @@ class Dag(MacroType):
         
         for product_uuid, hoeveelheden in self.producten.items():
             for hoeveelheid in hoeveelheden:
-                product_voedingswaarde = producten[product_uuid].voedingswaarde * hoeveelheid.waarde * (1.0 if hoeveelheid.eenheid in Hoeveelheid.BASIS_EENHEDEN else producten[product_uuid].eenheden[hoeveelheid.eenheid])
+                product_voedingswaarde = producten[product_uuid].bereken_voedingswaarde(hoeveelheid)
                 dag_voedingswaarde += product_voedingswaarde
         
         return dag_voedingswaarde

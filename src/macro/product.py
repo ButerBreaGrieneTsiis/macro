@@ -83,6 +83,13 @@ class Product(MacroType):
     def hoofdcategorie(self) -> Hoofdcategorie:
         return self.ingrediënt.categorie.hoofdcategorie
     
+    def bereken_voedingswaarde(
+        self,
+        hoeveelheid: Eenheid,
+        ) -> Voedingswaarde:
+        
+        return self.voedingswaarde * hoeveelheid.waarde * (1.0 if hoeveelheid.eenheid in Hoeveelheid.BASIS_EENHEDEN else self.eenheden[hoeveelheid.eenheid])
+    
 class Producten(MacroTypeDatabank):
     
     BESTANDSNAAM:   str                 = "producten"
