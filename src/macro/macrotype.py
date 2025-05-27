@@ -166,3 +166,9 @@ class Hoeveelheid(MacroType):
             return f"{self.waarde:{formaat}} {self.eenheid.enkelvoud}"
         else:
             return f"{self.waarde:{formaat}} {self.eenheid.meervoud}"
+    
+    def __add__(self, ander) -> "Hoeveelheid":
+        return Hoeveelheid(self.waarde + ander.waarde, self.eenheid)
+    
+    def __eq__(self, ander) -> bool:
+        return self.eenheid == ander.eenheid

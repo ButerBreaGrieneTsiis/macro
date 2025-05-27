@@ -98,12 +98,15 @@ class Dag(MacroType):
                     
                     hoeveelheid = Hoeveelheid(aantal, eenheid)
                     
-                    # nog een check schrijven of de eenheid reeds bestaat -> dan hoeveelheden sommeren -> Hoeveelheid.__add__() maken?
                     if product.uuid in self.producten.keys():
-                        self.producten[product.uuid].append(hoeveelheid)
+                        for ihoeveelheid_aanwezig, hoeveelheid_aanwezig in enumerate(self.producten[product.uuid]):
+                            if hoeveelheid == hoeveelheid_aanwezig:
+                                self.producten[product.uuid][ihoeveelheid_aanwezig] = hoeveelheid + hoeveelheid_aanwezig
+                                break
+                        else:
+                            self.producten[product.uuid].append(hoeveelheid)
                     else:
                         self.producten[product.uuid] = [hoeveelheid]
-                    print(self.producten)
                     break
             
             elif opdracht == "toevoegen gerechten":
