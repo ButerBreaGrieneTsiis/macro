@@ -332,7 +332,7 @@ class Producten(MacroTypeDatabank):
         stoppen:            bool    = False,
         ) -> Eenheid | Stop:
         
-        optie_dict = {"nieuwe eenheid": "nieuwe eenheid", f"eenheid \"{self[product_uuid].eenheid.enkelvoud}\"": "eigen eenheid"} | {f"eenheid \"{eenheid.enkelvoud}\"": eenheid for eenheid in self[product_uuid].eenheden.keys()}
+        optie_dict = {"nieuwe eenheid": "nieuwe eenheid", f"eenheid \"{self[product_uuid].basis_eenheid.enkelvoud}\"": "eigen eenheid"} | {f"eenheid \"{eenheid.enkelvoud}\"": eenheid for eenheid in self[product_uuid].eenheden.keys()}
         
         kies_optie = invoer_kiezen("bestaande eenheid of maakt een nieuwe", optie_dict, stoppen = stoppen)
         

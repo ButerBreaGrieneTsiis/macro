@@ -21,6 +21,9 @@ class MacroType:
         
         if "eenheid" in dict.keys():
             dict["eenheid"] = Eenheid(dict["eenheid"])
+            
+        if "basis_eenheid" in dict.keys():
+            dict["basis_eenheid"] = Eenheid(dict["basis_eenheid"])
         
         if "eenheden" in dict.keys():
             for eenheid in list(dict["eenheden"].keys()):
