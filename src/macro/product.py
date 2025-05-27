@@ -133,8 +133,8 @@ class Product(MacroType):
         self.eenheden           = dict() if eenheden is None else eenheden
     
     def __repr__(self) -> str:
-        return f"product \"{self.product_naam} ({self.merk.merk_naam})\"" \
-        + f"\nvoedingswaarde per 100 {self.eenheid.enkelvoud}:" \
+        return f"product \"{self.product_naam} ({self.merk})\"" \
+        + f"\nvoedingswaarde per 100 {self.basis_eenheid.enkelvoud}:" \
         + f"\n{self.voedingswaarde}"
     
     @classmethod
@@ -161,12 +161,12 @@ class Product(MacroType):
     
     def nieuwe_eenheid(self) -> Eenheid:
         
-        eenheid = invoer_kiezen("eenheid", {Eenheid[eenheid].enkelvoud: Eenheid[eenheid] for eenheid in Eenheid if eenheid not in Eenheid.BASIS_EENHEDEN})
+        eenheid = invoer_kiezen("eenheid", {eenheid.enkelvoud: eenheid for eenheid in Eenheid if eenheid not in Hoeveelheid.BASIS_EENHEDEN and eenheid not in Hoeveelheid.ENERGIE_EENHEDEN})
         
-        print(f"hoeveel 100 {self.eenheid.enkelvoud} is 1 {eenheid.enkelvoud}?")
-        aantal_ons = invoer_validatie(f"hoeveel 100 {self.eenheid.enkelvoud}", type = float)
+        print(f"hoeveel 100 {self.basis_eenheid.enkelvoud} is 1 {eenheid.enkelvoud}?")
+        aantal_ons = invoer_validatie(f"hoeveel 100 {self.basis_eenheid.enkelvoud}", type = float)
         
-        print(f">>> eenheid {eenheid.meervoud} toegevoegd van {aantal_ons:.2f} {self.eenheid.enkelvoud}")
+        print(f">>> eenheid {eenheid.meervoud} toegevoegd van {aantal_ons:.2f} {self.basis_eenheid.enkelvoud}")
         self.eenheden[eenheid.enkelvoud] = aantal_ons
         
         return eenheid
@@ -220,9 +220,9 @@ class Producten(MacroTypeDatabank):
                 self.nieuwe_eenheid()
             
             elif opdracht == "weergeven product":
-                product_uuid = self.kiezen(kies_bevestiging = False)
+                product = self.kiezen_product(kies_bevestiging = False, geef_uuid = False)
                 print()
-                print(self[product_uuid])
+                print(product)
         
         return self
     
