@@ -8,7 +8,7 @@ from grienetsiis import openen_json, opslaan_json, ObjectWijzer
 
 class MacroType:
     
-    encoder_dict: Dict[str, str] = {
+    ENCODER_DICT: Dict[str, str] = {
         "Dag": "naar_json",
         "Hoeveelheid": "naar_json",
         }
@@ -67,9 +67,9 @@ class MacroType:
         return dict_naar_json
     
     def opslaan(self) -> None:
-        bestandspad = self.bestandsmap / f"{self.bestandsnaam}.{self.extensie}"
+        bestandspad = self.BESTANDSMAP / f"{self.BESTANDSNAAM}.{self.EXTENSIE}"
         
-        opslaan_json(self, bestandspad, encoder_dict = self.encoder_dict)
+        opslaan_json(self, bestandspad, encoder_dict = self.ENCODER_DICT)
     
     @property
     def uuid(self):
@@ -81,9 +81,9 @@ class MacroType:
 
 class MacroTypeDatabank(dict):
     
-    bestandsmap:    Path = Path("gegevens")
-    extensie:       str = "json"
-    encoder_dict:   Dict[str, str] = {
+    BESTANDSMAP:    Path = Path("gegevens")
+    EXTENSIE:       str = "json"
+    ENCODER_DICT:   Dict[str, str] = {
         "Voedingswaarde":   "naar_json",
         "Hoofdcategorie":   "naar_json",
         "Categorie":        "naar_json",
@@ -95,10 +95,10 @@ class MacroTypeDatabank(dict):
     @classmethod
     def openen(cls) -> "MacroTypeDatabank":
         
-        if not cls.bestandsmap.is_dir():
-            cls.bestandsmap.mkdir()
+        if not cls.BESTANDSMAP.is_dir():
+            cls.BESTANDSMAP.mkdir()
         
-        bestandspad = cls.bestandsmap / f"{cls.bestandsnaam}.{cls.extensie}"
+        bestandspad = cls.BESTANDSMAP / f"{cls.BESTANDSNAAM}.{cls.EXTENSIE}"
         
         if bestandspad.is_file():
             def toevoegen_uuid(macrotype, uuid): 
@@ -107,15 +107,15 @@ class MacroTypeDatabank(dict):
             
             return cls(**{uuid: toevoegen_uuid(macrotype, uuid) for uuid, macrotype in openen_json(
                 bestandspad,
-                object_wijzers = cls.object_wijzers,
+                object_wijzers = cls.OBJECT_WIJZERS,
                 ).items()})
         else:
             return cls()
     
     def opslaan(self) -> None:
-        bestandspad = self.bestandsmap / f"{self.bestandsnaam}.{self.extensie}"
+        bestandspad = self.BESTANDSMAP / f"{self.BESTANDSNAAM}.{self.EXTENSIE}"
         
-        opslaan_json(self, bestandspad, encoder_dict = self.encoder_dict)
+        opslaan_json(self, bestandspad, encoder_dict = self.ENCODER_DICT)
     
     @property
     def lijst(self) -> List[MacroType]:
@@ -147,7 +147,8 @@ class Eenheid(Enum):
 
 class Hoeveelheid(MacroType):
     
-    velden = frozenset(("waarde", "eenheid", ))
+    VELDEN = frozenset(("waarde", "eenheid", ))
+    BASISEENHEDEN = [Eenheid["GRAM"], Eenheid["MILLILITER"], Eenheid["KILOCALORIE"]]
     
     def __init__(
         self,

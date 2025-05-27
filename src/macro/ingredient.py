@@ -9,7 +9,7 @@ from .macrotype import MacroType, MacroTypeDatabank
 
 class Ingrediënt(MacroType):
     
-    velden = frozenset(("ingrediënt_naam", "categorie_uuid",))
+    VELDEN = frozenset(("ingrediënt_naam", "categorie_uuid",))
     
     def __init__(
         self,
@@ -47,9 +47,9 @@ class Ingrediënt(MacroType):
 
 class Ingrediënten(MacroTypeDatabank):
     
-    bestandsnaam: str = "ingrediënten"
-    object_wijzers: List[ObjectWijzer] = [
-        ObjectWijzer(Ingrediënt.van_json, Ingrediënt.velden),
+    BESTANDSNAAM: str = "ingrediënten"
+    OBJECT_WIJZERS: List[ObjectWijzer] = [
+        ObjectWijzer(Ingrediënt.van_json, Ingrediënt.VELDEN),
         ]
     
     def opdracht(self):

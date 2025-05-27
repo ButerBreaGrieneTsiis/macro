@@ -11,14 +11,14 @@ from .voedingswaarde import Voedingswaarde
 
 class Product(MacroType):
     
-    velden = frozenset(("product_naam", "merk_naam", "voedingswaarde", "eenheid", "ingrediënt_uuid", "opmerking", "eenheden",))
+    VELDEN = frozenset(("product_naam", "merk_naam", "voedingswaarde", "basis_eenheid", "ingrediënt_uuid", "opmerking", "eenheden",))
     
     def __init__(
         self,
         product_naam:       str,
         merk_naam:          str,
         voedingswaarde:     Voedingswaarde,
-        eenheid:            Eenheid,
+        basis_eenheid:      Eenheid,
         ingrediënt_uuid:    str,
         opmerking:          str                     = None,
         eenheden:           Dict[Eenheid, float]    = None,
@@ -28,7 +28,7 @@ class Product(MacroType):
         self.merk_naam          = merk_naam
         self.opmerking          = opmerking
         self.voedingswaarde     = voedingswaarde
-        self.eenheid            = eenheid
+        self.basis_eenheid      = basis_eenheid
         self.ingrediënt_uuid    = ingrediënt_uuid
         self.eenheden           = dict() if eenheden is None else eenheden
     
@@ -46,21 +46,21 @@ class Product(MacroType):
         product_naam    = invoer_validatie("productnaam", str, valideren = True, kleine_letters = True)
         merk_naam       = invoer_validatie("merknaam", str, valideren = True, kleine_letters = True)
         opmerking       = invoer_validatie("opmerking", str, kleine_letters = True)
-        eenheid         = Eenheid(invoer_kiezen("eenheid", ["g", "ml"]))
-        voedingswaarde  = Voedingswaarde.nieuw(eenheid)
+        basis_eenheid   = Eenheid(invoer_kiezen("eenheid", ["g", "ml"]))
+        voedingswaarde  = Voedingswaarde.nieuw(basis_eenheid)
         
         return cls(
             product_naam,
             merk_naam,
             voedingswaarde,
-            eenheid,
+            basis_eenheid,
             ingrediënt_uuid,
             opmerking,
             )
     
     def nieuwe_eenheid(self) -> Eenheid:
         
-        eenheid = invoer_kiezen("eenheid", {Eenheid[eenheid].enkelvoud: Eenheid[eenheid] for eenheid in Eenheid._member_names_ if eenheid not in ["GRAM", "MILLILITER", "KILOCALORIE"]})
+        eenheid = invoer_kiezen("eenheid", {Eenheid[eenheid].enkelvoud: Eenheid[eenheid] for eenheid in Eenheid if eenheid not in Eenheid.BASISEENHEDEN})
         
         print(f"hoeveel 100 {self.eenheid.enkelvoud} is 1 {eenheid.enkelvoud}?")
         aantal_ons = invoer_validatie(f"hoeveel 100 {self.eenheid.enkelvoud}", type = float)
@@ -85,10 +85,10 @@ class Product(MacroType):
     
 class Producten(MacroTypeDatabank):
     
-    bestandsnaam:   str                 = "producten"
-    object_wijzers: List[ObjectWijzer]  = [
-        ObjectWijzer(Product.van_json, Product.velden),
-        ObjectWijzer(Voedingswaarde.van_json, Voedingswaarde.velden),
+    BESTANDSNAAM:   str                 = "producten"
+    OBJECT_WIJZERS: List[ObjectWijzer]  = [
+        ObjectWijzer(Product.van_json, Product.VELDEN),
+        ObjectWijzer(Voedingswaarde.van_json, Voedingswaarde.VELDEN),
         ]
     
     def opdracht(self):

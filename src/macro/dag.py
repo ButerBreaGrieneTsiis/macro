@@ -14,8 +14,8 @@ locale.setlocale(locale.LC_ALL, "nl_NL.UTF-8")
 
 class Dag(MacroType):
     
-    bestandsmap:    Path    = Path("gegevens\\dagen")
-    extensie:       str     = "dag"
+    BESTANDSMAP:    Path    = Path("gegevens\\dagen")
+    EXTENSIE:       str     = "dag"
     
     def __init__(
         self,
@@ -29,7 +29,7 @@ class Dag(MacroType):
         self.gerechten = dict() if gerechten is None else gerechten
     
     def __repr__(self) -> str:
-        return f"dag {self.dag} van {self.voedingswaarde.calorieën}"
+        return f"dag \"{self.dag}\" van {self.voedingswaarde.calorieën}"
     
     @classmethod
     def openen(
@@ -49,7 +49,7 @@ class Dag(MacroType):
             elif datum == "eergisteren":
                 datum = dt.date.today() - dt.timedelta(days = 2)
         
-        bestandspad = cls.bestandsmap
+        bestandspad = cls.BESTANDSMAP
         if not bestandspad.is_dir():
             bestandspad.mkdir()
         
@@ -57,14 +57,14 @@ class Dag(MacroType):
         if not bestandspad.is_dir():
             bestandspad.mkdir()
         
-        bestandspad /= f"{datum.strftime("%Y-%m-%d")}.{cls.extensie}"
+        bestandspad /= f"{datum.strftime("%Y-%m-%d")}.{cls.EXTENSIE}"
         
         if bestandspad.is_file():
             return openen_json(
                 bestandspad,
                 object_wijzers = [
                     ObjectWijzer(cls.van_json, frozenset(("datum", "producten", "gerechten"))),
-                    ObjectWijzer(Hoeveelheid.van_json, Hoeveelheid.velden),
+                    ObjectWijzer(Hoeveelheid.van_json, Hoeveelheid.VELDEN),
                     ],
                 )
         
@@ -113,6 +113,9 @@ class Dag(MacroType):
                 ...
             
             elif opdracht == "toon voedingswaarde":
+                print(self.voedingswaarde)
+            
+            elif opdracht == "toon producten":
                 ...
             
             else:
@@ -126,13 +129,15 @@ class Dag(MacroType):
     def dag(self) -> str:
         return f"{self.datum.strftime("%A %d %B %Y")}"
     
-    # @property
-    # def voedingswaarde(self) -> Voedingswaarde:
+    @property
+    def voedingswaarde(self) -> Voedingswaarde:
         
-    #     dag_voedingswaarde = Voedingswaarde()
-    #     producten = Producten.openen()
+        dag_voedingswaarde = Voedingswaarde()
+        producten = Producten.openen()
         
-    #     for product_uuid, hoeveelheden in self.producten.items():
-    #         for hoeveelheid in hoeveelheden:
-    #             product_voedingswaarde = producten[product_uuid].voedingswaarde * hoeveelheid.aantal * producten[product_uuid].eenheden[hoeveelheid.eenheid]
-    #             dag_voedingswaarde += product_voedingswaarde
+        for product_uuid, hoeveelheden in self.producten.items():
+            for hoeveelheid in hoeveelheden:
+                product_voedingswaarde = producten[product_uuid].voedingswaarde * hoeveelheid.waarde * (1.0 if hoeveelheid.eenheid in Hoeveelheid.BASISEENHEDEN else producten[product_uuid].eenheden[hoeveelheid.eenheid])
+                dag_voedingswaarde += product_voedingswaarde
+        
+        return dag_voedingswaarde
