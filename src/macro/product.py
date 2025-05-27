@@ -343,7 +343,7 @@ class Producten(MacroTypeDatabank):
             eenheid =  self.nieuwe_eenheid(product_uuid)
                         
         elif kies_optie == "eigen eenheid":
-            eenheid = self[product_uuid].eenheid
+            eenheid = self[product_uuid].basis_eenheid
         
         else:
             eenheid = kies_optie
