@@ -136,6 +136,7 @@ class Eenheid(Enum):
     GRAM        =   "g",            "g"
     MILLILITER  =   "ml",           "ml"
     KILOCALORIE =   "kcal",         "kcal"
+    KILOJOULE   =   "kJ",           "kJ"
     
     # https://stackoverflow.com/questions/75384124/how-to-initialize-named-tuple-in-python-enum
     def __new__(cls, enkelvoud, meervoud):
@@ -147,8 +148,9 @@ class Eenheid(Enum):
 
 class Hoeveelheid(MacroType):
     
-    VELDEN = frozenset(("waarde", "eenheid", ))
-    BASISEENHEDEN = [Eenheid["GRAM"], Eenheid["MILLILITER"], Eenheid["KILOCALORIE"]]
+    VELDEN              = frozenset(("waarde", "eenheid", ))
+    BASIS_EENHEDEN      = [Eenheid["GRAM"], Eenheid["MILLILITER"]]
+    ENERGIE_EENHEDEN    = [Eenheid["KILOCALORIE"], Eenheid["KILOJOULE"]]
     
     def __init__(
         self,
@@ -161,12 +163,14 @@ class Hoeveelheid(MacroType):
     
     def __repr__(self) -> str:
         
-        formaat = ".0f" if self.waarde.is_integer() else ".2f"
+        vermenigvuldiger = 100.0 if self.eenheid in self.BASIS_EENHEDEN else 1.0
+        
+        formaat = ".0f" if self.waarde.is_integer() or self.eenheid in self.BASIS_EENHEDEN else ".2f"
         
         if self.waarde == 1.0:
-            return f"{self.waarde:{formaat}} {self.eenheid.enkelvoud}"
+            return f"{self.waarde*vermenigvuldiger:{formaat}} {self.eenheid.enkelvoud}"
         else:
-            return f"{self.waarde:{formaat}} {self.eenheid.meervoud}"
+            return f"{self.waarde*vermenigvuldiger:{formaat}} {self.eenheid.meervoud}"
     
     def __add__(self, ander) -> "Hoeveelheid":
         return Hoeveelheid(self.waarde + ander.waarde, self.eenheid)

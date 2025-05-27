@@ -60,7 +60,7 @@ class Product(MacroType):
     
     def nieuwe_eenheid(self) -> Eenheid:
         
-        eenheid = invoer_kiezen("eenheid", {Eenheid[eenheid].enkelvoud: Eenheid[eenheid] for eenheid in Eenheid if eenheid not in Eenheid.BASISEENHEDEN})
+        eenheid = invoer_kiezen("eenheid", {Eenheid[eenheid].enkelvoud: Eenheid[eenheid] for eenheid in Eenheid if eenheid not in Eenheid.BASIS_EENHEDEN})
         
         print(f"hoeveel 100 {self.eenheid.enkelvoud} is 1 {eenheid.enkelvoud}?")
         aantal_ons = invoer_validatie(f"hoeveel 100 {self.eenheid.enkelvoud}", type = float)

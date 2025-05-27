@@ -116,7 +116,16 @@ class Dag(MacroType):
                 print(self.voedingswaarde)
             
             elif opdracht == "toon producten":
-                ...
+                
+                producten = Producten.openen()
+                
+                print(f"{"HOEVEELHEID":<17} PRODUCT")
+                
+                for product_uuid, hoeveelheden in self.producten.items():
+                    
+                    for hoeveelheid in hoeveelheden:
+                    
+                        print(f"{f"{hoeveelheid}":<17} {producten[product_uuid].product_naam}")
             
             else:
                 ...
@@ -137,7 +146,7 @@ class Dag(MacroType):
         
         for product_uuid, hoeveelheden in self.producten.items():
             for hoeveelheid in hoeveelheden:
-                product_voedingswaarde = producten[product_uuid].voedingswaarde * hoeveelheid.waarde * (1.0 if hoeveelheid.eenheid in Hoeveelheid.BASISEENHEDEN else producten[product_uuid].eenheden[hoeveelheid.eenheid])
+                product_voedingswaarde = producten[product_uuid].voedingswaarde * hoeveelheid.waarde * (1.0 if hoeveelheid.eenheid in Hoeveelheid.BASIS_EENHEDEN else producten[product_uuid].eenheden[hoeveelheid.eenheid])
                 dag_voedingswaarde += product_voedingswaarde
         
         return dag_voedingswaarde
