@@ -38,34 +38,41 @@ class MacroType:
         
         dict_naar_json = {}
         
-        for veld, waarde in self.__dict__.items():
+        for veld_sleutel, veld_waarde in self.__dict__.items():
             
             # alle velden uitsluiten die standaardwaardes hebben; nutteloos om op te slaan
-            if waarde is None:
+            if veld_waarde is None:
                 continue
-            elif isinstance(waarde, bool) and not waarde:
+            elif isinstance(veld_waarde, bool) and not veld_waarde:
                 continue
-            elif isinstance(waarde, list) and len(waarde) == 0:
+            elif isinstance(veld_waarde, list) and len(veld_waarde) == 0:
                 continue
-            elif isinstance(waarde, dict) and not bool(waarde):
+            elif isinstance(veld_waarde, dict) and not bool(veld_waarde):
                 continue
-            elif isinstance(waarde, str) and waarde == "":
+            elif isinstance(veld_waarde, str) and veld_waarde == "":
                 continue
-            elif isinstance(waarde, int) and waarde == 0:
+            elif isinstance(veld_waarde, int) and veld_waarde == 0:
                 continue
-            elif veld == "_uuid":
+            elif veld_sleutel == "_uuid":
                 continue
             
             # overige velden deserialiseren
-            elif isinstance(waarde, Eenheid):
-                dict_naar_json[veld] = waarde.value
-            elif isinstance(waarde, Hoeveelheid):
-                dict_naar_json[waarde.eenheid.value] = waarde.waarde
-            elif isinstance(waarde, dt.date):
-                dict_naar_json[veld] = waarde.strftime("%Y-%m-%d")
+            elif isinstance(veld_waarde, dict) and all(isinstance(veld_subsleutel, Eenheid) for veld_subsleutel in veld_waarde.keys()):
+                dict_naar_json[veld_sleutel] = {}
+                for veld_subsleutel, veld_subwaarde in veld_waarde.items():
+                    dict_naar_json[veld_sleutel][veld_subsleutel.value] = veld_subwaarde
+            elif isinstance(veld_sleutel, Eenheid):
+                dict_naar_json[veld_sleutel.value] = veld_waarde
+            elif isinstance(veld_waarde, Eenheid):
+                dict_naar_json[veld_sleutel] = veld_waarde.value
+            elif isinstance(veld_waarde, Hoeveelheid):
+                dict_naar_json[veld_waarde.eenheid.value] = veld_waarde.waarde
+            elif isinstance(veld_waarde, dt.date):
+                dict_naar_json[veld_sleutel] = veld_waarde.strftime("%Y-%m-%d")
             
+            # alle overige velden toevoegen
             else:
-                dict_naar_json[veld] = waarde
+                dict_naar_json[veld_sleutel] = veld_waarde
         
         return dict_naar_json
     
