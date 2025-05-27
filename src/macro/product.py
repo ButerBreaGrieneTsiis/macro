@@ -133,8 +133,7 @@ class Product(MacroType):
         self.eenheden           = dict() if eenheden is None else eenheden
     
     def __repr__(self) -> str:
-        merken = Merken.openen()
-        return f"product \"{self.product_naam} ({merken[self.merk_uuid]})\"" \
+        return f"product \"{self.product_naam} ({self.merk.merk_naam})\"" \
         + f"\nvoedingswaarde per 100 {self.eenheid.enkelvoud}:" \
         + f"\n{self.voedingswaarde}"
     
@@ -184,6 +183,11 @@ class Product(MacroType):
     @property
     def hoofdcategorie(self) -> Hoofdcategorie:
         return self.ingrediënt.categorie.hoofdcategorie
+    
+    @property
+    def merk(self) -> Merk:
+        merken = Merken.openen()
+        return merken[self.merk_uuid]
     
     def bereken_voedingswaarde(
         self,
