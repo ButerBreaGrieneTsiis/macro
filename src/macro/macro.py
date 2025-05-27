@@ -3,7 +3,7 @@ from grienetsiis import invoer_kiezen, STOP
 from .categorie import Categorieën, Hoofdcategorieën
 from .dag import Dag
 from .ingredient import Ingrediënten
-from .product import Producten
+from .product import Merken, Producten
 
 
 def uitvoeren():
@@ -34,7 +34,7 @@ def uitvoeren():
             
             while True:
                 
-                opdracht_gegevens = invoer_kiezen("opdracht gegevens", ["hoofdcategorieën", "categorieën", "ingrediënten", "producten"], stoppen = True)
+                opdracht_gegevens = invoer_kiezen("opdracht gegevens", ["hoofdcategorieën", "categorieën", "ingrediënten", "producten", "merken"], stoppen = True)
                 
                 if opdracht_gegevens is STOP:
                     break
@@ -62,5 +62,11 @@ def uitvoeren():
                     producten = Producten.openen()
                     producten.opdracht()
                     producten.opslaan()
+                
+                elif opdracht_gegevens == "merken":
+                    
+                    merken = Merken.openen()
+                    merken.opdracht()
+                    merken.opslaan()
     
     print("tot ziens")

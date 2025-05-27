@@ -1,7 +1,7 @@
 from typing import List
 from uuid import uuid4
 
-from grienetsiis import invoer_kiezen, invoer_validatie, ObjectWijzer
+from grienetsiis import invoer_kiezen, invoer_validatie, ObjectWijzer, STOP
 
 from .macrotype import MacroType, MacroTypeDatabank
 
@@ -78,7 +78,7 @@ class Hoofdcategorieën(MacroTypeDatabank):
             
             opdracht = invoer_kiezen("opdracht hoofdcategorie", ["nieuwe hoofdcategorie"], stoppen = True)
             
-            if not bool(opdracht):
+            if opdracht is STOP:
                 break
             
             elif opdracht == "nieuwe hoofdcategorie":
@@ -134,7 +134,7 @@ class Categorieën(MacroTypeDatabank):
         
             opdracht = invoer_kiezen("opdracht categorie", ["nieuwe categorie"], stoppen = True)
             
-            if not bool(opdracht):
+            if opdracht is STOP:
                 break
             
             elif opdracht == "nieuwe categorie":
