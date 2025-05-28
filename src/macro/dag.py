@@ -29,7 +29,10 @@ class Dag(MacroType):
         self.gerechten = dict() if gerechten is None else gerechten
     
     def __repr__(self) -> str:
-        return f"dag \"{self.dag}\" van {self.voedingswaarde.calorieën}"
+        if len(self.producten) == 0:
+            return f"dag \"{self.dag}\""
+        else:
+            return f"dag \"{self.dag}\" van {self.voedingswaarde.calorieën}"
     
     @classmethod
     def openen(
@@ -75,7 +78,7 @@ class Dag(MacroType):
         
         while True:
             
-            opdracht = invoer_kiezen(f"opdracht {self.dag}", ["toevoegen producten", "toevoegen gerechten","toon voedingswaarde", "toon producten"], stoppen = True)
+            opdracht = invoer_kiezen(f"opdracht voor {self.dag}", ["toevoegen producten", "toevoegen gerechten","toon voedingswaarde", "toon producten"], stoppen = True)
             
             if opdracht is STOP:
                 break
@@ -113,9 +116,18 @@ class Dag(MacroType):
                 ...
             
             elif opdracht == "toon voedingswaarde":
+                
+                if len(self.producten) == 0:
+                    print(f">>> er zijn geen producten voor {self}")
+                    continue
+                
                 print(self.voedingswaarde)
             
             elif opdracht == "toon producten":
+                
+                if len(self.producten) == 0:
+                    print(f">>> er zijn geen producten voor {self}")
+                    continue
                 
                 producten = Producten.openen()
                 
