@@ -88,35 +88,44 @@ class Ingrediënten(MacroTypeDatabank):
         
         while True:
             
-            kies_optie = invoer_kiezen("ingrediënt op naam of categorie, of maak een nieuwe", ["zoek op ingrediëntnaam", "zoek op categorie", "nieuw ingrediënt"])
-            
-            if kies_optie == "zoek op ingrediëntnaam" or kies_optie == "zoek op categorie":
+            if len(self) == 0:
                 
-                if kies_optie == "zoek op ingrediëntnaam":
-                    print("\ngeef een zoekterm op")
-                    zoekterm = invoer_validatie("ingrediëntnaam", str, kleine_letters = True)
-                    ingrediënten_mogelijk = [ingrediënt_uuid for ingrediënt_uuid, ingrediënt in self.items() if zoekterm in ingrediënt.ingrediënt_naam]
-                    if len(ingrediënten_mogelijk) == 0:
-                        print(f"\n>>> zoekterm \"{zoekterm}\" levert geen ingrediënten op")
-                        continue
+                kies_optie = invoer_kiezen("geen ingrediënten aanwezig, maak een nieuw ingrediënt", ["nieuw ingrediënt"], kies_een = False)
                 
-                else:
-                    categorieën = Categorieën.openen()
-                    categorie_uuid = categorieën.kiezen()
-                    ingrediënten_mogelijk = [ingrediënt_uuid for ingrediënt_uuid, ingrediënt in self.items() if ingrediënt.categorie_uuid == categorie_uuid]
-                    if len(ingrediënten_mogelijk) == 0:
-                        print(f"\n>>> geen ingrediënten onder categorie \"{categorieën[categorie_uuid].categorie_naam}\"")
-                        continue
-                
-                print(f"\n>>> {len(ingrediënten_mogelijk)} ingrediënt{"en" if len(ingrediënten_mogelijk) > 1 else ""} gevonden")
-                ingrediënt_uuid = invoer_kiezen("ingrediënt", {ingrediënt.ingrediënt_naam: ingrediënt_uuid for ingrediënt_uuid, ingrediënt in self.items() if ingrediënt_uuid in ingrediënten_mogelijk}, stoppen = True)
-                
-                if ingrediënt_uuid is STOP:
-                    continue
-                
-                if kies_bevestiging: print(f"\n>>> ingrediënt \"{self[ingrediënt_uuid].ingrediënt_naam}\" gekozen")
-                
-                return ingrediënt_uuid if geef_uuid else self[ingrediënt_uuid]
+                if kies_optie == "nieuw ingrediënt":
+                    return self.nieuw(geef_uuid)
             
             else:
-                return self.nieuw(geef_uuid)
+            
+                kies_optie = invoer_kiezen("ingrediënt op naam of categorie, of maak een nieuwe", ["zoek op ingrediëntnaam", "zoek op categorie", "nieuw ingrediënt"])
+                
+                if kies_optie == "zoek op ingrediëntnaam" or kies_optie == "zoek op categorie":
+                    
+                    if kies_optie == "zoek op ingrediëntnaam":
+                        print("\ngeef een zoekterm op")
+                        zoekterm = invoer_validatie("ingrediëntnaam", str, kleine_letters = True)
+                        ingrediënten_mogelijk = [ingrediënt_uuid for ingrediënt_uuid, ingrediënt in self.items() if zoekterm in ingrediënt.ingrediënt_naam]
+                        if len(ingrediënten_mogelijk) == 0:
+                            print(f"\n>>> zoekterm \"{zoekterm}\" levert geen ingrediënten op")
+                            continue
+                    
+                    else:
+                        categorieën = Categorieën.openen()
+                        categorie_uuid = categorieën.kiezen()
+                        ingrediënten_mogelijk = [ingrediënt_uuid for ingrediënt_uuid, ingrediënt in self.items() if ingrediënt.categorie_uuid == categorie_uuid]
+                        if len(ingrediënten_mogelijk) == 0:
+                            print(f"\n>>> geen ingrediënten onder categorie \"{categorieën[categorie_uuid].categorie_naam}\"")
+                            continue
+                    
+                    print(f"\n>>> {len(ingrediënten_mogelijk)} ingrediënt{"en" if len(ingrediënten_mogelijk) > 1 else ""} gevonden")
+                    ingrediënt_uuid = invoer_kiezen("ingrediënt", {ingrediënt.ingrediënt_naam: ingrediënt_uuid for ingrediënt_uuid, ingrediënt in self.items() if ingrediënt_uuid in ingrediënten_mogelijk}, stoppen = True)
+                    
+                    if ingrediënt_uuid is STOP:
+                        continue
+                    
+                    if kies_bevestiging: print(f"\n>>> ingrediënt \"{self[ingrediënt_uuid].ingrediënt_naam}\" gekozen")
+                    
+                    return ingrediënt_uuid if geef_uuid else self[ingrediënt_uuid]
+                
+                else:
+                    return self.nieuw(geef_uuid)

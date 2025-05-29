@@ -110,10 +110,12 @@ class MacroTypeDatabank(dict):
         
         bestandspad = cls.BESTANDSMAP / f"{cls.BESTANDSNAAM}.{cls.EXTENSIE}"
         
-        if bestandspad.is_file():
+        if bestandspad.is_file() and openen_json(bestandspad) != {}:
             def toevoegen_uuid(macrotype, uuid): 
                 macrotype.uuid = uuid
                 return macrotype
+            
+            
             
             return cls(**{uuid: toevoegen_uuid(macrotype, uuid) for uuid, macrotype in openen_json(
                 bestandspad,

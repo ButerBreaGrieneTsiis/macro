@@ -109,17 +109,26 @@ class Hoofdcategorieën(MacroTypeDatabank):
         
         while True:
             
-            kies_optie = invoer_kiezen("bestaande hoofdcategorie of maak een nieuwe", ["zoek op hoofdcategorie", "nieuwe hoofdcategorie"])
+            if len(self) == 0:
             
-            if kies_optie == "zoek op hoofdcategorie":
+                kies_optie = invoer_kiezen("geen hoofdcategorieën aanwezig, maak een nieuwe hoofdcategorie", ["nieuwe hoofdcategorie"], kies_een = False)
                 
-                hoofdcategorie_uuid = invoer_kiezen("hoofdcategorie", {hoofdcategorie.hoofdcategorie_naam: hoofdcategorie_uuid for hoofdcategorie_uuid, hoofdcategorie in self.items()})
-                if kies_bevestiging: print(f"\n>>> hoofdcategorie \"{self[hoofdcategorie_uuid].hoofdcategorie_naam}\" gekozen")
-                
-                return hoofdcategorie_uuid if geef_uuid else self[hoofdcategorie_uuid]
+                if kies_optie == "nieuwe hoofdcategorie":
+                    return self.nieuw(geef_uuid)
             
             else:
-                return self.nieuw(geef_uuid)
+                
+                kies_optie = invoer_kiezen("bestaande hoofdcategorie of maak een nieuwe", ["zoek op hoofdcategorie", "nieuwe hoofdcategorie"])
+                
+                if kies_optie == "zoek op hoofdcategorie":
+                    
+                    hoofdcategorie_uuid = invoer_kiezen("hoofdcategorie", {hoofdcategorie.hoofdcategorie_naam: hoofdcategorie_uuid for hoofdcategorie_uuid, hoofdcategorie in self.items()})
+                    if kies_bevestiging: print(f"\n>>> hoofdcategorie \"{self[hoofdcategorie_uuid].hoofdcategorie_naam}\" gekozen")
+                    
+                    return hoofdcategorie_uuid if geef_uuid else self[hoofdcategorie_uuid]
+                
+                else:
+                    return self.nieuw(geef_uuid)
 
 class Categorieën(MacroTypeDatabank):
     
@@ -164,18 +173,26 @@ class Categorieën(MacroTypeDatabank):
         ) -> str | Categorie:
         
         while True:
+            if len(self) == 0:
             
-            kies_optie = invoer_kiezen("bestaande categorie of maak een nieuwe", ["zoek op hoofdcategorie", "nieuwe categorie"])
-            
-            if kies_optie == "zoek op categorie":
+                kies_optie = invoer_kiezen("geen categorieën aanwezig, maak een nieuwe categorie", ["nieuwe categorie"], kies_een = False)
                 
-                hoofdcategorieën = Hoofdcategorieën.openen()
-                hoofdcategorie_uuid = hoofdcategorieën.kiezen()
-                
-                categorie_uuid = invoer_kiezen("categorie", {categorie.categorie_naam: categorie_uuid for categorie_uuid, categorie in self.items() if categorie.hoofdcategorie_uuid == hoofdcategorie_uuid})
-                if kies_bevestiging: print(f"\n>>> categorie \"{self[categorie_uuid].categorie_naam}\" gekozen")
-                
-                return categorie_uuid if geef_uuid else self[categorie_uuid]
+                if kies_optie == "nieuwe categorie":
+                    return self.nieuw(geef_uuid)
             
             else:
-                return self.nieuw(geef_uuid)
+                
+                kies_optie = invoer_kiezen("bestaande categorie of maak een nieuwe", ["zoek op hoofdcategorie", "nieuwe categorie"])
+                
+                if kies_optie == "zoek op categorie":
+                    
+                    hoofdcategorieën = Hoofdcategorieën.openen()
+                    hoofdcategorie_uuid = hoofdcategorieën.kiezen()
+                    
+                    categorie_uuid = invoer_kiezen("categorie", {categorie.categorie_naam: categorie_uuid for categorie_uuid, categorie in self.items() if categorie.hoofdcategorie_uuid == hoofdcategorie_uuid})
+                    if kies_bevestiging: print(f"\n>>> categorie \"{self[categorie_uuid].categorie_naam}\" gekozen")
+                    
+                    return categorie_uuid if geef_uuid else self[categorie_uuid]
+                
+                else:
+                    return self.nieuw(geef_uuid)

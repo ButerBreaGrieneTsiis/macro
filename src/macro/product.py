@@ -43,18 +43,30 @@ class Merken(MacroTypeDatabank):
         
         while True:
             
-            opdracht = invoer_kiezen("MENU GEGEVENS/MERK", ["nieuw merk", "weergeven merk"], stoppen = True, kies_een = False)
+            if len(self) == 0:
             
-            if opdracht is STOP:
-                break
+                opdracht = invoer_kiezen("MENU GEGEVENS/MERK", ["nieuw merk"], stoppen = True, kies_een = False)
+                
+                if opdracht is STOP:
+                    break
+                
+                elif opdracht == "nieuw merk":
+                    self.nieuw()
             
-            elif opdracht == "nieuw merk":
-                self.nieuw()
-            
-            elif opdracht == "weergeven merk":
-                merk_uuid = self.kiezen(kies_bevestiging = False)
-                print()
-                print(self[merk_uuid])
+            else:
+                
+                opdracht = invoer_kiezen("MENU GEGEVENS/MERK", ["nieuw merk", "weergeven merk"], stoppen = True, kies_een = False)
+                
+                if opdracht is STOP:
+                    break
+                
+                elif opdracht == "nieuw merk":
+                    self.nieuw()
+                
+                elif opdracht == "weergeven merk":
+                    merk_uuid = self.kiezen(kies_bevestiging = False)
+                    print()
+                    print(self[merk_uuid])
         
         return self
     
@@ -81,33 +93,45 @@ class Merken(MacroTypeDatabank):
         
         while True:
             
-            kies_optie = invoer_kiezen("merk op naam of maak een nieuwe", ["merknaam", "nieuw merk"], stoppen = stoppen)
-            
-            if kies_optie is STOP:
-                return STOP
-            
-            if kies_optie == "merknaam":
+            if len(self) == 0:
                 
-                print("\ngeef een zoekterm op voor een merk")
-                zoekterm = invoer_validatie("zoekterm", str, kleine_letters = True)
+                kies_optie = invoer_kiezen("geen merken aanwezig, maak een nieuw merk", ["nieuw merk"], stoppen = stoppen, kies_een = False)
                 
-                merken_mogelijk = [merk_uuid for merk_uuid, merk in self.items() if zoekterm in merk.merk_naam]
+                if kies_optie is STOP:
+                    return STOP
                 
-                if len(merken_mogelijk) == 0:
-                    print(f"\n>>> geen merken gevonden")
-                    continue
-                
-                merk_uuid = invoer_kiezen("merk", {merk.merk_naam: merk_uuid for merk_uuid, merk in self.items() if merk_uuid in merken_mogelijk}, stoppen = True)
-                
-                if merk_uuid is STOP:
-                    continue
-                
-                if kies_bevestiging: print(f"\n>>> merk \"{self[merk_uuid].merk_naam}\" gekozen")
-                
-                return merk_uuid if geef_uuid else self[merk_uuid]
+                else:
+                    return self.nieuw(geef_uuid)
             
             else:
-                return self.nieuw(geef_uuid)
+                
+                kies_optie = invoer_kiezen("merk op naam of maak een nieuwe", ["merknaam", "nieuw merk"], stoppen = stoppen)
+                
+                if kies_optie is STOP:
+                    return STOP
+                
+                if kies_optie == "merknaam":
+                    
+                    print("\ngeef een zoekterm op voor een merk")
+                    zoekterm = invoer_validatie("zoekterm", str, kleine_letters = True)
+                    
+                    merken_mogelijk = [merk_uuid for merk_uuid, merk in self.items() if zoekterm in merk.merk_naam]
+                    
+                    if len(merken_mogelijk) == 0:
+                        print(f"\n>>> geen merken gevonden")
+                        continue
+                    
+                    merk_uuid = invoer_kiezen("merk", {merk.merk_naam: merk_uuid for merk_uuid, merk in self.items() if merk_uuid in merken_mogelijk}, stoppen = True)
+                    
+                    if merk_uuid is STOP:
+                        continue
+                    
+                    if kies_bevestiging: print(f"\n>>> merk \"{self[merk_uuid].merk_naam}\" gekozen")
+                    
+                    return merk_uuid if geef_uuid else self[merk_uuid]
+                
+                else:
+                    return self.nieuw(geef_uuid)
 
 class Product(MacroType):
     
@@ -210,21 +234,31 @@ class Producten(MacroTypeDatabank):
         
         while True:
             
-            opdracht = invoer_kiezen("MENU GEGEVENS/PRODUCT", ["nieuw product", "nieuwe eenheid", "weergeven product"], stoppen = True, kies_een = False)
+            if len(self) == 0:
+                opdracht = invoer_kiezen("MENU GEGEVENS/PRODUCT", ["nieuw product"], stoppen = True, kies_een = False)
             
-            if opdracht is STOP:
-                break
-            
-            elif opdracht == "nieuw product":
-                self.nieuw()
-            
-            elif opdracht == "nieuwe eenheid":
-                self.nieuwe_eenheid()
-            
-            elif opdracht == "weergeven product":
-                product = self.kiezen_product(kies_bevestiging = False, geef_uuid = False)
-                print()
-                print(product)
+                if opdracht is STOP:
+                    break
+                
+                elif opdracht == "nieuw product":
+                    self.nieuw()
+                
+            else:
+                opdracht = invoer_kiezen("MENU GEGEVENS/PRODUCT", ["nieuw product", "nieuwe eenheid", "weergeven product"], stoppen = True, kies_een = False)
+                
+                if opdracht is STOP:
+                    break
+                
+                elif opdracht == "nieuw product":
+                    self.nieuw()
+                
+                elif opdracht == "nieuwe eenheid":
+                    self.nieuwe_eenheid()
+                
+                elif opdracht == "weergeven product":
+                    product = self.kiezen_product(kies_bevestiging = False, geef_uuid = False)
+                    print()
+                    print(product)
         
         return self
     
@@ -261,71 +295,83 @@ class Producten(MacroTypeDatabank):
         self,
         kies_bevestiging:   bool    = True,
         geef_uuid:          bool    = True,
-        stoppen:            bool    = False,
+        stoppen:            bool    = True,
         ) -> Product | str | Stop:
         
         while True:
             
-            kies_optie = invoer_kiezen("product op naam, ingrediënt of categorie, of maak een nieuwe", ["zoek op productnaam", "zoek op ingrediëntnaam", "zoek op categorie", "nieuw product"], stoppen = stoppen)
-            
-            if kies_optie is STOP:
-                return STOP
-            
-            if kies_optie == "zoek op ingrediëntnaam" or kies_optie == "zoek op productnaam" or kies_optie == "zoek op categorie":
+            if len(self) == 0:
                 
-                if kies_optie == "zoek op ingrediëntnaam" or kies_optie == "zoek op categorie":
+                kies_optie = invoer_kiezen("geen producten aanwezig, maak een nieuw product", ["nieuw product"], stoppen = stoppen, kies_een = False)
+                
+                if kies_optie is STOP:
+                    return STOP
+                
+                else:
+                    return self.nieuw(geef_uuid)
+            
+            else:
+            
+                kies_optie = invoer_kiezen("product op naam, ingrediënt of categorie, of maak een nieuwe", ["zoek op productnaam", "zoek op ingrediëntnaam", "zoek op categorie", "nieuw product"], stoppen = stoppen)
+                
+                if kies_optie is STOP:
+                    return STOP
+                
+                if kies_optie == "zoek op ingrediëntnaam" or kies_optie == "zoek op productnaam" or kies_optie == "zoek op categorie":
                     
-                    if kies_optie == "zoek op ingrediëntnaam":
+                    if kies_optie == "zoek op ingrediëntnaam" or kies_optie == "zoek op categorie":
                         
-                        print("\ngeef een zoekterm op voor een ingrediënt")
-                        zoekterm = invoer_validatie("zoekterm", str, kleine_letters = True)
+                        if kies_optie == "zoek op ingrediëntnaam":
+                            
+                            print("\ngeef een zoekterm op voor een ingrediënt")
+                            zoekterm = invoer_validatie("zoekterm", str, kleine_letters = True)
+                            
+                            ingrediënten = Ingrediënten.openen()
+                            ingrediënten_mogelijk = [ingrediënt_uuid for ingrediënt_uuid, ingrediënt in ingrediënten.items() if zoekterm in ingrediënt.ingrediënt_naam]
                         
-                        ingrediënten = Ingrediënten.openen()
-                        ingrediënten_mogelijk = [ingrediënt_uuid for ingrediënt_uuid, ingrediënt in ingrediënten.items() if zoekterm in ingrediënt.ingrediënt_naam]
+                        else:
+                            
+                            categorieën = Categorieën.openen()
+                            categorie_uuid = categorieën.kiezen()
+                            
+                            ingrediënten = Ingrediënten.openen()
+                            ingrediënten_mogelijk = [ingrediënt_uuid for ingrediënt_uuid, ingrediënt in ingrediënten.items() if ingrediënt.categorie_uuid == categorie_uuid]
+                        
+                        if len(ingrediënten_mogelijk) == 0:
+                            print(f">>> geen ingrediënten gevonden")
+                            continue
+                        
+                        ingrediënt_uuid = invoer_kiezen("ingrediënt", {ingrediënt.ingrediënt_naam: ingrediënt_uuid for ingrediënt_uuid, ingrediënt in ingrediënten.items() if ingrediënt_uuid in ingrediënten_mogelijk}, stoppen = True)
+                        
+                        if ingrediënt_uuid is STOP:
+                            continue
+                        
+                        print(f"\n>>> ingrediënt \"{ingrediënten[ingrediënt_uuid].ingrediënt_naam}\" gekozen")
+                        
+                        producten_mogelijk = [product_uuid for product_uuid, product in self.items() if product.ingrediënt_uuid == ingrediënt_uuid]
                     
                     else:
                         
-                        categorieën = Categorieën.openen()
-                        categorie_uuid = categorieën.kiezen()
+                        print("\ngeef een zoekterm op voor een product")
+                        zoekterm = invoer_validatie("zoekterm", str, kleine_letters = True)
                         
-                        ingrediënten = Ingrediënten.openen()
-                        ingrediënten_mogelijk = [ingrediënt_uuid for ingrediënt_uuid, ingrediënt in ingrediënten.items() if ingrediënt.categorie_uuid == categorie_uuid]
+                        producten_mogelijk = [product_uuid for product_uuid, product in self.items() if zoekterm in product.product_naam]
                     
-                    if len(ingrediënten_mogelijk) == 0:
-                        print(f">>> geen ingrediënten gevonden")
+                    if len(producten_mogelijk) == 0:
+                        print(f"\n>>> geen producten gevonden")
                         continue
                     
-                    ingrediënt_uuid = invoer_kiezen("ingrediënt", {ingrediënt.ingrediënt_naam: ingrediënt_uuid for ingrediënt_uuid, ingrediënt in ingrediënten.items() if ingrediënt_uuid in ingrediënten_mogelijk}, stoppen = True)
+                    product_uuid = invoer_kiezen("product", {product.product_naam: product_uuid for product_uuid, product in self.items() if product_uuid in producten_mogelijk}, stoppen = True)
                     
-                    if ingrediënt_uuid is STOP:
+                    if product_uuid is STOP:
                         continue
                     
-                    print(f"\n>>> ingrediënt \"{ingrediënten[ingrediënt_uuid].ingrediënt_naam}\" gekozen")
+                    if kies_bevestiging: print(f"\n>>> product \"{self[product_uuid].product_naam}\" gekozen")
                     
-                    producten_mogelijk = [product_uuid for product_uuid, product in self.items() if product.ingrediënt_uuid == ingrediënt_uuid]
+                    return product_uuid if geef_uuid else self[product_uuid]
                 
                 else:
-                    
-                    print("\ngeef een zoekterm op voor een product")
-                    zoekterm = invoer_validatie("zoekterm", str, kleine_letters = True)
-                    
-                    producten_mogelijk = [product_uuid for product_uuid, product in self.items() if zoekterm in product.product_naam]
-                
-                if len(producten_mogelijk) == 0:
-                    print(f"\n>>> geen producten gevonden")
-                    continue
-                
-                product_uuid = invoer_kiezen("product", {product.product_naam: product_uuid for product_uuid, product in self.items() if product_uuid in producten_mogelijk}, stoppen = True)
-                
-                if product_uuid is STOP:
-                    continue
-                
-                if kies_bevestiging: print(f"\n>>> product \"{self[product_uuid].product_naam}\" gekozen")
-                
-                return product_uuid if geef_uuid else self[product_uuid]
-            
-            else:
-                return self.nieuw(geef_uuid)
+                    return self.nieuw(geef_uuid)
     
     def kiezen_eenheid(
         self,
@@ -364,7 +410,7 @@ class Producten(MacroTypeDatabank):
         self,
         kies_bevestiging:   bool    = True,
         geef_uuid:          bool    = True,
-        stoppen:            bool    = False,
+        stoppen:            bool    = True,
         ) -> Tuple[Product | Stop, Eenheid | Stop]:
         
         product_uuid = self.kiezen_product(kies_bevestiging, stoppen)
