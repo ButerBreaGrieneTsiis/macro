@@ -115,11 +115,12 @@ class Voedingswaarde:
         dict_naar_json = {}
         
         for veld_sleutel, veld_waarde in self.__dict__.items():
-            
             if veld_waarde == 0.0:
                 continue
-            
-            dict_naar_json[veld_sleutel] = int(round(10 * veld_waarde.waarde))
+            elif veld_sleutel == "calorieën":
+                dict_naar_json[veld_sleutel] = veld_waarde.waarde
+            else:
+                dict_naar_json[veld_sleutel] = int(round(10 * veld_waarde.waarde))
         
         return dict_naar_json
     
