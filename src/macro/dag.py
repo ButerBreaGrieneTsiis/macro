@@ -78,7 +78,7 @@ class Dag(MacroType):
         
         while True:
             
-            opdracht = invoer_kiezen(f"opdracht voor {self.dag}", ["toevoegen producten", "toevoegen gerechten","toon voedingswaarde", "toon producten"], stoppen = True)
+            opdracht = invoer_kiezen(f"MENU DAG/{f"{self.dag}".upper()}", ["toevoegen producten", "toevoegen gerechten","toon voedingswaarde", "toon producten"], stoppen = True, kies_een = False)
             
             if opdracht is STOP:
                 break

@@ -43,7 +43,7 @@ class Merken(MacroTypeDatabank):
         
         while True:
             
-            opdracht = invoer_kiezen("opdracht merk", ["nieuw merk", "weergeven merk"], stoppen = True)
+            opdracht = invoer_kiezen("MENU GEGEVENS/MERK", ["nieuw merk", "weergeven merk"], stoppen = True, kies_een = False)
             
             if opdracht is STOP:
                 break
@@ -210,7 +210,7 @@ class Producten(MacroTypeDatabank):
         
         while True:
             
-            opdracht = invoer_kiezen("opdracht product", ["nieuw product", "nieuwe eenheid", "weergeven product"], stoppen = True)
+            opdracht = invoer_kiezen("MENU GEGEVENS/PRODUCT", ["nieuw product", "nieuwe eenheid", "weergeven product"], stoppen = True, kies_een = False)
             
             if opdracht is STOP:
                 break

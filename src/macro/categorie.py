@@ -76,7 +76,7 @@ class Hoofdcategorieën(MacroTypeDatabank):
         
         while True:
             
-            opdracht = invoer_kiezen("opdracht hoofdcategorie", ["nieuwe hoofdcategorie"], stoppen = True)
+            opdracht = invoer_kiezen("MENU GEGEVENS/HOOFDCATEGORIE", ["nieuwe hoofdcategorie"], stoppen = True, kies_een = False)
             
             if opdracht is STOP:
                 break
@@ -132,7 +132,7 @@ class Categorieën(MacroTypeDatabank):
         
         while True:
         
-            opdracht = invoer_kiezen("opdracht categorie", ["nieuwe categorie"], stoppen = True)
+            opdracht = invoer_kiezen("MENU GEGEVENS/CATEGORIE", ["nieuwe categorie"], stoppen = True, kies_een = False)
             
             if opdracht is STOP:
                 break

@@ -10,16 +10,16 @@ def uitvoeren():
     
     while True:
         
-        opdracht = invoer_kiezen("opdracht hoofdmenu", ["invullen dag", "gegevens bewerken"], stoppen = True)
+        opdracht = invoer_kiezen("HOOFDMENU", ["dag invullen", "gegevens bewerken"], stoppen = True, kies_een = False)
         
         if opdracht is STOP:
             break
         
-        elif opdracht == "invullen dag":
+        elif opdracht == "dag invullen":
             
             while True:
                 
-                opdracht_dag = invoer_kiezen("invullen dag", ["vandaag"], stoppen = True)
+                opdracht_dag = invoer_kiezen("MENU DAG", ["vandaag"], stoppen = True, kies_een = False)
                 
                 if opdracht_dag is STOP:
                     break
@@ -34,7 +34,7 @@ def uitvoeren():
             
             while True:
                 
-                opdracht_gegevens = invoer_kiezen("opdracht gegevens", ["hoofdcategorieën", "categorieën", "ingrediënten", "producten", "merken"], stoppen = True)
+                opdracht_gegevens = invoer_kiezen("MENU GEGEVENS", ["hoofdcategorieën", "categorieën", "ingrediënten", "producten", "merken"], stoppen = True, kies_een = False)
                 
                 if opdracht_gegevens is STOP:
                     break

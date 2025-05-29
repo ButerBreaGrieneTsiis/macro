@@ -56,7 +56,7 @@ class Ingrediënten(MacroTypeDatabank):
         
         while True:
             
-            opdracht = invoer_kiezen("opdracht ingrediënt", ["nieuw ingrediënt"], stoppen = True)
+            opdracht = invoer_kiezen("MENU GEGEVENS/INGREDIËNT", ["nieuw ingrediënt"], stoppen = True, kies_een = False)
             
             if opdracht is STOP:
                 break
