@@ -189,8 +189,8 @@ class Product(MacroType):
         # TE DOEN: check toevoegen voor overschrijven
         eenheid = invoer_kiezen("eenheid", {eenheid.enkelvoud: eenheid for eenheid in Eenheid if eenheid not in Hoeveelheid.BASIS_EENHEDEN and eenheid not in Hoeveelheid.ENERGIE_EENHEDEN})
         
-        print(f"hoeveel {self.basis_eenheid.enkelvoud} is \"{Hoeveelheid(1, eenheid)}\"?")
-        waarde = invoer_validatie(f"hoeveel {self.basis_eenheid.enkelvoud}", type = int)
+        print(f"hoeveel {self.basis_eenheid.meervoud} is \"{Hoeveelheid(1, eenheid)}\"?")
+        waarde = invoer_validatie(f"hoeveel {self.basis_eenheid.meervoud}", type = int)
         
         print(f">>> eenheid \"{eenheid.meervoud}\" toegevoegd van {Hoeveelheid(waarde, self.basis_eenheid)}")
         self.eenheden[eenheid] = waarde
@@ -273,6 +273,7 @@ class Producten(MacroTypeDatabank):
             product.nieuwe_eenheid()
         
         product_uuid = str(uuid4())
+        product.uuid = product_uuid
         self[product_uuid] = product
         
         self.opslaan()
