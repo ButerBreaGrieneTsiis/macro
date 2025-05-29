@@ -14,7 +14,7 @@ locale.setlocale(locale.LC_ALL, "nl_NL.UTF-8")
 
 class Dag(MacroType):
     
-    BESTANDSMAP:    Path    = Path("gegevens\\dagen")
+    BESTANDSMAP:    Path    = Path("gegevens/dagen")
     EXTENSIE:       str     = "dag"
     
     def __init__(
@@ -54,7 +54,7 @@ class Dag(MacroType):
         
         bestandspad = cls.BESTANDSMAP
         if not bestandspad.is_dir():
-            bestandspad.mkdir()
+            bestandspad.mkdir(parents = True)
         
         bestandspad /= f"{datum.year}"
         if not bestandspad.is_dir():
