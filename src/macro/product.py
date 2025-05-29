@@ -26,7 +26,7 @@ class Merk(MacroType):
     @classmethod
     def nieuw(cls) -> "Merk":
         
-        merk_naam = invoer_validatie("merknaam", str, valideren = True, kleine_letters = True)
+        merk_naam = invoer_validatie("merknaam", str, valideren = True, kleine_letters = True, uitsluiten_leeg = True)
         
         return cls(
             merk_naam,
@@ -145,7 +145,7 @@ class Product(MacroType):
         ingrediënten    = Ingrediënten.openen()
         ingrediënt_uuid = ingrediënten.kiezen()
         print(f"\ninvullen gegevens nieuw product onder ingrediënt \"{ingrediënten[ingrediënt_uuid].ingrediënt_naam}\"")
-        product_naam    = invoer_validatie("productnaam", str, valideren = True, kleine_letters = True)
+        product_naam    = invoer_validatie("productnaam", str, valideren = True, kleine_letters = True, uitsluiten_leeg = True)
         merken          = Merken.openen()
         merk_uuid       = merken.kiezen()
         opmerking       = invoer_validatie("opmerking", str, kleine_letters = True)

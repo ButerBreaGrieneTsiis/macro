@@ -24,7 +24,7 @@ class Hoofdcategorie(MacroType):
     def nieuw(cls) -> "Hoofdcategorie":
         
         print(f"\ninvullen gegevens nieuwe hoofdcategorie")
-        hoofdcategorie_naam = invoer_validatie("hoofdcategorienaam", str, valideren = True, kleine_letters = True)
+        hoofdcategorie_naam = invoer_validatie("hoofdcategorienaam", str, valideren = True, kleine_letters = True, uitsluiten_leeg = True)
         
         return cls(
             hoofdcategorie_naam
@@ -53,7 +53,7 @@ class Categorie(MacroType):
         hoofdcategorie_uuid = hoofdcategorieën.kiezen()
         
         print(f"\ninvullen gegevens nieuwe categorie onder hoofdcategorie \"{hoofdcategorieën[hoofdcategorie_uuid].hoofdcategorie_naam}\"")
-        categorie_naam = invoer_validatie("categorienaam", str, valideren = True, kleine_letters = True)
+        categorie_naam = invoer_validatie("categorienaam", str, valideren = True, kleine_letters = True, uitsluiten_leeg = True)
         
         return cls(
             categorie_naam,

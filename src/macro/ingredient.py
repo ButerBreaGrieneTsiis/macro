@@ -29,7 +29,7 @@ class Ingrediënt(MacroType):
         categorieën = Categorieën.openen()
         categorie_uuid = categorieën.kiezen()
         print(f"\ninvullen gegevens nieuw ingrediënt onder categorie \"{categorieën[categorie_uuid].categorie_naam}\"")
-        ingrediënt_naam = invoer_validatie("ingrediëntnaam", str, valideren = True, kleine_letters = True)
+        ingrediënt_naam = invoer_validatie("ingrediëntnaam", str, valideren = True, kleine_letters = True, uitsluiten_leeg = True)
         
         return cls(
             ingrediënt_naam,
