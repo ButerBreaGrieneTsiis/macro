@@ -28,8 +28,13 @@ class Ingrediënt(MacroType):
         
         categorieën = Categorieën.openen()
         categorie_uuid = categorieën.kiezen()
+        if categorie_uuid is STOP:
+            return STOP
+        
         print(f"\ninvullen gegevens nieuw ingrediënt onder categorie \"{categorieën[categorie_uuid].categorie_naam}\"")
         ingrediënt_naam = invoer_validatie("ingrediëntnaam", str, valideren = True, kleine_letters = True, uitsluiten_leeg = True)
+        if ingrediënt_naam is STOP:
+            return STOP
         
         return cls(
             ingrediënt_naam,
@@ -72,6 +77,8 @@ class Ingrediënten(MacroTypeDatabank):
         ):
         
         ingrediënt = Ingrediënt.nieuw()
+        if ingrediënt is STOP:
+            return STOP
         
         ingrediënt_uuid = str(uuid4())
         self[ingrediënt_uuid] = ingrediënt
@@ -84,22 +91,29 @@ class Ingrediënten(MacroTypeDatabank):
         self,
         kies_bevestiging: bool = True,
         geef_uuid: bool =  True,
+        stoppen: bool = False,
         ) -> str | Ingrediënt:
         
         while True:
             
             if len(self) == 0:
                 
-                kies_optie = invoer_kiezen("geen ingrediënten aanwezig, maak een nieuw ingrediënt", ["nieuw ingrediënt"], kies_een = False)
+                kies_optie = invoer_kiezen("geen ingrediënten aanwezig, maak een nieuw ingrediënt", ["nieuw ingrediënt"], kies_een = False, stoppen = stoppen)
                 
-                if kies_optie == "nieuw ingrediënt":
+                if kies_optie is STOP:
+                    return STOP
+                
+                else:
                     return self.nieuw(geef_uuid)
             
             else:
             
-                kies_optie = invoer_kiezen("ingrediënt op naam of categorie, of maak een nieuwe", ["zoek op ingrediëntnaam", "zoek op categorie", "nieuw ingrediënt"])
+                kies_optie = invoer_kiezen("ingrediënt op naam of categorie, of maak een nieuwe", ["zoek op ingrediëntnaam", "zoek op categorie", "nieuw ingrediënt"], stoppen = stoppen)
                 
-                if kies_optie == "zoek op ingrediëntnaam" or kies_optie == "zoek op categorie":
+                if kies_optie is STOP:
+                    return STOP
+                
+                elif kies_optie == "zoek op ingrediëntnaam" or kies_optie == "zoek op categorie":
                     
                     if kies_optie == "zoek op ingrediëntnaam":
                         print("\ngeef een zoekterm op")
@@ -112,6 +126,10 @@ class Ingrediënten(MacroTypeDatabank):
                     else:
                         categorieën = Categorieën.openen()
                         categorie_uuid = categorieën.kiezen()
+                        
+                        if categorie_uuid is STOP:
+                            return STOP
+                        
                         ingrediënten_mogelijk = [ingrediënt_uuid for ingrediënt_uuid, ingrediënt in self.items() if ingrediënt.categorie_uuid == categorie_uuid]
                         if len(ingrediënten_mogelijk) == 0:
                             print(f"\n>>> geen ingrediënten onder categorie \"{categorieën[categorie_uuid].categorie_naam}\"")

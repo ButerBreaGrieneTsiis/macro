@@ -52,6 +52,9 @@ class Categorie(MacroType):
         hoofdcategorieën = Hoofdcategorieën.openen()
         hoofdcategorie_uuid = hoofdcategorieën.kiezen()
         
+        if hoofdcategorie_uuid is STOP:
+            return STOP
+        
         print(f"\ninvullen gegevens nieuwe categorie onder hoofdcategorie \"{hoofdcategorieën[hoofdcategorie_uuid].hoofdcategorie_naam}\"")
         categorie_naam = invoer_validatie("categorienaam", str, valideren = True, kleine_letters = True, uitsluiten_leeg = True)
         
@@ -94,6 +97,9 @@ class Hoofdcategorieën(MacroTypeDatabank):
         
         hoofdcategorie = Hoofdcategorie.nieuw()
         
+        if hoofdcategorie is STOP:
+            return STOP
+        
         hoofdcategorie_uuid = str(uuid4())
         self[hoofdcategorie_uuid] = hoofdcategorie
         
@@ -105,22 +111,29 @@ class Hoofdcategorieën(MacroTypeDatabank):
         self,
         kies_bevestiging: bool = True,
         geef_uuid: bool =  True,
+        stoppen: bool = True,
         ) -> str | Hoofdcategorie:
         
         while True:
             
             if len(self) == 0:
             
-                kies_optie = invoer_kiezen("geen hoofdcategorieën aanwezig, maak een nieuwe hoofdcategorie", ["nieuwe hoofdcategorie"], kies_een = False)
+                kies_optie = invoer_kiezen("geen hoofdcategorieën aanwezig, maak een nieuwe hoofdcategorie", ["nieuwe hoofdcategorie"], kies_een = False, stoppen = stoppen)
                 
-                if kies_optie == "nieuwe hoofdcategorie":
+                if kies_optie is STOP:
+                    return STOP
+                
+                else:
                     return self.nieuw(geef_uuid)
             
             else:
                 
-                kies_optie = invoer_kiezen("bestaande hoofdcategorie of maak een nieuwe", ["zoek op hoofdcategorie", "nieuwe hoofdcategorie"])
+                kies_optie = invoer_kiezen("bestaande hoofdcategorie of maak een nieuwe", ["zoek op hoofdcategorie", "nieuwe hoofdcategorie"], stoppen = stoppen)
                 
-                if kies_optie == "zoek op hoofdcategorie":
+                if kies_optie is STOP:
+                    return STOP
+                
+                elif kies_optie == "zoek op hoofdcategorie":
                     
                     hoofdcategorie_uuid = invoer_kiezen("hoofdcategorie", {hoofdcategorie.hoofdcategorie_naam: hoofdcategorie_uuid for hoofdcategorie_uuid, hoofdcategorie in self.items()})
                     if kies_bevestiging: print(f"\n>>> hoofdcategorie \"{self[hoofdcategorie_uuid].hoofdcategorie_naam}\" gekozen")
@@ -158,6 +171,8 @@ class Categorieën(MacroTypeDatabank):
         ):
         
         categorie = Categorie.nieuw()
+        if categorie is STOP:
+            return STOP
         
         categorie_uuid = str(uuid4())
         self[categorie_uuid] = categorie
@@ -170,21 +185,28 @@ class Categorieën(MacroTypeDatabank):
         self,
         kies_bevestiging: bool = True,
         geef_uuid: bool =  True,
+        stoppen: bool = True,
         ) -> str | Categorie:
         
         while True:
             if len(self) == 0:
             
-                kies_optie = invoer_kiezen("geen categorieën aanwezig, maak een nieuwe categorie", ["nieuwe categorie"], kies_een = False)
+                kies_optie = invoer_kiezen("geen categorieën aanwezig, maak een nieuwe categorie", ["nieuwe categorie"], kies_een = False, stoppen = stoppen)
                 
-                if kies_optie == "nieuwe categorie":
+                if kies_optie is STOP:
+                    return STOP
+                
+                else:
                     return self.nieuw(geef_uuid)
             
             else:
                 
-                kies_optie = invoer_kiezen("bestaande categorie of maak een nieuwe", ["zoek op hoofdcategorie", "nieuwe categorie"])
+                kies_optie = invoer_kiezen("bestaande categorie of maak een nieuwe", ["zoek op hoofdcategorie", "nieuwe categorie"], stoppen = stoppen)
                 
-                if kies_optie == "zoek op categorie":
+                if kies_optie is STOP:
+                    return STOP
+                
+                elif kies_optie == "zoek op categorie":
                     
                     hoofdcategorieën = Hoofdcategorieën.openen()
                     hoofdcategorie_uuid = hoofdcategorieën.kiezen()

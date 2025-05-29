@@ -26,7 +26,9 @@ class Merk(MacroType):
     @classmethod
     def nieuw(cls) -> "Merk":
         
-        merk_naam = invoer_validatie("merknaam", str, valideren = True, kleine_letters = True, uitsluiten_leeg = True)
+        merk_naam = invoer_validatie("merknaam", str, valideren = True, kleine_letters = True, uitsluiten_leeg = True, stoppen = True)
+        if merk_naam is STOP:
+            return STOP
         
         return cls(
             merk_naam,
@@ -76,6 +78,8 @@ class Merken(MacroTypeDatabank):
         ):
         
         merk = Merk.nieuw()
+        if merk is STOP:
+            return STOP
         
         merk_uuid = str(uuid4())
         self[merk_uuid] = merk
@@ -167,11 +171,19 @@ class Product(MacroType):
     def nieuw(cls) -> "Product":
         
         ingrediënten    = Ingrediënten.openen()
-        ingrediënt_uuid = ingrediënten.kiezen()
+        ingrediënt_uuid = ingrediënten.kiezen(stoppen = True)
+        
+        if ingrediënt_uuid is STOP:
+            return STOP
+        
         print(f"\ninvullen gegevens nieuw product onder ingrediënt \"{ingrediënten[ingrediënt_uuid].ingrediënt_naam}\"")
         product_naam    = invoer_validatie("productnaam", str, valideren = True, kleine_letters = True, uitsluiten_leeg = True)
         merken          = Merken.openen()
         merk_uuid       = merken.kiezen()
+        
+        if merk_uuid is STOP:
+            return STOP
+        
         opmerking       = invoer_validatie("opmerking", str, kleine_letters = True)
         basis_eenheid   = Eenheid(invoer_kiezen("eenheid waarvoor voedingswaarden gelden", {f"{Hoeveelheid(100, basis_eenheid)}": basis_eenheid for basis_eenheid in Hoeveelheid.BASIS_EENHEDEN}))
         voedingswaarde  = Voedingswaarde.nieuw(basis_eenheid)
@@ -269,6 +281,9 @@ class Producten(MacroTypeDatabank):
         
         product = Product.nieuw()
         
+        if product is STOP:
+            return STOP
+        
         if invoer_kiezen("toevoegen nieuwe eenheid", {"ja": True, "nee": False}, kies_een = False):
             product.nieuwe_eenheid()
         
@@ -334,6 +349,9 @@ class Producten(MacroTypeDatabank):
                             
                             categorieën = Categorieën.openen()
                             categorie_uuid = categorieën.kiezen()
+                            
+                            if categorie_uuid is STOP:
+                                STOP
                             
                             ingrediënten = Ingrediënten.openen()
                             ingrediënten_mogelijk = [ingrediënt_uuid for ingrediënt_uuid, ingrediënt in ingrediënten.items() if ingrediënt.categorie_uuid == categorie_uuid]
