@@ -131,13 +131,13 @@ class Voedingswaarde:
         
         while True:
             
-            print(f"vul de voedingswaarde in per 100 {basis_eenheid.enkelvoud}")
+            print(f"vul de voedingswaarde in per {Hoeveelheid(100, basis_eenheid)}")
             
             calorieën = invoer_validatie("calorieën", int, bereik = (0, 900))
             vetten = invoer_validatie("vetten", float, bereik = (0.0, 100.0))
-            verzadigd = invoer_validatie("waarvan verzadigd", float, bereik = (0.0, vetten)) if not vetten == 0.0 else 0
+            verzadigd = invoer_validatie("waarvan verzadigd", float, bereik = (0.0, vetten)) if not vetten == 0.0 else 0.0
             koolhydraten = invoer_validatie("koolhydraten", float, bereik = (0.0, 100.0))
-            suikers = invoer_validatie("waarvan suikers", float, bereik = (0.0, koolhydraten)) if not koolhydraten == 0.0 else 0
+            suikers = invoer_validatie("waarvan suikers", float, bereik = (0.0, koolhydraten)) if not koolhydraten == 0.0 else 0.0
             eiwitten = invoer_validatie("eiwitten", float, bereik = (0.0, 100.0))
             vezels = invoer_validatie("vezels", float, bereik = (0.0, 100.0))
             zout = invoer_validatie("zout", float, bereik = (0.0, 100.0))
@@ -152,14 +152,14 @@ class Voedingswaarde:
             break
         
         return cls(
-            calorieën,
-            int(round(10 * vetten)),
-            int(round(10 * verzadigd)),
-            int(round(10 * koolhydraten)),
-            int(round(10 * suikers)),
-            int(round(10 * eiwitten)),
-            int(round(10 * vezels)),
-            int(round(10 * zout)),
+            Hoeveelheid(calorieën,    Eenheid("kcal")),
+            Hoeveelheid(vetten,       Eenheid("g")),
+            Hoeveelheid(verzadigd,    Eenheid("g")),
+            Hoeveelheid(koolhydraten, Eenheid("g")),
+            Hoeveelheid(suikers,      Eenheid("g")),
+            Hoeveelheid(eiwitten,     Eenheid("g")),
+            Hoeveelheid(vezels,       Eenheid("g")),
+            Hoeveelheid(zout,         Eenheid("g")),
             )
     
     @property

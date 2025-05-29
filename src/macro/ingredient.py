@@ -88,11 +88,11 @@ class Ingrediënten(MacroTypeDatabank):
         
         while True:
             
-            kies_optie = invoer_kiezen("ingrediënt op naam of categorie, of maak een nieuwe", ["ingrediëntnaam", "categorie", "nieuw"])
+            kies_optie = invoer_kiezen("ingrediënt op naam of categorie, of maak een nieuwe", ["nieuw ingrediënt", "zoek op ingrediëntnaam", "zoek op categorie"])
             
-            if kies_optie == "ingrediëntnaam" or kies_optie == "categorie":
+            if kies_optie == "zoek op ingrediëntnaam" or kies_optie == "zoek op categorie":
                 
-                if kies_optie == "ingrediëntnaam":
+                if kies_optie == "zoek op ingrediëntnaam":
                     print("\ngeef een zoekterm op")
                     zoekterm = invoer_validatie("ingrediëntnaam", str, kleine_letters = True)
                     ingrediënten_mogelijk = [ingrediënt_uuid for ingrediënt_uuid, ingrediënt in self.items() if zoekterm in ingrediënt.ingrediënt_naam]

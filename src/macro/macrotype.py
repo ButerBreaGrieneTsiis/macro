@@ -143,12 +143,10 @@ class Eenheid(Enum):
     EETLEPEL    =   "theelepel",    "theelepels"
     PLAK        =   "plak",         "plakken"
     VERPAKKING  =   "verpakking",   "verpakkingen"
-    GRAM        =   "g",            "g"
-    MILLILITER  =   "ml",           "ml"
-    HECTOGRAM   =   "hg",           "hg"
-    DECILITER   =   "dl",           "dl"
-    KILOCALORIE =   "kcal",         "kcal"
-    KILOJOULE   =   "kJ",           "kJ"
+    GRAM        =   "g",            "gram"
+    MILLILITER  =   "ml",           "milliliter"
+    KILOCALORIE =   "kcal",         "calorieën"
+    KILOJOULE   =   "kJ",           "kilojoule"
     
     # https://stackoverflow.com/questions/75384124/how-to-initialize-named-tuple-in-python-enum
     def __new__(cls, enkelvoud, meervoud):
@@ -161,7 +159,7 @@ class Eenheid(Enum):
 class Hoeveelheid(MacroType):
     
     VELDEN              = frozenset(("waarde", "eenheid", ))
-    BASIS_EENHEDEN      = [Eenheid("hg"), Eenheid("dl")]
+    BASIS_EENHEDEN      = [Eenheid("g"), Eenheid("ml")]
     ENERGIE_EENHEDEN    = [Eenheid("kcal"), Eenheid("kJ")]
     
     def __init__(
@@ -175,22 +173,10 @@ class Hoeveelheid(MacroType):
     
     def __repr__(self) -> str:
         
-        if self.eenheid == Eenheid("hg"):
-            eenheid = Eenheid("g")
-            waarde = self.waarde * 100.0
-        elif self.eenheid == Eenheid("dl"):
-            eenheid = Eenheid("ml")
-            waarde = self.waarde * 100.0
-        else:
-            eenheid = self.eenheid
-            waarde = self.waarde
+        formaat = ".0f" if self.waarde.is_integer() or self.eenheid in self.BASIS_EENHEDEN else ".2f"
+        eenheid = self.eenheid.enkelvoud if self.waarde == 1.0 or self.eenheid in self.BASIS_EENHEDEN or self.eenheid in self.ENERGIE_EENHEDEN else self.eenheid.meervoud
         
-        formaat = ".0f" if waarde.is_integer() or eenheid in self.BASIS_EENHEDEN else ".2f"
-        
-        if self.waarde == 1.0:
-            return f"{waarde:{formaat}} {eenheid.enkelvoud}"
-        else:
-            return f"{waarde:{formaat}} {eenheid.meervoud}"
+        return f"{self.waarde:{formaat}} {eenheid}"
     
     def __add__(
         self,

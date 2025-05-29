@@ -109,9 +109,9 @@ class Hoofdcategorieën(MacroTypeDatabank):
         
         while True:
             
-            kies_optie = invoer_kiezen("bestaande hoofdcategorie of maak een nieuwe", ["bestaande hoofdcategorie", "nieuwe hoofdcategorie"])
+            kies_optie = invoer_kiezen("bestaande hoofdcategorie of maak een nieuwe", ["nieuwe hoofdcategorie", "zoek op hoofdcategorie"])
             
-            if kies_optie == "bestaande hoofdcategorie":
+            if kies_optie == "zoek op hoofdcategorie":
                 
                 hoofdcategorie_uuid = invoer_kiezen("hoofdcategorie", {hoofdcategorie.hoofdcategorie_naam: hoofdcategorie_uuid for hoofdcategorie_uuid, hoofdcategorie in self.items()})
                 if kies_bevestiging: print(f"\n>>> hoofdcategorie \"{self[hoofdcategorie_uuid].hoofdcategorie_naam}\" gekozen")
@@ -165,9 +165,9 @@ class Categorieën(MacroTypeDatabank):
         
         while True:
             
-            kies_optie = invoer_kiezen("bestaande categorie of maak een nieuwe", ["bestaande categorie", "nieuwe categorie"])
+            kies_optie = invoer_kiezen("bestaande categorie of maak een nieuwe", ["nieuwe categorie", "zoek op hoofdcategorie"])
             
-            if kies_optie == "bestaande categorie":
+            if kies_optie == "zoek op categorie":
                 
                 hoofdcategorieën = Hoofdcategorieën.openen()
                 hoofdcategorie_uuid = hoofdcategorieën.kiezen()
