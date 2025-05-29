@@ -88,7 +88,7 @@ class Ingrediënten(MacroTypeDatabank):
         
         while True:
             
-            kies_optie = invoer_kiezen("ingrediënt op naam of categorie, of maak een nieuwe", ["nieuw ingrediënt", "zoek op ingrediëntnaam", "zoek op categorie"])
+            kies_optie = invoer_kiezen("ingrediënt op naam of categorie, of maak een nieuwe", ["zoek op ingrediëntnaam", "zoek op categorie", "nieuw ingrediënt"])
             
             if kies_optie == "zoek op ingrediëntnaam" or kies_optie == "zoek op categorie":
                 

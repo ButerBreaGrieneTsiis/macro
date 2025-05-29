@@ -109,7 +109,7 @@ class Hoofdcategorieën(MacroTypeDatabank):
         
         while True:
             
-            kies_optie = invoer_kiezen("bestaande hoofdcategorie of maak een nieuwe", ["nieuwe hoofdcategorie", "zoek op hoofdcategorie"])
+            kies_optie = invoer_kiezen("bestaande hoofdcategorie of maak een nieuwe", ["zoek op hoofdcategorie", "nieuwe hoofdcategorie"])
             
             if kies_optie == "zoek op hoofdcategorie":
                 
@@ -165,7 +165,7 @@ class Categorieën(MacroTypeDatabank):
         
         while True:
             
-            kies_optie = invoer_kiezen("bestaande categorie of maak een nieuwe", ["nieuwe categorie", "zoek op hoofdcategorie"])
+            kies_optie = invoer_kiezen("bestaande categorie of maak een nieuwe", ["zoek op hoofdcategorie", "nieuwe categorie"])
             
             if kies_optie == "zoek op categorie":
                 

@@ -266,7 +266,7 @@ class Producten(MacroTypeDatabank):
         
         while True:
             
-            kies_optie = invoer_kiezen("product op naam, ingrediënt of categorie, of maak een nieuwe", ["nieuw product", "zoek op productnaam", "zoek op ingrediëntnaam", "zoek op categorie"], stoppen = stoppen)
+            kies_optie = invoer_kiezen("product op naam, ingrediënt of categorie, of maak een nieuwe", ["zoek op productnaam", "zoek op ingrediëntnaam", "zoek op categorie", "nieuw product"], stoppen = stoppen)
             
             if kies_optie is STOP:
                 return STOP
@@ -335,10 +335,11 @@ class Producten(MacroTypeDatabank):
         ) -> Eenheid | Stop:
         
         optie_dict = {
-            "nieuwe eenheid": "nieuwe eenheid",
             f"per \"{self[product_uuid].basis_eenheid.meervoud}\"": "basiseenheid"
         } | {
             f"per \"{eenheid.enkelvoud}\"": eenheid for eenheid in self[product_uuid].eenheden.keys()
+        } | {
+            "nieuwe eenheid": "nieuwe eenheid",
             }
         
         kies_optie = invoer_kiezen("bestaande eenheid of maakt een nieuwe", optie_dict, stoppen = stoppen)
@@ -358,7 +359,7 @@ class Producten(MacroTypeDatabank):
         if kies_bevestiging: print(f"\n>>> eenheid \"{eenheid.meervoud}\" gekozen")
         
         return eenheid
-        
+    
     def kiezen_product_eenheid(
         self,
         kies_bevestiging:   bool    = True,
