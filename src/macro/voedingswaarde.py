@@ -163,5 +163,5 @@ class Voedingswaarde:
             )
     
     @property
-    def kilojoule(self):
-        ...
+    def kilojoule(self) -> Hoeveelheid:
+        return Hoeveelheid(self.KILOJOULE_PER_KILOCALORIE*self.calorieën.waarde, Eenheid("kJ"))
