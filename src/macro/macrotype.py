@@ -19,17 +19,17 @@ class MacroType:
         **dict,
         ) -> "MacroType":
         
-        if "eenheid" in dict.keys():
+        if "eenheid" in dict:
             dict["eenheid"] = Eenheid(dict["eenheid"])
             
-        if "basis_eenheid" in dict.keys():
+        if "basis_eenheid" in dict:
             dict["basis_eenheid"] = Eenheid(dict["basis_eenheid"])
         
-        if "eenheden" in dict.keys():
+        if "eenheden" in dict:
             for eenheid in list(dict["eenheden"].keys()):
                 dict["eenheden"][Eenheid(eenheid)] =  dict["eenheden"].pop(eenheid)
         
-        if "datum" in dict.keys():
+        if "datum" in dict:
             dict["datum"] = dt.datetime.strptime(dict["datum"], "%Y-%m-%d").date()
         
         return cls(**dict)
@@ -145,6 +145,8 @@ class Eenheid(Enum):
     VERPAKKING  =   "verpakking",   "verpakkingen"
     GRAM        =   "g",            "g"
     MILLILITER  =   "ml",           "ml"
+    HECTOGRAM   =   "hg",           "hg"
+    DECILITER   =   "dl",           "dl"
     KILOCALORIE =   "kcal",         "kcal"
     KILOJOULE   =   "kJ",           "kJ"
     
@@ -159,8 +161,8 @@ class Eenheid(Enum):
 class Hoeveelheid(MacroType):
     
     VELDEN              = frozenset(("waarde", "eenheid", ))
-    BASIS_EENHEDEN      = [Eenheid["GRAM"], Eenheid["MILLILITER"]]
-    ENERGIE_EENHEDEN    = [Eenheid["KILOCALORIE"], Eenheid["KILOJOULE"]]
+    BASIS_EENHEDEN      = [Eenheid("hg"), Eenheid("dl")]
+    ENERGIE_EENHEDEN    = [Eenheid("kcal"), Eenheid("kJ")]
     
     def __init__(
         self,
@@ -173,17 +175,67 @@ class Hoeveelheid(MacroType):
     
     def __repr__(self) -> str:
         
-        vermenigvuldiger = 100.0 if self.eenheid in self.BASIS_EENHEDEN else 1.0
+        if self.eenheid == Eenheid("hg"):
+            eenheid = Eenheid("g")
+            waarde = self.waarde * 100.0
+        elif self.eenheid == Eenheid("dl"):
+            eenheid = Eenheid("ml")
+            waarde = self.waarde * 100.0
+        else:
+            eenheid = self.eenheid
+            waarde = self.waarde
         
-        formaat = ".0f" if self.waarde.is_integer() or self.eenheid in self.BASIS_EENHEDEN else ".2f"
+        formaat = ".0f" if waarde.is_integer() or eenheid in self.BASIS_EENHEDEN else ".2f"
         
         if self.waarde == 1.0:
-            return f"{self.waarde*vermenigvuldiger:{formaat}} {self.eenheid.enkelvoud}"
+            return f"{waarde:{formaat}} {eenheid.enkelvoud}"
         else:
-            return f"{self.waarde*vermenigvuldiger:{formaat}} {self.eenheid.meervoud}"
+            return f"{waarde:{formaat}} {eenheid.meervoud}"
     
-    def __add__(self, ander) -> "Hoeveelheid":
+    def __add__(
+        self,
+        ander: "Hoeveelheid",
+        ) -> "Hoeveelheid":
+        
         return Hoeveelheid(self.waarde + ander.waarde, self.eenheid)
     
-    def __eq__(self, ander) -> bool:
-        return self.eenheid == ander.eenheid
+    def __eq__(
+        self, 
+        ander,
+        ) -> bool:
+        
+        if isinstance(ander, float) or isinstance(ander, int):
+            return self.waarde == ander
+        elif isinstance(ander, Hoeveelheid):
+            return self.eenheid == ander.eenheid
+    
+    def __mul__(
+        self,
+        factor: float | int,
+        ) -> "Hoeveelheid":
+        
+        return Hoeveelheid(
+            factor * self.waarde,
+            self.eenheid,
+            )
+    
+    def __rmul__(
+        self,
+        factor: float | int,
+        ) -> "Hoeveelheid":
+        
+        return Hoeveelheid(
+            factor * self.waarde,
+            self.eenheid,
+            )
+    
+    def __iadd__(
+        self,
+        ander: "Hoeveelheid",
+        ) -> "Hoeveelheid":
+        
+        assert self == ander
+        
+        self.waarde += ander.waarde
+        
+        return self

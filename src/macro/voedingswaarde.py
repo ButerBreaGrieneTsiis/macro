@@ -1,11 +1,11 @@
-from typing import List
+from typing import Dict
 
 from grienetsiis import invoer_validatie, invoer_kiezen
 
-from .macrotype import MacroType
+from .macrotype import Hoeveelheid, Eenheid
 
 
-class Voedingswaarde(MacroType):
+class Voedingswaarde:
     
     VELDEN = frozenset(("calorieën", "vetten", "verzadigd", "koolhydraten", "suikers", "eiwitten", "vezels", "zout", ))
     
@@ -16,37 +16,36 @@ class Voedingswaarde(MacroType):
     
     def __init__(
         self,
-        calorieën: int      = 0,
-        vetten: int         = 0,
-        verzadigd: int      = 0,
-        koolhydraten: int   = 0,
-        suikers: int        = 0,
-        eiwitten: int       = 0,
-        vezels: int         = 0,
-        zout: int           = 0,
+        calorieën: Hoeveelheid      = None,
+        vetten: Hoeveelheid         = None,
+        verzadigd: Hoeveelheid      = None,
+        koolhydraten: Hoeveelheid   = None,
+        suikers: Hoeveelheid        = None,
+        eiwitten: Hoeveelheid       = None,
+        vezels: Hoeveelheid         = None,
+        zout: Hoeveelheid           = None,
         ) -> "Voedingswaarde":
         
-        self.calorieën      =   calorieën
-        self.vetten         =   vetten
-        self.verzadigd      =   verzadigd
-        self.koolhydraten   =   koolhydraten
-        self.suikers        =   suikers
-        self.eiwitten       =   eiwitten
-        self.vezels         =   vezels
-        self.zout           =   zout
+        self.calorieën    = calorieën    if calorieën    is not None else Hoeveelheid(0.0, Eenheid("kcal"))
+        self.vetten       = vetten       if vetten       is not None else Hoeveelheid(0.0, Eenheid("g"))
+        self.verzadigd    = verzadigd    if verzadigd    is not None else Hoeveelheid(0.0, Eenheid("g"))
+        self.koolhydraten = koolhydraten if koolhydraten is not None else Hoeveelheid(0.0, Eenheid("g"))
+        self.suikers      = suikers      if suikers      is not None else Hoeveelheid(0.0, Eenheid("g"))
+        self.eiwitten     = eiwitten     if eiwitten     is not None else Hoeveelheid(0.0, Eenheid("g"))
+        self.vezels       = vezels       if vezels       is not None else Hoeveelheid(0.0, Eenheid("g"))
+        self.zout         = zout         if zout         is not None else Hoeveelheid(0.0, Eenheid("g"))
     
     def __repr__(self):
         
         return (
-            f"    {"calorieën":<21}{self.calorieën:>6.0f} kcal\n"
-            f"    {f"({int(self.KILOJOULE_PER_KILOCALORIE*self.calorieën)}":>27} kJ)\n"
-            f"    {"vetten":<21}{self.vetten/10:>6.1f} g\n"
-            f"        {"waarvan verzadigd":<17}{self.verzadigd/10:>6.1f} g\n"
-            f"    {"koolydraten":<21}{self.koolhydraten/10:>6.1f} g\n"
-            f"        {"waarvan suikers":<17}{self.suikers/10:>6.1f} g\n"
-            f"    {"eiwitten":<21}{self.eiwitten/10:>6.1f} g\n"
-            f"    {"vezels":<21}{self.vezels/10:>6.1f} g\n"
-            f"    {"zout":<21}{self.zout/10:>6.1f} g"
+            f"    {"calorieën":<21}{self.calorieën} ({self.kilojoule})\n"
+            f"    {"vetten":<21}{self.vetten}\n"
+            f"      {"waarvan verzadigd":<19}{self.verzadigd}\n"
+            f"    {"koolydraten":<21}{self.koolhydraten}\n"
+            f"      {"waarvan suikers":<19}{self.suikers}\n"
+            f"    {"eiwitten":<21}{self.eiwitten}\n"
+            f"    {"vezels":<21}{self.vezels}\n"
+            f"    {"zout":<21}{self.zout}"
             )
     
     def __mul__(
@@ -97,18 +96,32 @@ class Voedingswaarde(MacroType):
             self.zout           + ander.zout,
             )
     
-    def afronden(self):
+    @classmethod
+    def van_json(
+        cls,
+        **dict,
+        ) -> "Voedingswaarde":
         
-        self.calorieën      =   round(self.calorieën)
-        self.vetten         =   round(self.vetten)
-        self.verzadigd      =   round(self.verzadigd)
-        self.koolhydraten   =   round(self.koolhydraten)
-        self.suikers        =   round(self.suikers)
-        self.eiwitten       =   round(self.eiwitten)
-        self.vezels         =   round(self.vezels)
-        self.zout           =   round(self.zout)
+        for sleutel in list(dict.keys()):
+            if sleutel == "calorieën":
+                dict["calorieën"] = Hoeveelheid(dict["calorieën"], Eenheid("kcal"))
+            else:
+                dict[sleutel] = Hoeveelheid(dict[sleutel]/10, Eenheid("g"))
         
-        return self
+        return cls(**dict)
+    
+    def naar_json(self) -> Dict[str, int]:
+        
+        dict_naar_json = {}
+        
+        for veld_sleutel, veld_waarde in self.__dict__.items():
+            
+            if veld_waarde == 0.0:
+                continue
+            
+            dict_naar_json[veld_sleutel] = int(round(10 * veld_waarde.waarde))
+        
+        return dict_naar_json
     
     @classmethod
     def nieuw(
@@ -148,3 +161,7 @@ class Voedingswaarde(MacroType):
             int(round(10 * vezels)),
             int(round(10 * zout)),
             )
+    
+    @property
+    def kilojoule(self):
+        ...

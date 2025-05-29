@@ -147,7 +147,7 @@ class Product(MacroType):
         merken          = Merken.openen()
         merk_uuid       = merken.kiezen()
         opmerking       = invoer_validatie("opmerking", str, kleine_letters = True)
-        basis_eenheid   = Eenheid(invoer_kiezen("eenheid", ["g", "ml"]))
+        basis_eenheid   = Eenheid(invoer_kiezen("eenheid", {"100 g": "hg", "100 ml": "dl"}))
         voedingswaarde  = Voedingswaarde.nieuw(basis_eenheid)
         
         return cls(
