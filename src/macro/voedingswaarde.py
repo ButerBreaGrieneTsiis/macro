@@ -145,7 +145,7 @@ class Voedingswaarde:
             calorieën_berekend = vetten * cls.CALORIE_PER_GRAM_VET + koolhydraten * cls.CALORIE_PER_GRAM_KOOLHYDRAAT + eiwitten * cls.CALORIE_PER_GRAM_EIWIT
             
             if abs(calorieën - calorieën_berekend) / ((calorieën + calorieën_berekend)/2) > 0.1:
-                print(f"calorieën ingevuld ({calorieën} kcal) en berekend ({calorieën_berekend} kcal) verschillen meer dan 10%")
+                print(f"calorieën ingevuld ({Hoeveelheid(calorieën, Eenheid("kcal"))}) en berekend ({Hoeveelheid(calorieën_berekend, Eenheid("kcal"))}) verschillen meer dan 10%")
                 if invoer_kiezen("doorgaan", {"ja": False, "nee": True}):
                     continue
             

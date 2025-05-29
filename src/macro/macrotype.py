@@ -173,10 +173,14 @@ class Hoeveelheid(MacroType):
     
     def __repr__(self) -> str:
         
-        formaat = ".0f" if self.waarde.is_integer() or self.eenheid in self.ENERGIE_EENHEDEN else (".1f" if self.eenheid in self.BASIS_EENHEDEN else ".2f")
         eenheid = self.eenheid.enkelvoud if self.waarde == 1.0 or self.eenheid in self.BASIS_EENHEDEN or self.eenheid in self.ENERGIE_EENHEDEN else self.eenheid.meervoud
         
+        if self.eenheid in self.ENERGIE_EENHEDEN:
+            return f"{f"{self.waarde:.0f}"} {eenheid}"
+        
+        formaat = ".1f" if self.eenheid in self.BASIS_EENHEDEN else ".3f"
         return f"{f"{self.waarde:{formaat}}".rstrip("0").rstrip(".")} {eenheid}"
+        
     
     def __add__(
         self,
