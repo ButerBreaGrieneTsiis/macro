@@ -92,7 +92,7 @@ class Merken(MacroTypeDatabank):
         self,
         kies_bevestiging:   bool    = True,
         geef_uuid:          bool    = True,
-        stoppen:            bool    = False,
+        stoppen:            bool    = True,
         ) -> Merk | str | Stop:
         
         while True:
