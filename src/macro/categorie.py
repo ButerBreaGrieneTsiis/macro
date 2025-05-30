@@ -47,10 +47,13 @@ class Categorie(MacroType):
         return f"categorie \"{self.categorie_naam}\""
     
     @classmethod
-    def nieuw(cls) -> "Categorie":
+    def nieuw(
+        cls,
+        terug_naar: str,
+        ) -> "Categorie":
         
         hoofdcategorieën = Hoofdcategorieën.openen()
-        hoofdcategorie_uuid = hoofdcategorieën.kiezen()
+        hoofdcategorie_uuid = hoofdcategorieën.kiezen(terug_naar)
         
         if hoofdcategorie_uuid is STOP:
             return STOP
@@ -75,11 +78,14 @@ class Hoofdcategorieën(MacroTypeDatabank):
         ObjectWijzer(Hoofdcategorie.van_json, Hoofdcategorie.VELDEN),
         ]
     
-    def opdracht(self):
+    def opdracht(
+        self,
+        terug_naar: str,
+        ):
         
         while True:
             
-            opdracht = invoer_kiezen("MENU GEGEVENS/HOOFDCATEGORIE", ["nieuwe hoofdcategorie"], stoppen = True, kies_een = False)
+            opdracht = invoer_kiezen("MENU GEGEVENS/HOOFDCATEGORIE", ["nieuwe hoofdcategorie"], stoppen = True, kies_een = False, terug_naar = terug_naar)
             
             if opdracht is STOP:
                 break
@@ -109,6 +115,7 @@ class Hoofdcategorieën(MacroTypeDatabank):
     
     def kiezen(
         self,
+        terug_naar: str,
         kies_bevestiging: bool = True,
         geef_uuid: bool =  True,
         stoppen: bool = True,
@@ -118,17 +125,17 @@ class Hoofdcategorieën(MacroTypeDatabank):
             
             if len(self) == 0:
             
-                kies_optie = invoer_kiezen("geen hoofdcategorieën aanwezig, maak een nieuwe hoofdcategorie", ["nieuwe hoofdcategorie"], kies_een = False, stoppen = stoppen)
+                kies_optie = invoer_kiezen("geen hoofdcategorieën aanwezig, maak een nieuwe hoofdcategorie", ["nieuwe hoofdcategorie"], kies_een = False, stoppen = stoppen, terug_naar = terug_naar)
                 
                 if kies_optie is STOP:
                     return STOP
                 
                 else:
-                    return self.nieuw(geef_uuid)
+                    return self.nieuw(geef_uuid = geef_uuid)
             
             else:
                 
-                kies_optie = invoer_kiezen("bestaande hoofdcategorie of maak een nieuwe", ["zoek op hoofdcategorie", "nieuwe hoofdcategorie"], stoppen = stoppen)
+                kies_optie = invoer_kiezen("bestaande hoofdcategorie of maak een nieuwe", ["zoek op hoofdcategorie", "nieuwe hoofdcategorie"], stoppen = stoppen, terug_naar = terug_naar)
                 
                 if kies_optie is STOP:
                     return STOP
@@ -141,7 +148,7 @@ class Hoofdcategorieën(MacroTypeDatabank):
                     return hoofdcategorie_uuid if geef_uuid else self[hoofdcategorie_uuid]
                 
                 else:
-                    return self.nieuw(geef_uuid)
+                    return self.nieuw(geef_uuid = geef_uuid)
 
 class Categorieën(MacroTypeDatabank):
     
@@ -150,27 +157,31 @@ class Categorieën(MacroTypeDatabank):
         ObjectWijzer(Categorie.van_json, Categorie.VELDEN),
         ]
     
-    def opdracht(self):
+    def opdracht(
+        self,
+        terug_naar: str,
+        ):
         
         while True:
         
-            opdracht = invoer_kiezen("MENU GEGEVENS/CATEGORIE", ["nieuwe categorie"], stoppen = True, kies_een = False)
+            opdracht = invoer_kiezen("MENU GEGEVENS/CATEGORIE", ["nieuwe categorie"], stoppen = True, kies_een = False, terug_naar = terug_naar)
             
             if opdracht is STOP:
                 break
             
             elif opdracht == "nieuwe categorie":
                 
-                self.nieuw()
+                self.nieuw(terug_naar = "MENU GEGEVENS/CATEGORIE")
             
         return self
     
     def nieuw(
         self,
+        terug_naar: str,
         geef_uuid: bool = True,
         ):
         
-        categorie = Categorie.nieuw()
+        categorie = Categorie.nieuw(terug_naar)
         if categorie is STOP:
             return STOP
         
@@ -183,6 +194,7 @@ class Categorieën(MacroTypeDatabank):
     
     def kiezen(
         self,
+        terug_naar: str,
         kies_bevestiging: bool = True,
         geef_uuid: bool =  True,
         stoppen: bool = True,
@@ -191,17 +203,17 @@ class Categorieën(MacroTypeDatabank):
         while True:
             if len(self) == 0:
             
-                kies_optie = invoer_kiezen("geen categorieën aanwezig, maak een nieuwe categorie", ["nieuwe categorie"], kies_een = False, stoppen = stoppen)
+                kies_optie = invoer_kiezen("geen categorieën aanwezig, maak een nieuwe categorie", ["nieuwe categorie"], kies_een = False, stoppen = stoppen, terug_naar = terug_naar)
                 
                 if kies_optie is STOP:
                     return STOP
                 
                 else:
-                    return self.nieuw(geef_uuid)
+                    return self.nieuw(terug_naar, geef_uuid = geef_uuid)
             
             else:
                 
-                kies_optie = invoer_kiezen("bestaande categorie of maak een nieuwe", ["zoek op hoofdcategorie", "nieuwe categorie"], stoppen = stoppen)
+                kies_optie = invoer_kiezen("bestaande categorie of maak een nieuwe", ["zoek op hoofdcategorie", "nieuwe categorie"], stoppen = stoppen, terug_naar = terug_naar)
                 
                 if kies_optie is STOP:
                     return STOP
@@ -211,10 +223,13 @@ class Categorieën(MacroTypeDatabank):
                     hoofdcategorieën = Hoofdcategorieën.openen()
                     hoofdcategorie_uuid = hoofdcategorieën.kiezen()
                     
-                    categorie_uuid = invoer_kiezen("categorie", {categorie.categorie_naam: categorie_uuid for categorie_uuid, categorie in self.items() if categorie.hoofdcategorie_uuid == hoofdcategorie_uuid})
+                    categorie_uuid = invoer_kiezen("categorie", {categorie.categorie_naam: categorie_uuid for categorie_uuid, categorie in self.items() if categorie.hoofdcategorie_uuid == hoofdcategorie_uuid}, stoppen = stoppen, terug_naar = terug_naar)
+                    if categorie_uuid is STOP:
+                        return STOP
+                    
                     if kies_bevestiging: print(f"\n>>> categorie \"{self[categorie_uuid].categorie_naam}\" gekozen")
                     
                     return categorie_uuid if geef_uuid else self[categorie_uuid]
                 
                 else:
-                    return self.nieuw(geef_uuid)
+                    return self.nieuw(terug_naar, geef_uuid = geef_uuid)

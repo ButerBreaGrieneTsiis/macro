@@ -24,17 +24,18 @@ class Ingrediënt(MacroType):
         return f"Ingrediënt {self.ingrediënt_naam}"
     
     @classmethod
-    def nieuw(cls):
+    def nieuw(
+        cls,
+        terug_naar: str,
+        ):
         
         categorieën = Categorieën.openen()
-        categorie_uuid = categorieën.kiezen()
+        categorie_uuid = categorieën.kiezen(terug_naar)
         if categorie_uuid is STOP:
             return STOP
         
         print(f"\ninvullen gegevens nieuw ingrediënt onder categorie \"{categorieën[categorie_uuid].categorie_naam}\"")
         ingrediënt_naam = invoer_validatie("ingrediëntnaam", str, valideren = True, kleine_letters = True, uitsluiten_leeg = True)
-        if ingrediënt_naam is STOP:
-            return STOP
         
         return cls(
             ingrediënt_naam,
@@ -57,26 +58,30 @@ class Ingrediënten(MacroTypeDatabank):
         ObjectWijzer(Ingrediënt.van_json, Ingrediënt.VELDEN),
         ]
     
-    def opdracht(self):
+    def opdracht(
+        self,
+        terug_naar: str,
+        ):
         
         while True:
             
-            opdracht = invoer_kiezen("MENU GEGEVENS/INGREDIËNT", ["nieuw ingrediënt"], stoppen = True, kies_een = False)
+            opdracht = invoer_kiezen("MENU GEGEVENS/INGREDIËNT", ["nieuw ingrediënt"], stoppen = True, kies_een = False, terug_naar = terug_naar)
             
             if opdracht is STOP:
                 break
             
             elif opdracht == "nieuw ingrediënt":
-                self.nieuw()
+                self.nieuw(terug_naar = "MENU GEGEVENS/INGREDIËNT")
         
         return self
     
     def nieuw(
         self,
+        terug_naar: str,
         geef_uuid: bool = True,
         ):
         
-        ingrediënt = Ingrediënt.nieuw()
+        ingrediënt = Ingrediënt.nieuw(terug_naar)
         if ingrediënt is STOP:
             return STOP
         
@@ -89,6 +94,7 @@ class Ingrediënten(MacroTypeDatabank):
     
     def kiezen(
         self,
+        terug_naar: str,
         kies_bevestiging: bool = True,
         geef_uuid: bool =  True,
         stoppen: bool = False,
@@ -98,17 +104,17 @@ class Ingrediënten(MacroTypeDatabank):
             
             if len(self) == 0:
                 
-                kies_optie = invoer_kiezen("geen ingrediënten aanwezig, maak een nieuw ingrediënt", ["nieuw ingrediënt"], kies_een = False, stoppen = stoppen)
+                kies_optie = invoer_kiezen("geen ingrediënten aanwezig, maak een nieuw ingrediënt", ["nieuw ingrediënt"], kies_een = False, stoppen = stoppen, terug_naar = terug_naar)
                 
                 if kies_optie is STOP:
                     return STOP
                 
                 else:
-                    return self.nieuw(geef_uuid)
+                    return self.nieuw(terug_naar, geef_uuid = geef_uuid)
             
             else:
             
-                kies_optie = invoer_kiezen("ingrediënt op naam of categorie, of maak een nieuwe", ["zoek op ingrediëntnaam", "zoek op categorie", "nieuw ingrediënt"], stoppen = stoppen)
+                kies_optie = invoer_kiezen("ingrediënt op naam of categorie, of maak een nieuwe", ["zoek op ingrediëntnaam", "zoek op categorie", "nieuw ingrediënt"], stoppen = stoppen, terug_naar = terug_naar)
                 
                 if kies_optie is STOP:
                     return STOP
@@ -125,7 +131,7 @@ class Ingrediënten(MacroTypeDatabank):
                     
                     else:
                         categorieën = Categorieën.openen()
-                        categorie_uuid = categorieën.kiezen()
+                        categorie_uuid = categorieën.kiezen(terug_naar)
                         
                         if categorie_uuid is STOP:
                             return STOP
@@ -136,7 +142,7 @@ class Ingrediënten(MacroTypeDatabank):
                             continue
                     
                     print(f"\n>>> {len(ingrediënten_mogelijk)} ingrediënt{"en" if len(ingrediënten_mogelijk) > 1 else ""} gevonden")
-                    ingrediënt_uuid = invoer_kiezen("ingrediënt", {ingrediënt.ingrediënt_naam: ingrediënt_uuid for ingrediënt_uuid, ingrediënt in self.items() if ingrediënt_uuid in ingrediënten_mogelijk}, stoppen = True)
+                    ingrediënt_uuid = invoer_kiezen("ingrediënt", {ingrediënt.ingrediënt_naam: ingrediënt_uuid for ingrediënt_uuid, ingrediënt in self.items() if ingrediënt_uuid in ingrediënten_mogelijk}, stoppen = True, terug_naar = terug_naar)
                     
                     if ingrediënt_uuid is STOP:
                         continue
@@ -146,4 +152,4 @@ class Ingrediënten(MacroTypeDatabank):
                     return ingrediënt_uuid if geef_uuid else self[ingrediënt_uuid]
                 
                 else:
-                    return self.nieuw(geef_uuid)
+                    return self.nieuw(terug_naar, geef_uuid = geef_uuid)

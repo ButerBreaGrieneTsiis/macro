@@ -74,11 +74,14 @@ class Dag(MacroType):
         else:
             return cls(datum)
     
-    def opdracht(self):
+    def opdracht(
+        self,
+        terug_naar: str,
+        ):
         
         while True:
             
-            opdracht = invoer_kiezen(f"MENU DAG/{f"{self.dag}".upper()}", ["toevoegen producten", "toevoegen gerechten","toon voedingswaarde", "toon producten"], stoppen = True, kies_een = False)
+            opdracht = invoer_kiezen(f"MENU DAG/{f"{self.dag}".upper()}", ["toevoegen producten", "toevoegen gerechten","toon voedingswaarde", "toon producten"], stoppen = True, kies_een = False, terug_naar = terug_naar)
             
             if opdracht is STOP:
                 break
@@ -89,7 +92,7 @@ class Dag(MacroType):
                 
                 while True:
                     
-                    product, eenheid = producten.kiezen_product_eenheid(geef_uuid = False, stoppen = True)
+                    product, eenheid = producten.kiezen_product_eenheid(terug_naar = f"MENU DAG/{f"{self.dag}".upper()}", geef_uuid = False, stoppen = True)
                     
                     if product is STOP:
                         break

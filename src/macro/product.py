@@ -24,9 +24,12 @@ class Merk(MacroType):
         return f"merk \"{self.merk_naam}\""
     
     @classmethod
-    def nieuw(cls) -> "Merk":
+    def nieuw(
+        cls,
+        terug_naar: str,
+        ) -> "Merk":
         
-        merk_naam = invoer_validatie("merknaam", str, valideren = True, kleine_letters = True, uitsluiten_leeg = True, stoppen = True)
+        merk_naam = invoer_validatie("merknaam", str, valideren = True, kleine_letters = True, uitsluiten_leeg = True, stoppen = True, terug_naar = terug_naar)
         if merk_naam is STOP:
             return STOP
         
@@ -41,29 +44,32 @@ class Merken(MacroTypeDatabank):
         ObjectWijzer(Merk.van_json, Merk.VELDEN),
         ]
     
-    def opdracht(self):
+    def opdracht(
+        self,
+        terug_naar: str,
+        ):
         
         while True:
             
             if len(self) == 0:
             
-                opdracht = invoer_kiezen("MENU GEGEVENS/MERK", ["nieuw merk"], stoppen = True, kies_een = False)
+                opdracht = invoer_kiezen("MENU GEGEVENS/MERK", ["nieuw merk"], stoppen = True, kies_een = False, terug_naar = terug_naar)
                 
                 if opdracht is STOP:
                     break
                 
                 elif opdracht == "nieuw merk":
-                    self.nieuw()
+                    self.nieuw(terug_naar = "MENU GEGEVENS/MERK")
             
             else:
                 
-                opdracht = invoer_kiezen("MENU GEGEVENS/MERK", ["nieuw merk", "weergeven merk"], stoppen = True, kies_een = False)
+                opdracht = invoer_kiezen("MENU GEGEVENS/MERK", ["nieuw merk", "weergeven merk"], stoppen = True, kies_een = False, terug_naar = terug_naar)
                 
                 if opdracht is STOP:
                     break
                 
                 elif opdracht == "nieuw merk":
-                    self.nieuw()
+                    self.nieuw(terug_naar = "MENU GEGEVENS/MERK")
                 
                 elif opdracht == "weergeven merk":
                     merk_uuid = self.kiezen(kies_bevestiging = False)
@@ -74,10 +80,11 @@ class Merken(MacroTypeDatabank):
     
     def nieuw(
         self,
+        terug_naar: str,
         geef_uuid: bool = True,
         ):
         
-        merk = Merk.nieuw()
+        merk = Merk.nieuw(terug_naar)
         if merk is STOP:
             return STOP
         
@@ -90,6 +97,7 @@ class Merken(MacroTypeDatabank):
     
     def kiezen(
         self,
+        terug_naar: str,
         kies_bevestiging:   bool    = True,
         geef_uuid:          bool    = True,
         stoppen:            bool    = True,
@@ -99,17 +107,17 @@ class Merken(MacroTypeDatabank):
             
             if len(self) == 0:
                 
-                kies_optie = invoer_kiezen("geen merken aanwezig, maak een nieuw merk", ["nieuw merk"], stoppen = stoppen, kies_een = False)
+                kies_optie = invoer_kiezen("geen merken aanwezig, maak een nieuw merk", ["nieuw merk"], stoppen = stoppen, kies_een = False, terug_naar = terug_naar)
                 
                 if kies_optie is STOP:
                     return STOP
                 
                 else:
-                    return self.nieuw(geef_uuid)
+                    return self.nieuw(terug_naar, geef_uuid = geef_uuid)
             
             else:
                 
-                kies_optie = invoer_kiezen("merk op naam of maak een nieuwe", ["merknaam", "nieuw merk"], stoppen = stoppen)
+                kies_optie = invoer_kiezen("merk op naam of maak een nieuwe", ["merknaam", "nieuw merk"], stoppen = stoppen, terug_naar = terug_naar)
                 
                 if kies_optie is STOP:
                     return STOP
@@ -125,7 +133,7 @@ class Merken(MacroTypeDatabank):
                         print(f"\n>>> geen merken gevonden")
                         continue
                     
-                    merk_uuid = invoer_kiezen("merk", {merk.merk_naam: merk_uuid for merk_uuid, merk in self.items() if merk_uuid in merken_mogelijk}, stoppen = True)
+                    merk_uuid = invoer_kiezen("merk", {merk.merk_naam: merk_uuid for merk_uuid, merk in self.items() if merk_uuid in merken_mogelijk}, stoppen = True, terug_naar = terug_naar)
                     
                     if merk_uuid is STOP:
                         continue
@@ -135,7 +143,7 @@ class Merken(MacroTypeDatabank):
                     return merk_uuid if geef_uuid else self[merk_uuid]
                 
                 else:
-                    return self.nieuw(geef_uuid)
+                    return self.nieuw(terug_naar, geef_uuid = geef_uuid)
 
 class Product(MacroType):
     
@@ -168,10 +176,13 @@ class Product(MacroType):
         + f"\n{self.voedingswaarde}"
     
     @classmethod
-    def nieuw(cls) -> "Product":
+    def nieuw(
+        cls,
+        terug_naar: str,
+        ) -> "Product":
         
         ingrediënten    = Ingrediënten.openen()
-        ingrediënt_uuid = ingrediënten.kiezen(stoppen = True)
+        ingrediënt_uuid = ingrediënten.kiezen(terug_naar, stoppen = True)
         
         if ingrediënt_uuid is STOP:
             return STOP
@@ -179,7 +190,7 @@ class Product(MacroType):
         print(f"\ninvullen gegevens nieuw product onder ingrediënt \"{ingrediënten[ingrediënt_uuid].ingrediënt_naam}\"")
         product_naam    = invoer_validatie("productnaam", str, valideren = True, kleine_letters = True, uitsluiten_leeg = True)
         merken          = Merken.openen()
-        merk_uuid       = merken.kiezen()
+        merk_uuid       = merken.kiezen(terug_naar)
         
         if merk_uuid is STOP:
             return STOP
@@ -242,27 +253,30 @@ class Producten(MacroTypeDatabank):
         ObjectWijzer(Voedingswaarde.van_json, Voedingswaarde.VELDEN),
         ]
     
-    def opdracht(self):
+    def opdracht(
+        self,
+        terug_naar: str,
+        ):
         
         while True:
             
             if len(self) == 0:
-                opdracht = invoer_kiezen("MENU GEGEVENS/PRODUCT", ["nieuw product"], stoppen = True, kies_een = False)
+                opdracht = invoer_kiezen("MENU GEGEVENS/PRODUCT", ["nieuw product"], stoppen = True, kies_een = False, terug_naar = terug_naar)
             
                 if opdracht is STOP:
                     break
                 
                 elif opdracht == "nieuw product":
-                    self.nieuw()
+                    self.nieuw(terug_naar = "MENU GEGEVENS/PRODUCT")
                 
             else:
-                opdracht = invoer_kiezen("MENU GEGEVENS/PRODUCT", ["nieuw product", "nieuwe eenheid", "weergeven product"], stoppen = True, kies_een = False)
+                opdracht = invoer_kiezen("MENU GEGEVENS/PRODUCT", ["nieuw product", "nieuwe eenheid", "weergeven product"], stoppen = True, kies_een = False, terug_naar = terug_naar)
                 
                 if opdracht is STOP:
                     break
                 
                 elif opdracht == "nieuw product":
-                    self.nieuw()
+                    self.nieuw(terug_naar = "MENU GEGEVENS/PRODUCT")
                 
                 elif opdracht == "nieuwe eenheid":
                     self.nieuwe_eenheid()
@@ -276,10 +290,11 @@ class Producten(MacroTypeDatabank):
     
     def nieuw(
         self,
+        terug_naar: str,
         geef_uuid: bool = True,
         ):
         
-        product = Product.nieuw()
+        product = Product.nieuw(terug_naar)
         
         if product is STOP:
             return STOP
@@ -309,6 +324,7 @@ class Producten(MacroTypeDatabank):
     
     def kiezen_product(
         self,
+        terug_naar: str,
         kies_bevestiging:   bool    = True,
         geef_uuid:          bool    = True,
         stoppen:            bool    = True,
@@ -318,17 +334,17 @@ class Producten(MacroTypeDatabank):
             
             if len(self) == 0:
                 
-                kies_optie = invoer_kiezen("geen producten aanwezig, maak een nieuw product", ["nieuw product"], stoppen = stoppen, kies_een = False)
+                kies_optie = invoer_kiezen("geen producten aanwezig, maak een nieuw product", ["nieuw product"], stoppen = stoppen, kies_een = False, terug_naar = terug_naar)
                 
                 if kies_optie is STOP:
                     return STOP
                 
                 else:
-                    return self.nieuw(geef_uuid)
+                    return self.nieuw(terug_naar, geef_uuid = geef_uuid)
             
             else:
             
-                kies_optie = invoer_kiezen("product op naam, ingrediënt of categorie, of maak een nieuwe", ["zoek op productnaam", "zoek op ingrediëntnaam", "zoek op categorie", "nieuw product"], stoppen = stoppen)
+                kies_optie = invoer_kiezen("product op naam, ingrediënt of categorie, of maak een nieuwe", ["zoek op productnaam", "zoek op ingrediëntnaam", "zoek op categorie", "nieuw product"], stoppen = stoppen, terug_naar = terug_naar)
                 
                 if kies_optie is STOP:
                     return STOP
@@ -348,7 +364,7 @@ class Producten(MacroTypeDatabank):
                         else:
                             
                             categorieën = Categorieën.openen()
-                            categorie_uuid = categorieën.kiezen()
+                            categorie_uuid = categorieën.kiezen(terug_naar)
                             
                             if categorie_uuid is STOP:
                                 STOP
@@ -360,7 +376,7 @@ class Producten(MacroTypeDatabank):
                             print(f">>> geen ingrediënten gevonden")
                             continue
                         
-                        ingrediënt_uuid = invoer_kiezen("ingrediënt", {ingrediënt.ingrediënt_naam: ingrediënt_uuid for ingrediënt_uuid, ingrediënt in ingrediënten.items() if ingrediënt_uuid in ingrediënten_mogelijk}, stoppen = True)
+                        ingrediënt_uuid = invoer_kiezen("ingrediënt", {ingrediënt.ingrediënt_naam: ingrediënt_uuid for ingrediënt_uuid, ingrediënt in ingrediënten.items() if ingrediënt_uuid in ingrediënten_mogelijk}, stoppen = True, terug_naar = terug_naar)
                         
                         if ingrediënt_uuid is STOP:
                             continue
@@ -380,7 +396,7 @@ class Producten(MacroTypeDatabank):
                         print(f"\n>>> geen producten gevonden")
                         continue
                     
-                    product_uuid = invoer_kiezen("product", {product.product_naam: product_uuid for product_uuid, product in self.items() if product_uuid in producten_mogelijk}, stoppen = True)
+                    product_uuid = invoer_kiezen("product", {product.product_naam: product_uuid for product_uuid, product in self.items() if product_uuid in producten_mogelijk}, stoppen = True, terug_naar = terug_naar)
                     
                     if product_uuid is STOP:
                         continue
@@ -390,7 +406,7 @@ class Producten(MacroTypeDatabank):
                     return product_uuid if geef_uuid else self[product_uuid]
                 
                 else:
-                    return self.nieuw(geef_uuid)
+                    return self.nieuw(terug_naar, geef_uuid = geef_uuid)
     
     def kiezen_eenheid(
         self,
@@ -427,17 +443,18 @@ class Producten(MacroTypeDatabank):
     
     def kiezen_product_eenheid(
         self,
+        terug_naar: str,
         kies_bevestiging:   bool    = True,
         geef_uuid:          bool    = True,
         stoppen:            bool    = True,
         ) -> Tuple[Product | Stop, Eenheid | Stop]:
         
-        product_uuid = self.kiezen_product(kies_bevestiging, stoppen)
+        product_uuid = self.kiezen_product(terug_naar, kies_bevestiging = kies_bevestiging, stoppen = stoppen)
         
         if product_uuid is STOP:
             return STOP, ...
         
-        eenheid = self.kiezen_eenheid(product_uuid, kies_bevestiging, stoppen)
+        eenheid = self.kiezen_eenheid(terug_naar, product_uuid, kies_bevestiging = kies_bevestiging, stoppen = stoppen)
         
         if eenheid is STOP:
             return product_uuid if geef_uuid else self[product_uuid], STOP
