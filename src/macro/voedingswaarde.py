@@ -134,20 +134,55 @@ class Voedingswaarde:
             
             print(f"vul de voedingswaarde in per {Hoeveelheid(100, basis_eenheid)}")
             
-            calorieën = invoer_validatie("calorieën", int, bereik = (0, 900))
-            vetten = invoer_validatie("vetten", float, bereik = (0.0, 100.0))
-            verzadigd = invoer_validatie("waarvan verzadigd", float, bereik = (0.0, vetten)) if not vetten == 0.0 else 0.0
-            koolhydraten = invoer_validatie("koolhydraten", float, bereik = (0.0, 100.0))
-            suikers = invoer_validatie("waarvan suikers", float, bereik = (0.0, koolhydraten)) if not koolhydraten == 0.0 else 0.0
-            eiwitten = invoer_validatie("eiwitten", float, bereik = (0.0, 100.0))
-            vezels = invoer_validatie("vezels", float, bereik = (0.0, 100.0))
-            zout = invoer_validatie("zout", float, bereik = (0.0, 100.0))
+            calorieën = invoer_validatie(
+                "calorieën",
+                int,
+                bereik = (0, 900),
+                )
+            vetten = invoer_validatie(
+                "vetten",
+                float,
+                bereik = (0.0, 100.0),
+                )
+            verzadigd = invoer_validatie(
+                "waarvan verzadigd",
+                float,
+                bereik = (0.0, vetten),
+                ) if not vetten == 0.0 else 0.0
+            koolhydraten = invoer_validatie(
+                "koolhydraten",
+                float,
+                bereik = (0.0, 100.0),
+                )
+            suikers = invoer_validatie(
+                "waarvan suikers",
+                float,
+                bereik = (0.0, koolhydraten),
+                ) if not koolhydraten == 0.0 else 0.0
+            eiwitten = invoer_validatie(
+                "eiwitten",
+                float,
+                bereik = (0.0, 100.0),
+                )
+            vezels = invoer_validatie(
+                "vezels",
+                float,
+                bereik = (0.0, 100.0),
+                )
+            zout = invoer_validatie(
+                "zout",
+                float,
+                bereik = (0.0, 100.0),
+                )
             
             calorieën_berekend = vetten * cls.CALORIE_PER_GRAM_VET + koolhydraten * cls.CALORIE_PER_GRAM_KOOLHYDRAAT + eiwitten * cls.CALORIE_PER_GRAM_EIWIT
             
             if abs(calorieën - calorieën_berekend) / ((calorieën + calorieën_berekend)/2) > 0.1:
                 print(f"calorieën ingevuld ({Hoeveelheid(calorieën, Eenheid("kcal"))}) en berekend ({Hoeveelheid(calorieën_berekend, Eenheid("kcal"))}) verschillen meer dan 10%")
-                if invoer_kiezen("doorgaan", {"ja": False, "nee": True}):
+                if invoer_kiezen(
+                    "doorgaan",
+                    {"ja": False, "nee": True},
+                    ):
                     continue
             
             break

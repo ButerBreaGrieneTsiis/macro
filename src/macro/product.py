@@ -29,7 +29,15 @@ class Merk(MacroType):
         terug_naar: str,
         ) -> "Merk":
         
-        merk_naam = invoer_validatie("merknaam", str, valideren = True, kleine_letters = True, uitsluiten_leeg = True, stoppen = True, terug_naar = terug_naar)
+        merk_naam = invoer_validatie(
+            "merknaam",
+            str,
+            valideren = True,
+            kleine_letters = True,
+            uitsluiten_leeg = True,
+            stoppen = True,
+            terug_naar = terug_naar,
+            )
         if merk_naam is STOP:
             return STOP
         
@@ -53,7 +61,13 @@ class Merken(MacroTypeDatabank):
             
             if len(self) == 0:
             
-                opdracht = invoer_kiezen("MENU GEGEVENS/MERK", ["nieuw merk"], stoppen = True, kies_een = False, terug_naar = terug_naar)
+                opdracht = invoer_kiezen(
+                    "MENU GEGEVENS/MERK",
+                    ["nieuw merk"],
+                    stoppen = True,
+                    kies_een = False,
+                    terug_naar = terug_naar,
+                    )
                 
                 if opdracht is STOP:
                     break
@@ -107,7 +121,13 @@ class Merken(MacroTypeDatabank):
             
             if len(self) == 0:
                 
-                kies_optie = invoer_kiezen("geen merken aanwezig, maak een nieuw merk", ["nieuw merk"], stoppen = stoppen, kies_een = False, terug_naar = terug_naar)
+                kies_optie = invoer_kiezen(
+                    "geen merken aanwezig, maak een nieuw merk",
+                    ["nieuw merk"],
+                    stoppen = stoppen,
+                    kies_een = False,
+                    terug_naar = terug_naar,
+                    )
                 
                 if kies_optie is STOP:
                     return STOP
@@ -117,7 +137,12 @@ class Merken(MacroTypeDatabank):
             
             else:
                 
-                kies_optie = invoer_kiezen("merk op naam of maak een nieuwe", ["merknaam", "nieuw merk"], stoppen = stoppen, terug_naar = terug_naar)
+                kies_optie = invoer_kiezen(
+                    "merk op naam of maak een nieuwe",
+                    ["merknaam", "nieuw merk"],
+                    stoppen = stoppen,
+                    terug_naar = terug_naar,
+                    )
                 
                 if kies_optie is STOP:
                     return STOP
@@ -125,7 +150,11 @@ class Merken(MacroTypeDatabank):
                 if kies_optie == "merknaam":
                     
                     print("\ngeef een zoekterm op voor een merk")
-                    zoekterm = invoer_validatie("zoekterm", str, kleine_letters = True)
+                    zoekterm = invoer_validatie(
+                        "zoekterm",
+                        str,
+                        kleine_letters = True,
+                        )
                     
                     merken_mogelijk = [merk_uuid for merk_uuid, merk in self.items() if zoekterm in merk.merk_naam]
                     
@@ -133,7 +162,12 @@ class Merken(MacroTypeDatabank):
                         print(f"\n>>> geen merken gevonden")
                         continue
                     
-                    merk_uuid = invoer_kiezen("merk", {merk.merk_naam: merk_uuid for merk_uuid, merk in self.items() if merk_uuid in merken_mogelijk}, stoppen = True, terug_naar = terug_naar)
+                    merk_uuid = invoer_kiezen(
+                        "merk",
+                        {merk.merk_naam: merk_uuid for merk_uuid, merk in self.items() if merk_uuid in merken_mogelijk},
+                        stoppen = True,
+                        terug_naar = terug_naar,
+                        )
                     
                     if merk_uuid is STOP:
                         continue
@@ -188,15 +222,28 @@ class Product(MacroType):
             return STOP
         
         print(f"\ninvullen gegevens nieuw product onder ingrediënt \"{ingrediënten[ingrediënt_uuid].ingrediënt_naam}\"")
-        product_naam    = invoer_validatie("productnaam", str, valideren = True, kleine_letters = True, uitsluiten_leeg = True)
+        product_naam    = invoer_validatie(
+            "productnaam",
+            str,
+            valideren = True,
+            kleine_letters = True,
+            uitsluiten_leeg = True,
+            )
         merken          = Merken.openen()
         merk_uuid       = merken.kiezen(terug_naar)
         
         if merk_uuid is STOP:
             return STOP
         
-        opmerking       = invoer_validatie("opmerking", str, kleine_letters = True)
-        basis_eenheid   = Eenheid(invoer_kiezen("eenheid waarvoor voedingswaarden gelden", {f"{Hoeveelheid(100, basis_eenheid)}": basis_eenheid for basis_eenheid in Hoeveelheid.BASIS_EENHEDEN}))
+        opmerking       = invoer_validatie(
+            "opmerking",
+            str,
+            kleine_letters = True,
+            )
+        basis_eenheid   = Eenheid(invoer_kiezen(
+            "eenheid waarvoor voedingswaarden gelden",
+            {f"{Hoeveelheid(100, basis_eenheid)}": basis_eenheid for basis_eenheid in Hoeveelheid.BASIS_EENHEDEN},
+            ))
         voedingswaarde  = Voedingswaarde.nieuw(basis_eenheid)
         
         return cls(
@@ -210,10 +257,16 @@ class Product(MacroType):
     
     def nieuwe_eenheid(self) -> Eenheid:
         # TE DOEN: check toevoegen voor overschrijven
-        eenheid = invoer_kiezen("eenheid", {eenheid.enkelvoud: eenheid for eenheid in Eenheid if eenheid not in Hoeveelheid.BASIS_EENHEDEN and eenheid not in Hoeveelheid.ENERGIE_EENHEDEN})
+        eenheid = invoer_kiezen(
+            "eenheid",
+            {eenheid.enkelvoud: eenheid for eenheid in Eenheid if eenheid not in Hoeveelheid.BASIS_EENHEDEN and eenheid not in Hoeveelheid.ENERGIE_EENHEDEN},
+            )
         
         print(f"hoeveel {self.basis_eenheid.meervoud} is \"{Hoeveelheid(1, eenheid)}\"?")
-        waarde = invoer_validatie(f"hoeveel {self.basis_eenheid.meervoud}", type = int)
+        waarde = invoer_validatie(
+            f"hoeveel {self.basis_eenheid.meervoud}",
+            int,
+            )
         
         print(f">>> eenheid \"{eenheid.meervoud}\" toegevoegd van {Hoeveelheid(waarde, self.basis_eenheid)}")
         self.eenheden[eenheid] = waarde
@@ -261,7 +314,13 @@ class Producten(MacroTypeDatabank):
         while True:
             
             if len(self) == 0:
-                opdracht = invoer_kiezen("MENU GEGEVENS/PRODUCT", ["nieuw product"], stoppen = True, kies_een = False, terug_naar = terug_naar)
+                opdracht = invoer_kiezen(
+                    "MENU GEGEVENS/PRODUCT",
+                    ["nieuw product"],
+                    stoppen = True,
+                    kies_een = False,
+                    terug_naar = terug_naar,
+                    )
             
                 if opdracht is STOP:
                     break
@@ -270,7 +329,13 @@ class Producten(MacroTypeDatabank):
                     self.nieuw(terug_naar = "MENU GEGEVENS/PRODUCT")
                 
             else:
-                opdracht = invoer_kiezen("MENU GEGEVENS/PRODUCT", ["nieuw product", "nieuwe eenheid", "weergeven product"], stoppen = True, kies_een = False, terug_naar = terug_naar)
+                opdracht = invoer_kiezen(
+                    "MENU GEGEVENS/PRODUCT",
+                    ["nieuw product", "nieuwe eenheid", "weergeven product"],
+                    stoppen = True,
+                    kies_een = False,
+                    terug_naar = terug_naar,
+                    )
                 
                 if opdracht is STOP:
                     break
@@ -299,7 +364,11 @@ class Producten(MacroTypeDatabank):
         if product is STOP:
             return STOP
         
-        if invoer_kiezen("toevoegen nieuwe eenheid", {"ja": True, "nee": False}, kies_een = False):
+        if invoer_kiezen(
+            "toevoegen nieuwe eenheid",
+            {"ja": True, "nee": False},
+            kies_een = False,
+            ):
             product.nieuwe_eenheid()
         
         product_uuid = str(uuid4())
@@ -334,7 +403,13 @@ class Producten(MacroTypeDatabank):
             
             if len(self) == 0:
                 
-                kies_optie = invoer_kiezen("geen producten aanwezig, maak een nieuw product", ["nieuw product"], stoppen = stoppen, kies_een = False, terug_naar = terug_naar)
+                kies_optie = invoer_kiezen(
+                    "geen producten aanwezig, maak een nieuw product",
+                    ["nieuw product"],
+                    stoppen = stoppen,
+                    kies_een = False,
+                    terug_naar = terug_naar,
+                    )
                 
                 if kies_optie is STOP:
                     return STOP
@@ -344,7 +419,12 @@ class Producten(MacroTypeDatabank):
             
             else:
             
-                kies_optie = invoer_kiezen("product op naam, ingrediënt of categorie, of maak een nieuwe", ["zoek op productnaam", "zoek op ingrediëntnaam", "zoek op categorie", "nieuw product"], stoppen = stoppen, terug_naar = terug_naar)
+                kies_optie = invoer_kiezen(
+                    "product op naam, ingrediënt of categorie, of maak een nieuwe",
+                    ["zoek op productnaam", "zoek op ingrediëntnaam", "zoek op categorie", "nieuw product"],
+                    stoppen = stoppen,
+                    terug_naar = terug_naar,
+                    )
                 
                 if kies_optie is STOP:
                     return STOP
@@ -356,7 +436,11 @@ class Producten(MacroTypeDatabank):
                         if kies_optie == "zoek op ingrediëntnaam":
                             
                             print("\ngeef een zoekterm op voor een ingrediënt")
-                            zoekterm = invoer_validatie("zoekterm", str, kleine_letters = True)
+                            zoekterm = invoer_validatie(
+                                "zoekterm",
+                                str,
+                                kleine_letters = True,
+                                )
                             
                             ingrediënten = Ingrediënten.openen()
                             ingrediënten_mogelijk = [ingrediënt_uuid for ingrediënt_uuid, ingrediënt in ingrediënten.items() if zoekterm in ingrediënt.ingrediënt_naam]
@@ -376,7 +460,12 @@ class Producten(MacroTypeDatabank):
                             print(f">>> geen ingrediënten gevonden")
                             continue
                         
-                        ingrediënt_uuid = invoer_kiezen("ingrediënt", {ingrediënt.ingrediënt_naam: ingrediënt_uuid for ingrediënt_uuid, ingrediënt in ingrediënten.items() if ingrediënt_uuid in ingrediënten_mogelijk}, stoppen = True, terug_naar = terug_naar)
+                        ingrediënt_uuid = invoer_kiezen(
+                            "ingrediënt",
+                            {ingrediënt.ingrediënt_naam: ingrediënt_uuid for ingrediënt_uuid, ingrediënt in ingrediënten.items() if ingrediënt_uuid in ingrediënten_mogelijk},
+                            stoppen = True,
+                            terug_naar = terug_naar,
+                            )
                         
                         if ingrediënt_uuid is STOP:
                             continue
@@ -388,7 +477,11 @@ class Producten(MacroTypeDatabank):
                     else:
                         
                         print("\ngeef een zoekterm op voor een product")
-                        zoekterm = invoer_validatie("zoekterm", str, kleine_letters = True)
+                        zoekterm = invoer_validatie(
+                            "zoekterm",
+                            str,
+                            kleine_letters = True,
+                            )
                         
                         producten_mogelijk = [product_uuid for product_uuid, product in self.items() if zoekterm in product.product_naam]
                     
@@ -396,7 +489,12 @@ class Producten(MacroTypeDatabank):
                         print(f"\n>>> geen producten gevonden")
                         continue
                     
-                    product_uuid = invoer_kiezen("product", {product.product_naam: product_uuid for product_uuid, product in self.items() if product_uuid in producten_mogelijk}, stoppen = True, terug_naar = terug_naar)
+                    product_uuid = invoer_kiezen(
+                        "product",
+                        {product.product_naam: product_uuid for product_uuid, product in self.items() if product_uuid in producten_mogelijk},
+                        stoppen = True,
+                        terug_naar = terug_naar,
+                        )
                     
                     if product_uuid is STOP:
                         continue
@@ -423,7 +521,11 @@ class Producten(MacroTypeDatabank):
             "nieuwe eenheid": "nieuwe eenheid",
             }
         
-        kies_optie = invoer_kiezen("bestaande eenheid of maakt een nieuwe", optie_dict, stoppen = stoppen)
+        kies_optie = invoer_kiezen(
+            "bestaande eenheid of maakt een nieuwe",
+            optie_dict,
+            stoppen = stoppen,
+            )
         
         if kies_optie is STOP:
             return STOP

@@ -81,7 +81,13 @@ class Dag(MacroType):
         
         while True:
             
-            opdracht = invoer_kiezen(f"MENU DAG/{f"{self.dag}".upper()}", ["toevoegen producten", "toevoegen gerechten","toon voedingswaarde", "toon producten"], stoppen = True, kies_een = False, terug_naar = terug_naar)
+            opdracht = invoer_kiezen(
+                f"MENU DAG/{f"{self.dag}".upper()}",
+                ["toevoegen producten", "toevoegen gerechten","toon voedingswaarde", "toon producten"],
+                stoppen = True,
+                kies_een = False,
+                terug_naar = terug_naar,
+                )
             
             if opdracht is STOP:
                 break
@@ -100,7 +106,10 @@ class Dag(MacroType):
                     if eenheid is STOP:
                         continue
                     
-                    aantal = invoer_validatie(f"hoeveel {eenheid.meervoud}", float)
+                    aantal = invoer_validatie(
+                        f"hoeveel {eenheid.meervoud}",
+                        float,
+                        )
                     
                     hoeveelheid = Hoeveelheid(aantal, eenheid)
                     

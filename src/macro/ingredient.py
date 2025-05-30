@@ -35,7 +35,13 @@ class Ingrediënt(MacroType):
             return STOP
         
         print(f"\ninvullen gegevens nieuw ingrediënt onder categorie \"{categorieën[categorie_uuid].categorie_naam}\"")
-        ingrediënt_naam = invoer_validatie("ingrediëntnaam", str, valideren = True, kleine_letters = True, uitsluiten_leeg = True)
+        ingrediënt_naam = invoer_validatie(
+            "ingrediëntnaam",
+            str,
+            valideren = True,
+            kleine_letters = True,
+            uitsluiten_leeg = True,
+            )
         
         return cls(
             ingrediënt_naam,
@@ -65,7 +71,13 @@ class Ingrediënten(MacroTypeDatabank):
         
         while True:
             
-            opdracht = invoer_kiezen("MENU GEGEVENS/INGREDIËNT", ["nieuw ingrediënt"], stoppen = True, kies_een = False, terug_naar = terug_naar)
+            opdracht = invoer_kiezen(
+                "MENU GEGEVENS/INGREDIËNT",
+                ["nieuw ingrediënt"],
+                stoppen = True,
+                kies_een = False,
+                terug_naar = terug_naar,
+                )
             
             if opdracht is STOP:
                 break
@@ -104,7 +116,13 @@ class Ingrediënten(MacroTypeDatabank):
             
             if len(self) == 0:
                 
-                kies_optie = invoer_kiezen("geen ingrediënten aanwezig, maak een nieuw ingrediënt", ["nieuw ingrediënt"], kies_een = False, stoppen = stoppen, terug_naar = terug_naar)
+                kies_optie = invoer_kiezen(
+                    "geen ingrediënten aanwezig, maak een nieuw ingrediënt",
+                    ["nieuw ingrediënt"],
+                    kies_een = False,
+                    stoppen = stoppen,
+                    terug_naar = terug_naar,
+                    )
                 
                 if kies_optie is STOP:
                     return STOP
@@ -114,7 +132,12 @@ class Ingrediënten(MacroTypeDatabank):
             
             else:
             
-                kies_optie = invoer_kiezen("ingrediënt op naam of categorie, of maak een nieuwe", ["zoek op ingrediëntnaam", "zoek op categorie", "nieuw ingrediënt"], stoppen = stoppen, terug_naar = terug_naar)
+                kies_optie = invoer_kiezen(
+                    "ingrediënt op naam of categorie, of maak een nieuwe",
+                    ["zoek op ingrediëntnaam", "zoek op categorie", "nieuw ingrediënt"],
+                    stoppen = stoppen,
+                    terug_naar = terug_naar,
+                    )
                 
                 if kies_optie is STOP:
                     return STOP
@@ -123,7 +146,11 @@ class Ingrediënten(MacroTypeDatabank):
                     
                     if kies_optie == "zoek op ingrediëntnaam":
                         print("\ngeef een zoekterm op")
-                        zoekterm = invoer_validatie("ingrediëntnaam", str, kleine_letters = True)
+                        zoekterm = invoer_validatie(
+                            "ingrediëntnaam",
+                            str,
+                            kleine_letters = True,
+                            )
                         ingrediënten_mogelijk = [ingrediënt_uuid for ingrediënt_uuid, ingrediënt in self.items() if zoekterm in ingrediënt.ingrediënt_naam]
                         if len(ingrediënten_mogelijk) == 0:
                             print(f"\n>>> zoekterm \"{zoekterm}\" levert geen ingrediënten op")
@@ -142,7 +169,12 @@ class Ingrediënten(MacroTypeDatabank):
                             continue
                     
                     print(f"\n>>> {len(ingrediënten_mogelijk)} ingrediënt{"en" if len(ingrediënten_mogelijk) > 1 else ""} gevonden")
-                    ingrediënt_uuid = invoer_kiezen("ingrediënt", {ingrediënt.ingrediënt_naam: ingrediënt_uuid for ingrediënt_uuid, ingrediënt in self.items() if ingrediënt_uuid in ingrediënten_mogelijk}, stoppen = True, terug_naar = terug_naar)
+                    ingrediënt_uuid = invoer_kiezen(
+                        "ingrediënt",
+                        {ingrediënt.ingrediënt_naam: ingrediënt_uuid for ingrediënt_uuid, ingrediënt in self.items() if ingrediënt_uuid in ingrediënten_mogelijk},
+                        stoppen = True,
+                        terug_naar = terug_naar,
+                        )
                     
                     if ingrediënt_uuid is STOP:
                         continue
