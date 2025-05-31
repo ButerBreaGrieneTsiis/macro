@@ -122,7 +122,7 @@ class Categorie(MacroType):
         
             print(f"\ninvullen nieuwe naam voor {self}")
             categorie_naam = invoer_validatie(
-                "categorie_naam",
+                "categorienaam",
                 str,
                 valideren = True,
                 kleine_letters = True,
@@ -301,6 +301,8 @@ class Hoofdcategorieën(MacroTypeDatabank):
                 
                 elif kies_optie == "zoek op hoofdcategorienaam":
                     
+                    print("\ngeef een zoekterm op")
+                    
                     zoekterm = invoer_validatie(
                         "hoofdcategorienaam",
                         str,
@@ -400,7 +402,7 @@ class Categorieën(MacroTypeDatabank):
                     print(f"     {hoofdcategorie}")
                     for categorie in self.lijst:
                         if categorie.hoofdcategorie_uuid == hoofdcategorie_uuid:
-                            print(f"         {categorie}")
+                            print(f"       {categorie}")
             
         return self
     
@@ -429,7 +431,7 @@ class Categorieën(MacroTypeDatabank):
         kies_bevestiging: bool = True,
         geef_uuid: bool =  True,
         stoppen: bool = True,
-        uitsluiten_nieuw: bool = False
+        uitsluiten_nieuw: bool = False,
         ) -> str | Categorie:
         
         while True:
@@ -473,7 +475,7 @@ class Categorieën(MacroTypeDatabank):
                     kies_optie = invoer_kiezen(
                         "bestaande categorie of maak een nieuwe",
                         [
-                            "selecteren hoofdcategorie",
+                            "selecteren categorie",
                             "zoek op categorienaam",
                             "nieuwe categorie",
                             ],
@@ -509,6 +511,8 @@ class Categorieën(MacroTypeDatabank):
                     return categorie_uuid if geef_uuid else self[categorie_uuid]
                 
                 elif kies_optie == "zoek op categorienaam":
+                    
+                    print("\ngeef een zoekterm op")
                     
                     zoekterm = invoer_validatie(
                         "categorienaam",
