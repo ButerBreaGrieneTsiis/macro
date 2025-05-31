@@ -8,7 +8,9 @@ from .macrotype import MacroType, MacroTypeDatabank
 
 class Hoofdcategorie(MacroType):
     
-    VELDEN = frozenset(("hoofdcategorie_naam", ))
+    VELDEN = frozenset((
+        "hoofdcategorie_naam",
+        ))
     
     def __init__(
         self,
@@ -35,10 +37,28 @@ class Hoofdcategorie(MacroType):
         return cls(
             hoofdcategorie_naam
             )
+    
+    def bewerk(self):
+        
+        print(f"\ninvullen nieuwe naam voor {self}")
+        hoofdcategorie_naam = invoer_validatie(
+            "hoofdcategorienaam",
+            str,
+            valideren = True,
+            kleine_letters = True,
+            uitsluiten_leeg = True,
+            )
+        
+        self.hoofdcategorie_naam = hoofdcategorie_naam
+        
+        return self
 
 class Categorie(MacroType):
     
-    VELDEN = frozenset(("categorie_naam", "hoofdcategorie_uuid",))
+    VELDEN = frozenset((
+        "categorie_naam",
+        "hoofdcategorie_uuid",
+        ))
     
     def __init__(
         self,
@@ -78,6 +98,53 @@ class Categorie(MacroType):
             hoofdcategorie_uuid,
             )
     
+    def bewerk(
+        self,
+        terug_naar: str,
+        ):
+        
+        print(f"selecteren wat te bewerken")
+        
+        kies_optie = invoer_kiezen(
+            "veld",
+            [
+                "bewerk categorienaam",
+                "bewerk hoofdcategorie",
+                ],
+            stoppen = True,
+            terug_naar = terug_naar,
+            )
+        
+        if kies_optie is STOP:
+            return
+        
+        if kies_optie == "bewerk categorienaam":
+        
+            print(f"\ninvullen nieuwe naam voor {self}")
+            categorie_naam = invoer_validatie(
+                "categorie_naam",
+                str,
+                valideren = True,
+                kleine_letters = True,
+                uitsluiten_leeg = True,
+                )
+            
+            self.categorie_naam = categorie_naam
+        
+        elif kies_optie == "bewerk hoofdcategorie":
+            
+            hoofdcategorieën = Hoofdcategorieën.openen()
+            hoofdcategorie_uuid = hoofdcategorieën.kiezen(
+                terug_naar = terug_naar,
+                )
+            
+            if hoofdcategorie_uuid is STOP:
+                return
+            
+            self.hoofdcategorie_uuid = hoofdcategorie_uuid
+        
+        return self
+        
     @property
     def hoofdcategorie(self):
         hoofdcategorieën = Hoofdcategorieën.openen()
@@ -99,7 +166,11 @@ class Hoofdcategorieën(MacroTypeDatabank):
             
             opdracht = invoer_kiezen(
                 "MENU GEGEVENS/HOOFDCATEGORIE",
-                ["nieuwe hoofdcategorie"],
+                [
+                    "nieuwe hoofdcategorie",
+                    "selecteren en bewerken",
+                    "toon hoofdcategorieën",
+                    ],
                 stoppen = True,
                 kies_een = False,
                 terug_naar = terug_naar,
@@ -111,7 +182,26 @@ class Hoofdcategorieën(MacroTypeDatabank):
             elif opdracht == "nieuwe hoofdcategorie":
                 
                 self.nieuw()
-        
+            
+            elif opdracht == "selecteren en bewerken":
+                
+                hoofdcategorie_uuid = self.kiezen(
+                    terug_naar = "MENU GEGEVENS/HOOFDCATEGORIE",
+                    uitsluiten_nieuw = True,
+                    )
+                if hoofdcategorie_uuid is STOP:
+                    continue
+                
+                self[hoofdcategorie_uuid].bewerk()
+            
+            elif opdracht == "toon hoofdcategorieën":
+                
+                if len(self) == 0:
+                    print("\n>>> geen hoofdcategorieën aanwezig")
+                    continue
+                print("")
+                print(self)
+            
         return self
     
     def nieuw(
@@ -137,15 +227,20 @@ class Hoofdcategorieën(MacroTypeDatabank):
         kies_bevestiging: bool = True,
         geef_uuid: bool =  True,
         stoppen: bool = True,
+        uitsluiten_nieuw: bool = False,
         ) -> str | Hoofdcategorie:
         
         while True:
             
             if len(self) == 0:
-            
+                
+                if uitsluiten_nieuw:
+                    print("\n>>> geen hoofdcategorieën aanwezig om te selecteren")
+                    return STOP
+                
                 kies_optie = invoer_kiezen(
                     "geen hoofdcategorieën aanwezig, maak een nieuwe hoofdcategorie",
-                    ["nieuwe hoofdcategorie"],
+                    "nieuwe hoofdcategorie",
                     kies_een = False,
                     stoppen = stoppen,
                     terug_naar = terug_naar,
@@ -154,34 +249,97 @@ class Hoofdcategorieën(MacroTypeDatabank):
                 if kies_optie is STOP:
                     return STOP
                 
-                else:
-                    return self.nieuw(geef_uuid = geef_uuid)
+                if kies_optie == "nieuwe hoofdcategorie":
+                    return self.nieuw(
+                        geef_uuid = geef_uuid,
+                        )
             
             else:
                 
-                kies_optie = invoer_kiezen(
-                    "bestaande hoofdcategorie of maak een nieuwe",
-                    ["zoek op hoofdcategorie", "nieuwe hoofdcategorie"],
-                    stoppen = stoppen,
-                    terug_naar = terug_naar,
-                    )
+                if uitsluiten_nieuw:
+                    kies_optie = invoer_kiezen(
+                        "bestaande hoofdcategorie of maak een nieuwe",
+                        [
+                            "selecteren hoofdcategorie",
+                            "zoek op hoofdcategorienaam",
+                            ],
+                        stoppen = stoppen,
+                        terug_naar = terug_naar,
+                        )
+                
+                else:
+                    kies_optie = invoer_kiezen(
+                        "bestaande hoofdcategorie of maak een nieuwe",
+                        [
+                            "selecteren hoofdcategorie",
+                            "zoek op hoofdcategorienaam",
+                            "nieuwe hoofdcategorie",
+                            ],
+                        stoppen = stoppen,
+                        terug_naar = terug_naar,
+                        )
                 
                 if kies_optie is STOP:
                     return STOP
                 
-                elif kies_optie == "zoek op hoofdcategorie":
+                elif kies_optie == "selecteren hoofdcategorie":
                     
                     hoofdcategorie_uuid = invoer_kiezen(
                         "hoofdcategorie",
-                        {hoofdcategorie.hoofdcategorie_naam: hoofdcategorie_uuid for hoofdcategorie_uuid, hoofdcategorie in self.items()},
+                        {f"{hoofdcategorie}": hoofdcategorie_uuid for hoofdcategorie_uuid, hoofdcategorie in self.items()},
+                        stoppen = True,
+                        terug_naar = terug_naar,
                         )
-                    if kies_bevestiging: print(f"\n>>> hoofdcategorie \"{self[hoofdcategorie_uuid].hoofdcategorie_naam}\" gekozen")
+                    
+                    if hoofdcategorie_uuid is STOP: 
+                        continue
+                    
+                    if kies_bevestiging: 
+                        print(f"\n>>> hoofdcategorie \"{self[hoofdcategorie_uuid].hoofdcategorie_naam}\" gekozen")
                     
                     return hoofdcategorie_uuid if geef_uuid else self[hoofdcategorie_uuid]
                 
-                else:
-                    return self.nieuw(geef_uuid = geef_uuid)
-
+                elif kies_optie == "zoek op hoofdcategorienaam":
+                    
+                    zoekterm = invoer_validatie(
+                        "hoofdcategorienaam",
+                        str,
+                        kleine_letters = True,
+                        )
+                    
+                    hoofdcategorieën_mogelijk = self.zoeken(zoekterm)
+                    if len(hoofdcategorieën_mogelijk) == 0:
+                        print(f"\n>>> zoekterm \"{zoekterm}\" levert geen hoofdcategorieën op")
+                        continue
+                    
+                    print(f"\n>>> {len(hoofdcategorieën_mogelijk)} hoofdcategorie{"ën" if len(hoofdcategorieën_mogelijk) > 1 else ""} gevonden")
+                    hoofdcategorie_uuid = invoer_kiezen(
+                        "hoofdcategorie",
+                        {hoofdcategorie.hoofdcategorie_naam: hoofdcategorie_uuid for hoofdcategorie_uuid, hoofdcategorie in self.items() if hoofdcategorie_uuid in hoofdcategorieën_mogelijk},
+                        stoppen = True,
+                        terug_naar = terug_naar,
+                        )
+                    
+                    if hoofdcategorie_uuid is STOP:
+                        continue
+                    
+                    if kies_bevestiging: 
+                        print(f"\n>>> hoofdcategorie \"{self[hoofdcategorie_uuid].hoofdcategorie_naam}\" gekozen")
+                    
+                    return hoofdcategorie_uuid if geef_uuid else self[hoofdcategorie_uuid]
+                
+                if kies_optie == "nieuwe hoofdcategorie":
+                    return self.nieuw(
+                        geef_uuid = geef_uuid,
+                        )
+    
+    def zoeken(
+        self,
+        zoekterm: str,
+        ) -> List[str]:
+        
+        return [hoofdcategorie_uuid for hoofdcategorie_uuid, hoofdcategorie in self.items() if zoekterm in hoofdcategorie.hoofdcategorie_naam]
+        
 class Categorieën(MacroTypeDatabank):
     
     BESTANDSNAAM: str = "categorieën"
@@ -195,10 +353,14 @@ class Categorieën(MacroTypeDatabank):
         ):
         
         while True:
-        
+            
             opdracht = invoer_kiezen(
                 "MENU GEGEVENS/CATEGORIE",
-                ["nieuwe categorie"],
+                [
+                    "nieuwe categorie",
+                    "selecteer en bewerk",
+                    "toon categorieën",
+                    ],
                 stoppen = True,
                 kies_een = False,
                 terug_naar = terug_naar,
@@ -209,7 +371,36 @@ class Categorieën(MacroTypeDatabank):
             
             elif opdracht == "nieuwe categorie":
                 
-                self.nieuw(terug_naar = "MENU GEGEVENS/CATEGORIE")
+                self.nieuw(
+                    terug_naar = "MENU GEGEVENS/CATEGORIE",
+                    )
+            
+            elif opdracht == "selecteer en bewerk":
+                
+                categorie_uuid = self.kiezen(
+                    terug_naar = "MENU GEGEVENS/CATEGORIE",
+                    uitsluiten_nieuw = True,
+                    )
+                if categorie_uuid is STOP:
+                    continue
+                
+                self[categorie_uuid].bewerk(
+                    terug_naar = "MENU GEGEVENS/CATEGORIE",
+                    )
+            
+            elif opdracht == "toon categorieën":
+                
+                if len(self) == 0:
+                    print("\n>>> geen categorieën aanwezig")
+                    continue
+                
+                print()
+                hoofdcategorieën = Hoofdcategorieën.openen()
+                for hoofdcategorie_uuid, hoofdcategorie in hoofdcategorieën.items():
+                    print(f"     {hoofdcategorie}")
+                    for categorie in self.lijst:
+                        if categorie.hoofdcategorie_uuid == hoofdcategorie_uuid:
+                            print(f"         {categorie}")
             
         return self
     
@@ -219,7 +410,9 @@ class Categorieën(MacroTypeDatabank):
         geef_uuid: bool = True,
         ):
         
-        categorie = Categorie.nieuw(terug_naar)
+        categorie = Categorie.nieuw(
+            terug_naar,
+            )
         if categorie is STOP:
             return STOP
         
@@ -236,14 +429,19 @@ class Categorieën(MacroTypeDatabank):
         kies_bevestiging: bool = True,
         geef_uuid: bool =  True,
         stoppen: bool = True,
+        uitsluiten_nieuw: bool = False
         ) -> str | Categorie:
         
         while True:
             if len(self) == 0:
-            
+                
+                if uitsluiten_nieuw:
+                    print("\n>>> geen categorieën aanwezig om te selecteren")
+                    return STOP
+                
                 kies_optie = invoer_kiezen(
                     "geen categorieën aanwezig, maak een nieuwe categorie",
-                    ["nieuwe categorie"],
+                    "nieuwe categorie",
                     kies_een = False,
                     stoppen = stoppen,
                     terug_naar = terug_naar,
@@ -252,38 +450,102 @@ class Categorieën(MacroTypeDatabank):
                 if kies_optie is STOP:
                     return STOP
                 
-                else:
-                    return self.nieuw(terug_naar, geef_uuid = geef_uuid)
+                if kies_optie == "nieuwe categorie":
+                    return self.nieuw(
+                        terug_naar,
+                        geef_uuid = geef_uuid,
+                        )
             
             else:
                 
-                kies_optie = invoer_kiezen(
-                    "bestaande categorie of maak een nieuwe",
-                    ["zoek op hoofdcategorie", "nieuwe categorie"],
-                    stoppen = stoppen,
-                    terug_naar = terug_naar,
-                    )
+                if uitsluiten_nieuw:
+                    kies_optie = invoer_kiezen(
+                        "bestaande hoofdcategorie of maak een nieuwe",
+                        [
+                            "selecteren hoofdcategorie",
+                            "zoek op categorienaam",
+                            ],
+                        stoppen = stoppen,
+                        terug_naar = terug_naar,
+                        )
+                
+                else:
+                    kies_optie = invoer_kiezen(
+                        "bestaande categorie of maak een nieuwe",
+                        [
+                            "selecteren hoofdcategorie",
+                            "zoek op categorienaam",
+                            "nieuwe categorie",
+                            ],
+                        stoppen = stoppen,
+                        terug_naar = terug_naar,
+                        )
                 
                 if kies_optie is STOP:
                     return STOP
                 
-                elif kies_optie == "zoek op categorie":
+                elif kies_optie == "selecteren categorie":
                     
                     hoofdcategorieën = Hoofdcategorieën.openen()
-                    hoofdcategorie_uuid = hoofdcategorieën.kiezen()
+                    hoofdcategorie_uuid = hoofdcategorieën.kiezen(
+                        terug_naar,
+                        uitsluiten_nieuw = True,
+                        )
+                    if hoofdcategorie_uuid is STOP:
+                        return STOP
                     
                     categorie_uuid = invoer_kiezen(
                         "categorie",
-                        {categorie.categorie_naam: categorie_uuid for categorie_uuid, categorie in self.items() if categorie.hoofdcategorie_uuid == hoofdcategorie_uuid},
+                        {f"{categorie}": categorie_uuid for categorie_uuid, categorie in self.items() if categorie.hoofdcategorie_uuid == hoofdcategorie_uuid},
                         stoppen = stoppen,
                         terug_naar = terug_naar,
                         )
                     if categorie_uuid is STOP:
                         return STOP
                     
-                    if kies_bevestiging: print(f"\n>>> categorie \"{self[categorie_uuid].categorie_naam}\" gekozen")
+                    if kies_bevestiging:
+                        print(f"\n>>> categorie \"{self[categorie_uuid].categorie_naam}\" gekozen")
                     
                     return categorie_uuid if geef_uuid else self[categorie_uuid]
                 
-                else:
-                    return self.nieuw(terug_naar, geef_uuid = geef_uuid)
+                elif kies_optie == "zoek op categorienaam":
+                    
+                    zoekterm = invoer_validatie(
+                        "categorienaam",
+                        str,
+                        kleine_letters = True,
+                        )
+                    
+                    categorieën_mogelijk = self.zoeken(zoekterm)
+                    if len(categorieën_mogelijk) == 0:
+                        print(f"\n>>> zoekterm \"{zoekterm}\" levert geen categorieën op")
+                        continue
+                    
+                    print(f"\n>>> {len(categorieën_mogelijk)} categorie{"ën" if len(categorieën_mogelijk) > 1 else ""} gevonden")
+                    categorie_uuid = invoer_kiezen(
+                        "categorie",
+                        {categorie.categorie_naam: categorie_uuid for categorie_uuid, categorie in self.items() if categorie_uuid in categorieën_mogelijk},
+                        stoppen = True,
+                        terug_naar = terug_naar,
+                        )
+                    
+                    if categorie_uuid is STOP:
+                        continue
+                    
+                    if kies_bevestiging: 
+                        print(f"\n>>> categorie \"{self[categorie_uuid].categorie_naam}\" gekozen")
+                    
+                    return categorie_uuid if geef_uuid else self[categorie_uuid]
+                
+                elif kies_optie == "nieuwe categorie":
+                    return self.nieuw(
+                        terug_naar,
+                        geef_uuid = geef_uuid,
+                        )
+    
+    def zoeken(
+        self,
+        zoekterm: str,
+        ) -> List[str]:
+        
+        return [categorie_uuid for categorie_uuid, categorie in self.items() if zoekterm in categorie.categorie_naam]

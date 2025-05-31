@@ -102,6 +102,10 @@ class MacroTypeDatabank(dict):
         "Gerecht":          "naar_json",
         }
     
+    def __repr__(self) -> str:
+        
+        return "\n".join([f"     {macrotype}" for macrotype in self.lijst])
+    
     @classmethod
     def openen(cls) -> "MacroTypeDatabank":
         
