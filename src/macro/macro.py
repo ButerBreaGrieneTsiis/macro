@@ -29,7 +29,14 @@ def uitvoeren():
                 
                 opdracht_dag = invoer_kiezen(
                     "MENU DAG",
-                    ["vandaag"],
+                    [
+                        "vandaag",
+                        "gisteren",
+                        "eergisteren",
+                        "morgen",
+                        "overmorgen",
+                        "aangepast",
+                        ],
                     stoppen = True,
                     kies_een = False,
                     terug_naar = "HOOFDMENU",
@@ -38,11 +45,9 @@ def uitvoeren():
                 if opdracht_dag is STOP:
                     break
                 
-                elif opdracht_dag == "vandaag":
-                    
-                    dag = Dag.openen("vandaag")
-                    dag.opdracht(terug_naar)
-                    dag.opslaan()
+                dag = Dag.openen(opdracht_dag)
+                dag.opdracht(terug_naar)
+                dag.opslaan()
         
         elif opdracht == "gegevens bewerken":
             

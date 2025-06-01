@@ -53,7 +53,7 @@ class MacroType:
                 continue
             elif isinstance(veld_waarde, int) and veld_waarde == 0:
                 continue
-            elif veld_sleutel == "_uuid":
+            elif veld_sleutel == "uuid":
                 continue
             
             # overige velden deserialiseren
@@ -81,14 +81,6 @@ class MacroType:
         
         opslaan_json(self, bestandspad, encoder_dict = self.ENCODER_DICT)
     
-    @property
-    def uuid(self):
-        return self._uuid
-    
-    @uuid.setter
-    def uuid(self, waarde):
-        self._uuid = waarde
-
 class MacroTypeDatabank(dict):
     
     BESTANDSMAP:    Path = Path("gegevens")
@@ -99,6 +91,7 @@ class MacroTypeDatabank(dict):
         "Categorie":        "naar_json",
         "Ingrediënt":       "naar_json",
         "Product":          "naar_json",
+        "Merk":             "naar_json",
         "Gerecht":          "naar_json",
         }
     
@@ -118,8 +111,6 @@ class MacroTypeDatabank(dict):
             def toevoegen_uuid(macrotype, uuid): 
                 macrotype.uuid = uuid
                 return macrotype
-            
-            
             
             return cls(**{uuid: toevoegen_uuid(macrotype, uuid) for uuid, macrotype in openen_json(
                 bestandspad,

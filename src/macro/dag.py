@@ -40,17 +40,37 @@ class Dag(MacroType):
         datum: str | dt.date,
         ) -> "Dag":
         
-        if isinstance(datum, str):
-            if datum == "vandaag":
-                datum = dt.date.today()
-            elif datum == "morgen":
-                datum = dt.date.today() + dt.timedelta(days = 1)
-            elif datum == "overmorgen":
-                datum = dt.date.today() + dt.timedelta(days = 2)
-            elif datum == "gisteren":
-                datum = dt.date.today() - dt.timedelta(days = 1)
-            elif datum == "eergisteren":
-                datum = dt.date.today() - dt.timedelta(days = 2)
+        if datum == "vandaag":
+            datum = dt.date.today()
+        elif datum == "morgen":
+            datum = dt.date.today() + dt.timedelta(days = 1)
+        elif datum == "overmorgen":
+            datum = dt.date.today() + dt.timedelta(days = 2)
+        elif datum == "gisteren":
+            datum = dt.date.today() - dt.timedelta(days = 1)
+        elif datum == "eergisteren":
+            datum = dt.date.today() - dt.timedelta(days = 2)
+        elif datum == "aangepast":
+            
+            jaar = invoer_validatie(
+                "jaar",
+                int,
+                bereik = (1970, dt.datetime.today().year)
+                )
+            
+            maand = invoer_validatie(
+                "maand",
+                int,
+                bereik = (1, 12)
+                )
+            
+            dag = invoer_validatie(
+                "dag",
+                int,
+                bereik = (1, 31)
+                )
+            
+            datum = dt.date(jaar, maand, dag)
         
         bestandspad = cls.BESTANDSMAP
         if not bestandspad.is_dir():
