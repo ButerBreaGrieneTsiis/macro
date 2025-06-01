@@ -83,7 +83,12 @@ class Dag(MacroType):
             
             opdracht = invoer_kiezen(
                 f"MENU DAG/{f"{self.dag}".upper()}",
-                ["toevoegen producten", "toevoegen gerechten","toon voedingswaarde", "toon producten"],
+                [
+                    "toevoegen producten",
+                    "toevoegen gerechten",
+                    "toon voedingswaarde",
+                    "toon producten",
+                    ],
                 stoppen = True,
                 kies_een = False,
                 terug_naar = terug_naar,

@@ -136,6 +136,7 @@ class Categorie(MacroType):
             hoofdcategorieën = Hoofdcategorieën.openen()
             hoofdcategorie_uuid = hoofdcategorieën.kiezen(
                 terug_naar = terug_naar,
+                uitsluiten_nieuw = True,
                 )
             
             if hoofdcategorie_uuid is STOP:
@@ -240,7 +241,9 @@ class Hoofdcategorieën(MacroTypeDatabank):
                 
                 kies_optie = invoer_kiezen(
                     "geen hoofdcategorieën aanwezig, maak een nieuwe hoofdcategorie",
-                    "nieuwe hoofdcategorie",
+                    [
+                        "nieuwe hoofdcategorie",
+                        ],
                     kies_een = False,
                     stoppen = stoppen,
                     terug_naar = terug_naar,
@@ -287,7 +290,7 @@ class Hoofdcategorieën(MacroTypeDatabank):
                     hoofdcategorie_uuid = invoer_kiezen(
                         "hoofdcategorie",
                         {f"{hoofdcategorie}": hoofdcategorie_uuid for hoofdcategorie_uuid, hoofdcategorie in self.items()},
-                        stoppen = True,
+                        stoppen = stoppen,
                         terug_naar = terug_naar,
                         )
                     
@@ -295,7 +298,7 @@ class Hoofdcategorieën(MacroTypeDatabank):
                         continue
                     
                     if kies_bevestiging: 
-                        print(f"\n>>> hoofdcategorie \"{self[hoofdcategorie_uuid].hoofdcategorie_naam}\" gekozen")
+                        print(f"\n>>> {self[hoofdcategorie_uuid]} gekozen")
                     
                     return hoofdcategorie_uuid if geef_uuid else self[hoofdcategorie_uuid]
                 
@@ -317,7 +320,7 @@ class Hoofdcategorieën(MacroTypeDatabank):
                     print(f"\n>>> {len(hoofdcategorieën_mogelijk)} hoofdcategorie{"ën" if len(hoofdcategorieën_mogelijk) > 1 else ""} gevonden")
                     hoofdcategorie_uuid = invoer_kiezen(
                         "hoofdcategorie",
-                        {hoofdcategorie.hoofdcategorie_naam: hoofdcategorie_uuid for hoofdcategorie_uuid, hoofdcategorie in self.items() if hoofdcategorie_uuid in hoofdcategorieën_mogelijk},
+                        {self[hoofdcategorie_uuid].hoofdcategorie_naam: hoofdcategorie_uuid for hoofdcategorie_uuid in hoofdcategorieën_mogelijk},
                         stoppen = True,
                         terug_naar = terug_naar,
                         )
@@ -326,7 +329,7 @@ class Hoofdcategorieën(MacroTypeDatabank):
                         continue
                     
                     if kies_bevestiging: 
-                        print(f"\n>>> hoofdcategorie \"{self[hoofdcategorie_uuid].hoofdcategorie_naam}\" gekozen")
+                        print(f"\n>>> {self[hoofdcategorie_uuid]} gekozen")
                     
                     return hoofdcategorie_uuid if geef_uuid else self[hoofdcategorie_uuid]
                 
@@ -443,7 +446,9 @@ class Categorieën(MacroTypeDatabank):
                 
                 kies_optie = invoer_kiezen(
                     "geen categorieën aanwezig, maak een nieuwe categorie",
-                    "nieuwe categorie",
+                    [
+                        "nieuwe categorie",
+                        ],
                     kies_een = False,
                     stoppen = stoppen,
                     terug_naar = terug_naar,
@@ -506,7 +511,7 @@ class Categorieën(MacroTypeDatabank):
                         return STOP
                     
                     if kies_bevestiging:
-                        print(f"\n>>> categorie \"{self[categorie_uuid].categorie_naam}\" gekozen")
+                        print(f"\n>>> {self[categorie_uuid]} gekozen")
                     
                     return categorie_uuid if geef_uuid else self[categorie_uuid]
                 
@@ -528,7 +533,7 @@ class Categorieën(MacroTypeDatabank):
                     print(f"\n>>> {len(categorieën_mogelijk)} categorie{"ën" if len(categorieën_mogelijk) > 1 else ""} gevonden")
                     categorie_uuid = invoer_kiezen(
                         "categorie",
-                        {categorie.categorie_naam: categorie_uuid for categorie_uuid, categorie in self.items() if categorie_uuid in categorieën_mogelijk},
+                        {self[categorie_uuid].categorie_naam: categorie_uuid for categorie_uuid in categorieën_mogelijk},
                         stoppen = True,
                         terug_naar = terug_naar,
                         )
@@ -537,7 +542,7 @@ class Categorieën(MacroTypeDatabank):
                         continue
                     
                     if kies_bevestiging: 
-                        print(f"\n>>> categorie \"{self[categorie_uuid].categorie_naam}\" gekozen")
+                        print(f"\n>>> {self[categorie_uuid]} gekozen")
                     
                     return categorie_uuid if geef_uuid else self[categorie_uuid]
                 

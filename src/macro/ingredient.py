@@ -91,6 +91,7 @@ class Ingrediënt(MacroType):
             categorieën = Categorieën.openen()
             categorie_uuid = categorieën.kiezen(
                 terug_naar = terug_naar,
+                uitsluiten_nieuw = True,
                 )
             
             if categorie_uuid is STOP:
@@ -214,7 +215,9 @@ class Ingrediënten(MacroTypeDatabank):
                 
                 kies_optie = invoer_kiezen(
                     "geen ingrediënten aanwezig, maak een nieuw ingrediënt",
-                    "nieuw ingrediënt",
+                    [
+                        "nieuw ingrediënt",
+                        ],
                     kies_een = False,
                     stoppen = stoppen,
                     terug_naar = terug_naar,
@@ -284,7 +287,7 @@ class Ingrediënten(MacroTypeDatabank):
                         return STOP
                     
                     if kies_bevestiging:
-                        print(f"\n>>> ingrediënt \"{self[ingrediënt_uuid].ingrediënt_naam}\" gekozen")
+                        print(f"\n>>> {self[ingrediënt_uuid]} gekozen")
                     
                     return ingrediënt_uuid if geef_uuid else self[ingrediënt_uuid]
                 
@@ -306,7 +309,7 @@ class Ingrediënten(MacroTypeDatabank):
                     print(f"\n>>> {len(ingrediënten_mogelijk)} ingrediënt{"en" if len(ingrediënten_mogelijk) > 1 else ""} gevonden")
                     ingrediënt_uuid = invoer_kiezen(
                         "ingrediënt",
-                        {ingrediënt.ingrediënt_naam: ingrediënt_uuid for ingrediënt_uuid, ingrediënt in self.items() if ingrediënt_uuid in ingrediënten_mogelijk},
+                        {self[ingrediënt_uuid].ingrediënt_naam: ingrediënt_uuid for ingrediënt_uuid in ingrediënten_mogelijk},
                         stoppen = True,
                         terug_naar = terug_naar,
                         )
@@ -315,7 +318,7 @@ class Ingrediënten(MacroTypeDatabank):
                         continue
                     
                     if kies_bevestiging:
-                        print(f"\n>>> ingrediënt \"{self[ingrediënt_uuid].ingrediënt_naam}\" gekozen")
+                        print(f"\n>>> {self[ingrediënt_uuid].ingrediënt_naam} gekozen")
                     
                     return ingrediënt_uuid if geef_uuid else self[ingrediënt_uuid]
                 
