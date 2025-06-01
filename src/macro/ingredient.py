@@ -180,7 +180,6 @@ class Ingrediënten(MacroTypeDatabank):
     def nieuw(
         self,
         terug_naar: str,
-        geef_uuid: bool = True,
         ):
         
         ingrediënt = Ingrediënt.nieuw(
@@ -194,13 +193,12 @@ class Ingrediënten(MacroTypeDatabank):
         
         self.opslaan()
         
-        return ingrediënt_uuid if geef_uuid else ingrediënt
+        return ingrediënt_uuid
     
     def kiezen(
         self,
         terug_naar: str,
         kies_bevestiging: bool = True,
-        geef_uuid: bool =  True,
         stoppen: bool = False,
         uitsluiten_nieuw: bool = False,
         ) -> str | Ingrediënt:
@@ -227,7 +225,9 @@ class Ingrediënten(MacroTypeDatabank):
                     return STOP
                 
                 else:
-                    return self.nieuw(terug_naar, geef_uuid = geef_uuid)
+                    return self.nieuw(
+                        terug_naar,
+                        )
             
             else:
                 
@@ -289,7 +289,7 @@ class Ingrediënten(MacroTypeDatabank):
                     if kies_bevestiging:
                         print(f"\n>>> {self[ingrediënt_uuid]} gekozen")
                     
-                    return ingrediënt_uuid if geef_uuid else self[ingrediënt_uuid]
+                    return ingrediënt_uuid
                 
                 elif kies_optie == "zoek op ingrediëntnaam":
                         
@@ -320,12 +320,11 @@ class Ingrediënten(MacroTypeDatabank):
                     if kies_bevestiging:
                         print(f"\n>>> {self[ingrediënt_uuid].ingrediënt_naam} gekozen")
                     
-                    return ingrediënt_uuid if geef_uuid else self[ingrediënt_uuid]
+                    return ingrediënt_uuid
                 
                 if kies_optie == "nieuw ingrediënt":
                     return self.nieuw(
                         terug_naar,
-                        geef_uuid = geef_uuid,
                         )
     
     def zoeken(

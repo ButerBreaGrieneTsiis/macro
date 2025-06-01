@@ -205,10 +205,7 @@ class Hoofdcategorieën(MacroTypeDatabank):
             
         return self
     
-    def nieuw(
-        self,
-        geef_uuid: bool = True,
-        ):
+    def nieuw(self):
         
         hoofdcategorie = Hoofdcategorie.nieuw()
         
@@ -220,13 +217,12 @@ class Hoofdcategorieën(MacroTypeDatabank):
         
         self.opslaan()
         
-        return hoofdcategorie_uuid if geef_uuid else hoofdcategorie
+        return hoofdcategorie_uuid
     
     def kiezen(
         self,
         terug_naar: str,
         kies_bevestiging: bool = True,
-        geef_uuid: bool =  True,
         stoppen: bool = True,
         uitsluiten_nieuw: bool = False,
         ) -> str | Hoofdcategorie:
@@ -253,9 +249,7 @@ class Hoofdcategorieën(MacroTypeDatabank):
                     return STOP
                 
                 if kies_optie == "nieuwe hoofdcategorie":
-                    return self.nieuw(
-                        geef_uuid = geef_uuid,
-                        )
+                    return self.nieuw()
             
             else:
                 
@@ -300,7 +294,7 @@ class Hoofdcategorieën(MacroTypeDatabank):
                     if kies_bevestiging: 
                         print(f"\n>>> {self[hoofdcategorie_uuid]} gekozen")
                     
-                    return hoofdcategorie_uuid if geef_uuid else self[hoofdcategorie_uuid]
+                    return hoofdcategorie_uuid
                 
                 elif kies_optie == "zoek op hoofdcategorienaam":
                     
@@ -331,12 +325,10 @@ class Hoofdcategorieën(MacroTypeDatabank):
                     if kies_bevestiging: 
                         print(f"\n>>> {self[hoofdcategorie_uuid]} gekozen")
                     
-                    return hoofdcategorie_uuid if geef_uuid else self[hoofdcategorie_uuid]
+                    return hoofdcategorie_uuid
                 
                 if kies_optie == "nieuwe hoofdcategorie":
-                    return self.nieuw(
-                        geef_uuid = geef_uuid,
-                        )
+                    return self.nieuw()
     
     def zoeken(
         self,
@@ -412,7 +404,6 @@ class Categorieën(MacroTypeDatabank):
     def nieuw(
         self,
         terug_naar: str,
-        geef_uuid: bool = True,
         ):
         
         categorie = Categorie.nieuw(
@@ -426,13 +417,12 @@ class Categorieën(MacroTypeDatabank):
         
         self.opslaan()
         
-        return categorie_uuid if geef_uuid else categorie
+        return categorie_uuid
     
     def kiezen(
         self,
         terug_naar: str,
         kies_bevestiging: bool = True,
-        geef_uuid: bool =  True,
         stoppen: bool = True,
         uitsluiten_nieuw: bool = False,
         ) -> str | Categorie:
@@ -460,7 +450,6 @@ class Categorieën(MacroTypeDatabank):
                 if kies_optie == "nieuwe categorie":
                     return self.nieuw(
                         terug_naar,
-                        geef_uuid = geef_uuid,
                         )
             
             else:
@@ -513,7 +502,7 @@ class Categorieën(MacroTypeDatabank):
                     if kies_bevestiging:
                         print(f"\n>>> {self[categorie_uuid]} gekozen")
                     
-                    return categorie_uuid if geef_uuid else self[categorie_uuid]
+                    return categorie_uuid
                 
                 elif kies_optie == "zoek op categorienaam":
                     
@@ -544,12 +533,10 @@ class Categorieën(MacroTypeDatabank):
                     if kies_bevestiging: 
                         print(f"\n>>> {self[categorie_uuid]} gekozen")
                     
-                    return categorie_uuid if geef_uuid else self[categorie_uuid]
                 
                 elif kies_optie == "nieuwe categorie":
                     return self.nieuw(
                         terug_naar,
-                        geef_uuid = geef_uuid,
                         )
     
     def zoeken(

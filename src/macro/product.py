@@ -119,7 +119,6 @@ class Merken(MacroTypeDatabank):
     def nieuw(
         self,
         terug_naar: str,
-        geef_uuid: bool = True,
         ):
         
         merk = Merk.nieuw(terug_naar)
@@ -131,13 +130,12 @@ class Merken(MacroTypeDatabank):
         
         self.opslaan()
         
-        return merk_uuid if geef_uuid else merk
+        return merk_uuid
     
     def kiezen(
         self,
         terug_naar: str,
         kies_bevestiging: bool = True,
-        geef_uuid: bool = True,
         stoppen: bool = True,
         uitsluiten_nieuw: bool = False,
         ) -> Merk | str | Stop:
@@ -164,7 +162,9 @@ class Merken(MacroTypeDatabank):
                     return STOP
                 
                 else:
-                    return self.nieuw(terug_naar, geef_uuid = geef_uuid)
+                    return self.nieuw(
+                        terug_naar,
+                        )
             
             else:
                 
@@ -220,12 +220,11 @@ class Merken(MacroTypeDatabank):
                     if kies_bevestiging:
                         print(f"\n>>> {self[merk_uuid]} gekozen")
                     
-                    return merk_uuid if geef_uuid else self[merk_uuid]
+                    return merk_uuid
                 
                 elif kies_optie == "nieuw merk":
                     return self.nieuw(
                         terug_naar,
-                        geef_uuid = geef_uuid,
                         )
 
 class Product(MacroType):
@@ -558,7 +557,6 @@ class Producten(MacroTypeDatabank):
     def nieuw(
         self,
         terug_naar: str,
-        geef_uuid: bool = True,
         ):
         
         product = Product.nieuw(terug_naar)
@@ -574,12 +572,11 @@ class Producten(MacroTypeDatabank):
             product.bewerk_eenheden()
         
         product_uuid = str(uuid4())
-        product.uuid = product_uuid
         self[product_uuid] = product
         
         self.opslaan()
         
-        return product_uuid if geef_uuid else product
+        return product_uuid
     
     def nieuwe_eenheid(
         self,
@@ -597,7 +594,6 @@ class Producten(MacroTypeDatabank):
         self,
         terug_naar: str,
         kies_bevestiging: bool = True,
-        geef_uuid: bool = True,
         stoppen: bool = True,
         uitsluiten_nieuw: bool = False,
         ) -> Product | str | Stop:
@@ -624,7 +620,9 @@ class Producten(MacroTypeDatabank):
                     return STOP
                 
                 else:
-                    return self.nieuw(terug_naar, geef_uuid = geef_uuid)
+                    return self.nieuw(
+                        terug_naar,
+                        )
             
             else:
                 
@@ -695,7 +693,7 @@ class Producten(MacroTypeDatabank):
                     if kies_bevestiging:
                         print(f"\n>>> {self[product_uuid]} gekozen")
                     
-                    return product_uuid if geef_uuid else self[product_uuid]
+                    return product_uuid
                 
                 if kies_optie == "zoek op naam":
                     
@@ -748,19 +746,18 @@ class Producten(MacroTypeDatabank):
                     if kies_bevestiging:
                         print(f"\n>>> {self[product_uuid]} gekozen")
                     
-                    return product_uuid if geef_uuid else self[product_uuid]
+                    return product_uuid
                 
                 if kies_optie == "nieuw product":
                     return self.nieuw(
                         terug_naar,
-                        geef_uuid = geef_uuid,
                         )
     
     def kiezen_eenheid(
         self,
-        product_uuid:       str,
-        kies_bevestiging:   bool    = True,
-        stoppen:            bool    = False,
+        product_uuid: str,
+        kies_bevestiging: bool = True,
+        stoppen: bool = False,
         ) -> Eenheid | Stop:
         
         optie_dict = {
@@ -796,9 +793,8 @@ class Producten(MacroTypeDatabank):
     def kiezen_product_eenheid(
         self,
         terug_naar: str,
-        kies_bevestiging:   bool    = True,
-        geef_uuid:          bool    = True,
-        stoppen:            bool    = True,
+        kies_bevestiging: bool = True,
+        stoppen: bool = True,
         ) -> Tuple[Product | Stop, Eenheid | Stop]:
         
         product_uuid = self.kiezen_product(terug_naar, kies_bevestiging = kies_bevestiging, stoppen = stoppen)
@@ -809,9 +805,9 @@ class Producten(MacroTypeDatabank):
         eenheid = self.kiezen_eenheid(terug_naar, product_uuid, kies_bevestiging = kies_bevestiging, stoppen = stoppen)
         
         if eenheid is STOP:
-            return product_uuid if geef_uuid else self[product_uuid], STOP
+            return product_uuid
         
-        return product_uuid if geef_uuid else self[product_uuid], eenheid
+        return product_uuid
     
     def zoeken(
         self,

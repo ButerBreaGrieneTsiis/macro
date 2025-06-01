@@ -123,9 +123,12 @@ class Dag(MacroType):
                 
                 while True:
                     
-                    product, eenheid = producten.kiezen_product_eenheid(terug_naar = f"MENU DAG/{f"{self.dag}".upper()}", geef_uuid = False, stoppen = True)
+                    product_uuid, eenheid = producten.kiezen_product_eenheid(
+                        terug_naar = f"MENU DAG/{f"{self.dag}".upper()}",
+                        stoppen = True,
+                        )
                     
-                    if product is STOP:
+                    if product_uuid is STOP:
                         break
                     
                     if eenheid is STOP:
@@ -138,15 +141,15 @@ class Dag(MacroType):
                     
                     hoeveelheid = Hoeveelheid(aantal, eenheid)
                     
-                    if product.uuid in self.producten.keys():
-                        for ihoeveelheid_aanwezig, hoeveelheid_aanwezig in enumerate(self.producten[product.uuid]):
+                    if product_uuid in self.producten.keys():
+                        for ihoeveelheid_aanwezig, hoeveelheid_aanwezig in enumerate(self.producten[product_uuid]):
                             if hoeveelheid == hoeveelheid_aanwezig:
-                                self.producten[product.uuid][ihoeveelheid_aanwezig] = hoeveelheid + hoeveelheid_aanwezig
+                                self.producten[product_uuid][ihoeveelheid_aanwezig] = hoeveelheid + hoeveelheid_aanwezig
                                 break
                         else:
-                            self.producten[product.uuid].append(hoeveelheid)
+                            self.producten[product_uuid].append(hoeveelheid)
                     else:
-                        self.producten[product.uuid] = [hoeveelheid]
+                        self.producten[product_uuid] = [hoeveelheid]
                     break
             
             elif opdracht == "toevoegen gerechten":
