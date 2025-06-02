@@ -1,14 +1,107 @@
-is het nodig om voedinsgswaarde apart te maken voor 
-een los product t.o.v. een totale voedingswaarde voor een dag/recept?
-
 TOEVOEGINGEN
     
+    0.3.0
+        [ ] plotter
+            grafiek linker y-as calorieën, rechter y-as macro's
+            grafiek met relatieve hoeveelheid macro's
+    
+    0.2.0
+        [ ] Gerecht
+            [ ] onderzoeken gebruikmaken van Categorie/Hoofdcategorie
+                [?] simpele inheritance met anders cls.BESTANDSNAAM?
+            [ ] toevoegen producten en diens hoeveelheden
+            [ ] toevoegen recept
+            [ ] toevoegen bewerkingen, en deze een naam geven
+        [ ] MENU GEGEVENS:
+            [ ] gerecht
+                [ ] print alle
+                [ ] selecteren en bewerken zonder NIEUW
+
+        [ ] Dag
+            [ ] toevoegen gerecht
+                [ ] selecteren gerecht
+                    [ ] selecteren op basis van naam
+                    [ ] selecteren op basis van hoofdcategorie/categorie
+                [ ] selecteren bewerking indien aanwezig
+                [ ] selecteren portiegrootte
+    
+    [ ] uitsluiten nieuw weghalen???
+    
+    0.1.0
+        [v] MENU GEGEVENS: mogelijkheid tot simpel inzien:
+            [v] hoofdcat:
+                [v] print alle
+                [v] selecteren en bewerken
+                    [v] selecteren zonder NIEUW
+                        [v] zoeken op hoofdcategorie (nummer intypen)
+                        [v] direct zoeken op hoofdcategorienaam (naam intypen)
+                    [v] bewerken
+                        [v] hoofdcategorienaam
+            [v] categorieën:
+                [v] print alle (met tussen haakjes hoofdcat)
+                [v] selecteren en bewerken
+                    [v] selecteren zonder NIEUW
+                        [v] zoeken op hoofdcategorie (nummer intypen)
+                            [v] zoeken op categorie (nummer intypen)
+                        [v] direct zoeken op categorienaam (naam intypen)
+                    [v] bewerken
+                        [v] hoofdcategorie
+                        [v] categorienaam
+            [v] ingrediënten:
+                [v] print alle (met tussen haakjes cat/hoofdcat)
+                [v] selecteren en bewerken
+                    [v] selecteren zonder NIEUW
+                        [v] zoeken op hoofdcategorie (nummer intypen)
+                            [v] zoeken op categorie (nummer intypen)
+                                [v] zoeken op ingrediënt (nummer intypen)
+                        [v] direct zoeken op ingrediëntnaam (naam intypen)
+                    [v] bewerken
+                        [v] categorie
+                        [v] ingrediëntnaam
+            [v] producten:
+                [v] print alle (met tussen haakjes ingrediënt)
+                [v] selecteren en bewerken
+                    [v] selecteren zonder NIEUW
+                        [v] zoeken op hoofdcategorie (nummer intypen)
+                            [v] zoeken op categorie (nummer intypen)
+                                [v] zoeken op ingrediënt (nummer intypen)
+                                    [v] zoeken op product (nummer intypen)
+                        [v] direct zoeken op naam en printen overeenkomstige ingrediënten en producten
+                            [v] selecteren ingrediënt (nummer intypen)
+                                [v] selecteren product (nummer intypen)
+                            [v] selecteren product (nummer intypen)
+                    [v] bewerken
+                        [v] ingrediënt
+                        [v] productnaam
+                        [v] merk
+                        [v] voedingswaarde
+                        [v] eenheden
+                            [v] indien bestaand, vraag of het overschreden moet worden (nieuwe_eenheid() aanroepen)
+                    [v] weergeven
+                        [v] merk
+                        [v] voedingswaarde
+                        [v] eenheden
+            [v] merken:
+                [v] print alle
+                [v] bewerken
+                    [v] naam
+        
+        [v] MENU DAG:
+            [v] gisteren/morgen etc
+            [v] aangepaste datum op jaar/maand/dag
+        
+        [v] uuid
+            [i] uuid wordt nu toegekend aan MacroType bij inlezen, maar hier wordt geen gebruikt van gemaakt
+                [1] uuid als veld van MacroType verwijderen en volledig werken met geef_uuid
+                [2] uuid als veld van MacroType gebruiken, en geef_uuid verwijderen (altijd MacroType geven)
+
     Macro/Algemeen
         [v] verduidelijken menu-opties
         [v] toevoegen >>> waar missend
     
     MacroType
-        [ ] verwijderen uuid attribute?
+        [x] verwijderen uuid attribute?
+            [!] juist zo houden als @property want het is niet een attribute gemaakt met __init__ maar één die met een expression is toegevoegd (obj.uuid = value)
     
     Categorie
         [ ] onderzoeken uitbreiden voor gerechten
@@ -17,17 +110,16 @@ TOEVOEGINGEN
         [x] @property producten() die lijst van Producten teruggeeft
     
     Dag
-        [ ] toevoegen producten + hoeveelheid
+        [v] toevoegen producten + hoeveelheid
+            [v] bij dubbele eenheid -> sommeren
+            [v] g/ml als 100 tonen
         [ ] toevoegen gerechten
-        [ ] berekenen voedingswaarde
+        [v] berekenen voedingswaarde
         [ ] weergeven dag: producten, gerechten, voedingswaarde
+            [v] producten
+            [ ] gerechten
+            [v] voedingswaarde
         [ ] kopiëren van andere dagen d.m.v. indices producten/gerechten
-    
-    Gerecht
-        [ ] onderzoeken gebruikmaken van Categorie/Hoofdcategorie
-        [ ] toevoegen producten en diens hoeveelheden
-        [ ] toevoegen recept
-        [ ] toevoegen bewerkingen, en deze een naam geven
     
     Ingrediënt
         [x] @property producten() die lijst van producten genereert
@@ -39,16 +131,22 @@ TOEVOEGINGEN
         [v] @property ingrediënt()
         [v] @property categorie()
         [v] @property hoofdcategorie()
-        [ ] berekenen voedingswaarde aan de hand van hoeveelheid
-        [ ] merk_naam vervangen door merk_uuid
-        [ ] @property Product.merk()
+        [v] berekenen voedingswaarde aan de hand van hoeveelheid
+        [v] merk_naam vervangen door merk_uuid
+        [v] @property Product.merk()
     
     Merk
-        [ ] Merk MacroType
-            [ ] Merk.nieuw()
-        [ ] Merken MacroTypeDatabank
-            [ ] Merken.kiezen()
-            [ ] Merken.nieuw()
+        [v] Merk MacroType
+            [v] Merk.nieuw()
+        [v] Merken MacroTypeDatabank
+            [v] Merken.kiezen()
+            [v] Merken.nieuw()
         
     Voedingswaarde
-        [ ] veranderen van attributes naar hoeveelheden ? kcal toevoegen als Eenheid?
+        [v] veranderen van attributes naar hoeveelheden?
+        [v] kiezen eenheid "hg" of "dl" nog aanpassen -> "hoeveel hg" moet worden "hoeveel 100 g" OF "hoeveel g" en dan ingevulde waarde met 100 vermenigvuldigen?
+        
+    Grienetsiis
+        [v] terug_naar argument voor stoppen
+    
+    [ ] onderzoeken alle mogelijke paden die afgelegd kunnen worden vanuit hoofdmenu

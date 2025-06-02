@@ -470,8 +470,8 @@ class Product(MacroType):
 
 class Producten(MacroTypeDatabank):
     
-    BESTANDSNAAM:   str                 = "producten"
-    OBJECT_WIJZERS: List[ObjectWijzer]  = [
+    BESTANDSNAAM: str = "producten"
+    OBJECT_WIJZERS: List[ObjectWijzer] = [
         ObjectWijzer(Product.van_json, Product.VELDEN),
         ObjectWijzer(Voedingswaarde.van_json, Voedingswaarde.VELDEN),
         ]

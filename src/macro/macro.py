@@ -1,7 +1,8 @@
 from grienetsiis import invoer_kiezen, STOP
 
-from .categorie import Categorieën, Hoofdcategorieën
+from .categorie import Hoofdcategorieën, Categorieën, HoofdcategorieënGerecht, CategorieënGerecht
 from .dag import Dag
+from .gerecht import Gerechten
 from .ingredient import Ingrediënten
 from .product import Merken, Producten
 
@@ -12,7 +13,10 @@ def uitvoeren():
         
         opdracht = invoer_kiezen(
             "HOOFDMENU",
-            ["dag invullen", "gegevens bewerken"],
+            [
+                "dag invullen",
+                "gegevens bewerken",
+                ],
             stoppen = True,
             kies_een = False,
             terug_naar = "AFSLUITEN",
@@ -57,8 +61,16 @@ def uitvoeren():
                 
                 opdracht_gegevens = invoer_kiezen(
                     "MENU GEGEVENS",
-                    ["hoofdcategorieën",
-                    "categorieën", "ingrediënten", "producten", "merken"],
+                    [
+                        "hoofdcategorieën",
+                        "categorieën",
+                        "ingrediënten",
+                        "producten",
+                        "merken",
+                        "hoofdcategorieën gerechten",
+                        "categorieën gerechten",
+                        "gerechten",
+                        ],
                     stoppen = True,
                     kies_een = False,
                     terug_naar = "HOOFDMENU",
@@ -96,5 +108,23 @@ def uitvoeren():
                     merken = Merken.openen()
                     merken.opdracht(terug_naar)
                     merken.opslaan()
+                
+                elif opdracht_gegevens == "hoofdcategorieën gerechten":
+                    
+                    hoofdcategorieën_gerecht = HoofdcategorieënGerecht.openen()
+                    hoofdcategorieën_gerecht.opdracht(terug_naar)
+                    hoofdcategorieën_gerecht.opslaan()
+                
+                elif opdracht_gegevens == "categorieën gerechten":
+                    
+                    categorieën_gerecht = CategorieënGerecht.openen()
+                    categorieën_gerecht.opdracht(terug_naar)
+                    categorieën_gerecht.opslaan()
+                
+                elif opdracht_gegevens == "gerechten":
+                    
+                    gerechten = Gerechten.openen()
+                    gerechten.opdracht(terug_naar)
+                    gerechten.opslaan()
     
     print("tot ziens")

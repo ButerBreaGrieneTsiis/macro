@@ -1,10 +1,15 @@
 from typing import Any, Dict, List
 
+from grienetsiis import ObjectWijzer
+
+from .categorie import HoofdcategorieënGerecht, CategorieënGerecht
 from .macrotype import MacroType, MacroTypeDatabank, Hoeveelheid
 from .voedingswaarde import Voedingswaarde
 
 
 class Gerecht(MacroType):
+    
+    VELDEN = frozenset(("gerecht_naam", "categorie_uuid", "producten", "porties", "recept", "versies",))
     
     def __init__(
         self,
@@ -26,14 +31,27 @@ class Gerecht(MacroType):
     def __repr__(self):
         ...
     
+    @classmethod
+    def nieuw(
+        cls,
+        terug_naar: str,
+        ) -> "Gerecht":
+        
+        return cls(
+            
+        )
+    
     @property
     def voedingswaarde(self) -> Voedingswaarde:
         ...
         
     @property
     def ingrediënten(self) -> Dict[str, str]: # mapping van product_uuid: ingredient_uuid
-        
         ...
 
 class Gerechten(MacroTypeDatabank):
-    ...
+    
+    BESTANDSNAAM: str = "gerechten"
+    OBJECT_WIJZERS: List[ObjectWijzer] = [
+        ObjectWijzer(Gerecht.van_json, Gerecht.VELDEN),
+        ]

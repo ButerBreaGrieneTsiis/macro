@@ -76,9 +76,9 @@ class Categorie(MacroType):
     def nieuw(
         cls,
         terug_naar: str,
+        hoofdcategorieën,
         ) -> "Categorie":
         
-        hoofdcategorieën = Hoofdcategorieën.openen()
         hoofdcategorie_uuid = hoofdcategorieën.kiezen(terug_naar)
         
         if hoofdcategorie_uuid is STOP:
@@ -157,6 +157,7 @@ class Hoofdcategorieën(MacroTypeDatabank):
     OBJECT_WIJZERS: List[ObjectWijzer] = [
         ObjectWijzer(Hoofdcategorie.van_json, Hoofdcategorie.VELDEN),
         ]
+    MENU: str = "MENU GEGEVENS/HOOFDCATEGORIE"
     
     def opdracht(
         self,
@@ -166,7 +167,7 @@ class Hoofdcategorieën(MacroTypeDatabank):
         while True:
             
             opdracht = invoer_kiezen(
-                "MENU GEGEVENS/HOOFDCATEGORIE",
+                self.MENU,
                 [
                     "nieuwe hoofdcategorie",
                     "selecteren en bewerken",
@@ -187,7 +188,7 @@ class Hoofdcategorieën(MacroTypeDatabank):
             elif opdracht == "selecteren en bewerken":
                 
                 hoofdcategorie_uuid = self.kiezen(
-                    terug_naar = "MENU GEGEVENS/HOOFDCATEGORIE",
+                    terug_naar = self.MENU,
                     uitsluiten_nieuw = True,
                     )
                 if hoofdcategorie_uuid is STOP:
@@ -343,6 +344,8 @@ class Categorieën(MacroTypeDatabank):
     OBJECT_WIJZERS: List[ObjectWijzer] = [
         ObjectWijzer(Categorie.van_json, Categorie.VELDEN),
         ]
+    HOOFDCATEGORIEËN = Hoofdcategorieën
+    MENU: str = "MENU GEGEVENS/HOOFDCATEGORIE"
     
     def opdracht(
         self,
@@ -352,7 +355,7 @@ class Categorieën(MacroTypeDatabank):
         while True:
             
             opdracht = invoer_kiezen(
-                "MENU GEGEVENS/CATEGORIE",
+                self.MENU,
                 [
                     "nieuwe categorie",
                     "selecteer en bewerk",
@@ -369,20 +372,20 @@ class Categorieën(MacroTypeDatabank):
             elif opdracht == "nieuwe categorie":
                 
                 self.nieuw(
-                    terug_naar = "MENU GEGEVENS/CATEGORIE",
+                    terug_naar = self.MENU,
                     )
             
             elif opdracht == "selecteer en bewerk":
                 
                 categorie_uuid = self.kiezen(
-                    terug_naar = "MENU GEGEVENS/CATEGORIE",
+                    terug_naar = self.MENU,
                     uitsluiten_nieuw = True,
                     )
                 if categorie_uuid is STOP:
                     continue
                 
                 self[categorie_uuid].bewerk(
-                    terug_naar = "MENU GEGEVENS/CATEGORIE",
+                    terug_naar = self.MENU,
                     )
             
             elif opdracht == "toon categorieën":
@@ -392,7 +395,7 @@ class Categorieën(MacroTypeDatabank):
                     continue
                 
                 print()
-                hoofdcategorieën = Hoofdcategorieën.openen()
+                hoofdcategorieën = self.HOOFDCATEGORIEËN.openen()
                 for hoofdcategorie_uuid, hoofdcategorie in hoofdcategorieën.items():
                     print(f"     {hoofdcategorie}")
                     for categorie in self.lijst:
@@ -406,8 +409,11 @@ class Categorieën(MacroTypeDatabank):
         terug_naar: str,
         ):
         
+        hoofdcategorieën = self.HOOFDCATEGORIEËN.openen()
+        
         categorie = Categorie.nieuw(
             terug_naar,
+            hoofdcategorieën,
             )
         if categorie is STOP:
             return STOP
@@ -482,7 +488,7 @@ class Categorieën(MacroTypeDatabank):
                 
                 elif kies_optie == "selecteren categorie":
                     
-                    hoofdcategorieën = Hoofdcategorieën.openen()
+                    hoofdcategorieën = self.HOOFDCATEGORIEËN.openen()
                     hoofdcategorie_uuid = hoofdcategorieën.kiezen(
                         terug_naar,
                         uitsluiten_nieuw = True,
@@ -545,3 +551,14 @@ class Categorieën(MacroTypeDatabank):
         ) -> List[str]:
         
         return [categorie_uuid for categorie_uuid, categorie in self.items() if zoekterm in categorie.categorie_naam]
+
+class HoofdcategorieënGerecht(Hoofdcategorieën):
+    
+    BESTANDSNAAM: str = "hoofdcategorieën_gerecht"
+    MENU: str = "MENU GEGEVENS/HOOFDCATEGORIE GERECHT"
+
+class CategorieënGerecht(Categorieën):
+    
+    BESTANDSNAAM: str = "categorieën_gerecht"
+    HOOFDCATEGORIEËN = HoofdcategorieënGerecht
+    MENU: str = "MENU GEGEVENS/CATEGORIE GERECHT"
