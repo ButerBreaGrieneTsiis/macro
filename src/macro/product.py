@@ -132,7 +132,6 @@ class Merken(MacroTypeDatabank):
     def kiezen(
         self,
         terug_naar: str,
-        kies_bevestiging: bool = True,
         uitsluiten_nieuw: bool = False,
         ) -> Merk | str | Stop:
         
@@ -213,8 +212,7 @@ class Merken(MacroTypeDatabank):
                     if merk_uuid is STOP:
                         continue
                     
-                    if kies_bevestiging:
-                        print(f"\n>>> {self[merk_uuid]} gekozen")
+                    print(f"\n>>> {self[merk_uuid]} gekozen")
                     
                     return merk_uuid
                 
@@ -590,7 +588,6 @@ class Producten(MacroTypeDatabank):
     def kiezen_product(
         self,
         terug_naar: str,
-        kies_bevestiging: bool = True,
         uitsluiten_nieuw: bool = False,
         ) -> str | Stop:
         
@@ -686,8 +683,7 @@ class Producten(MacroTypeDatabank):
                     if product_uuid is STOP:
                         return STOP
                     
-                    if kies_bevestiging:
-                        print(f"\n>>> {self[product_uuid]} gekozen")
+                    print(f"\n>>> {self[product_uuid]} gekozen")
                     
                     return product_uuid
                 
@@ -739,8 +735,7 @@ class Producten(MacroTypeDatabank):
                     else:
                         product_uuid = uuid
                     
-                    if kies_bevestiging:
-                        print(f"\n>>> {self[product_uuid]} gekozen")
+                    print(f"\n>>> {self[product_uuid]} gekozen")
                     
                     return product_uuid
                 
@@ -753,7 +748,6 @@ class Producten(MacroTypeDatabank):
         self,
         terug_naar: str,
         product_uuid: str,
-        kies_bevestiging: bool = True,
         ) -> Eenheid | Stop:
         
         optie_dict = {
@@ -783,23 +777,21 @@ class Producten(MacroTypeDatabank):
         else:
             eenheid = kies_optie
         
-        if kies_bevestiging:
-            print(f"\n>>> eenheid \"{eenheid.meervoud}\" gekozen")
+        print(f"\n>>> eenheid \"{eenheid.meervoud}\" gekozen")
         
         return eenheid
     
     def kiezen_product_eenheid(
         self,
         terug_naar: str,
-        kies_bevestiging: bool = True,
         ) -> Tuple[str | Stop, Eenheid | Stop]:
         
-        product_uuid = self.kiezen_product(terug_naar, kies_bevestiging = kies_bevestiging)
+        product_uuid = self.kiezen_product(terug_naar)
         
         if product_uuid is STOP:
             return product_uuid, ...
         
-        eenheid = self.kiezen_eenheid(terug_naar, product_uuid, kies_bevestiging = kies_bevestiging)
+        eenheid = self.kiezen_eenheid(terug_naar, product_uuid)
         
         if eenheid is STOP:
             return product_uuid, eenheid

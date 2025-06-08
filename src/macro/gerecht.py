@@ -510,7 +510,6 @@ class Gerechten(MacroTypeDatabank):
     def kiezen_gerecht(
         self,
         terug_naar: str,
-        kies_bevestiging: bool = True,
         uitsluiten_nieuw: bool = False,
         ) -> str | Stop:
         
@@ -597,8 +596,7 @@ class Gerechten(MacroTypeDatabank):
                     if gerecht_uuid is STOP:
                         return STOP
                     
-                    if kies_bevestiging:
-                        print(f"\n>>> {self[gerecht_uuid]} gekozen")
+                    print(f"\n>>> {self[gerecht_uuid]} gekozen")
                     
                     return gerecht_uuid
                 
@@ -628,8 +626,7 @@ class Gerechten(MacroTypeDatabank):
                     if gerecht_uuid is STOP:
                         continue
                     
-                    if kies_bevestiging:
-                        print(f"\n>>> {self[gerecht_uuid].gerecht_naam} gekozen")
+                    print(f"\n>>> {self[gerecht_uuid]} gekozen")
                     
                     return gerecht_uuid
                 
@@ -642,7 +639,6 @@ class Gerechten(MacroTypeDatabank):
         self,
         terug_naar: str,
         gerecht_uuid: str,
-        kies_bevestiging: bool = True,
         ) -> str | Stop:
         
         optie_dict = {
@@ -665,25 +661,21 @@ class Gerechten(MacroTypeDatabank):
         
         elif kies_optie == "nieuwe versie":
             versie_uuid = self.nieuwe_versie(gerecht_uuid)
-            if kies_bevestiging: 
-                print(f"\n>>> versie \"{self[gerecht_uuid].versies[versie_uuid].versie_naam}\" gekozen")
+            print(f"\n>>> versie \"{self[gerecht_uuid].versies[versie_uuid].versie_naam}\" gekozen")
                         
         else:
             versie_uuid = kies_optie
-            if kies_bevestiging: 
-                print(f"\n>>> versie \"{kies_optie}\" gekozen")
+            print(f"\n>>> versie \"{kies_optie}\" gekozen")
         
         return versie_uuid
         
     def kiezen_gerecht_versie(
         self,
         terug_naar: str,
-        kies_bevestiging: bool = True,
         ) -> Tuple[str | Stop, str | Stop]:
         
         gerecht_uuid = self.kiezen_gerecht(
             terug_naar,
-            kies_bevestiging = kies_bevestiging,
             )
         
         if gerecht_uuid is STOP:
@@ -692,7 +684,6 @@ class Gerechten(MacroTypeDatabank):
         versie_uuid = self.kiezen_versie(
             terug_naar,
             gerecht_uuid,
-            kies_bevestiging = kies_bevestiging,
             )
         
         if versie_uuid is STOP:

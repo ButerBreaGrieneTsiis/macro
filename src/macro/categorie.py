@@ -223,7 +223,6 @@ class Hoofdcategorieën(MacroTypeDatabank):
     def kiezen(
         self,
         terug_naar: str,
-        kies_bevestiging: bool = True,
         uitsluiten_nieuw: bool = False,
         ) -> str | Stop:
         
@@ -291,8 +290,7 @@ class Hoofdcategorieën(MacroTypeDatabank):
                     if hoofdcategorie_uuid is STOP: 
                         continue
                     
-                    if kies_bevestiging: 
-                        print(f"\n>>> {self[hoofdcategorie_uuid]} gekozen")
+                    print(f"\n>>> {self[hoofdcategorie_uuid]} gekozen")
                     
                     return hoofdcategorie_uuid
                 
@@ -322,8 +320,7 @@ class Hoofdcategorieën(MacroTypeDatabank):
                     if hoofdcategorie_uuid is STOP:
                         continue
                     
-                    if kies_bevestiging: 
-                        print(f"\n>>> {self[hoofdcategorie_uuid]} gekozen")
+                    print(f"\n>>> {self[hoofdcategorie_uuid]} gekozen")
                     
                     return hoofdcategorie_uuid
                 
@@ -427,7 +424,6 @@ class Categorieën(MacroTypeDatabank):
     def kiezen(
         self,
         terug_naar: str,
-        kies_bevestiging: bool = True,
         uitsluiten_nieuw: bool = False,
         ) -> str | Stop:
         
@@ -503,8 +499,7 @@ class Categorieën(MacroTypeDatabank):
                     if categorie_uuid is STOP:
                         return STOP
                     
-                    if kies_bevestiging:
-                        print(f"\n>>> {self[categorie_uuid]} gekozen")
+                    print(f"\n>>> {self[categorie_uuid]} gekozen")
                     
                     return categorie_uuid
                 
@@ -534,8 +529,7 @@ class Categorieën(MacroTypeDatabank):
                     if categorie_uuid is STOP:
                         continue
                     
-                    if kies_bevestiging: 
-                        print(f"\n>>> {self[categorie_uuid]} gekozen")
+                    print(f"\n>>> {self[categorie_uuid]} gekozen")
                     
                     return categorie_uuid
                 

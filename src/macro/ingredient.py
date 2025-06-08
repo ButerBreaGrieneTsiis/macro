@@ -198,7 +198,6 @@ class Ingrediënten(MacroTypeDatabank):
     def kiezen(
         self,
         terug_naar: str,
-        kies_bevestiging: bool = True,
         uitsluiten_nieuw: bool = False,
         ) -> str | Stop:
         
@@ -285,8 +284,7 @@ class Ingrediënten(MacroTypeDatabank):
                     if ingrediënt_uuid is STOP:
                         return STOP
                     
-                    if kies_bevestiging:
-                        print(f"\n>>> {self[ingrediënt_uuid]} gekozen")
+                    print(f"\n>>> {self[ingrediënt_uuid]} gekozen")
                     
                     return ingrediënt_uuid
                 
@@ -316,8 +314,7 @@ class Ingrediënten(MacroTypeDatabank):
                     if ingrediënt_uuid is STOP:
                         continue
                     
-                    if kies_bevestiging:
-                        print(f"\n>>> {self[ingrediënt_uuid]} gekozen")
+                    print(f"\n>>> {self[ingrediënt_uuid]} gekozen")
                     
                     return ingrediënt_uuid
                 
