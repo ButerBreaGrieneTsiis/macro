@@ -82,7 +82,7 @@ class Merken(MacroTypeDatabank):
                 [
                     "nieuw merk",
                     "selecteer en bewerk",
-                    "toon merken",
+                    "weergeef merken",
                     ],
                 stoppen = True,
                 kies_een = False,
@@ -108,7 +108,7 @@ class Merken(MacroTypeDatabank):
                     terug_naar = "MENU GEGEVENS/MERK",
                     )
             
-            elif opdracht == "toon merken":
+            elif opdracht == "weergeef merken":
                 
                 print()
                 for merk in self.lijst:
@@ -489,7 +489,7 @@ class Producten(MacroTypeDatabank):
                     "nieuw product",
                     "selecteer en bewerk",
                     "selecteer en weergeef",
-                    "toon producten",
+                    "weergeef producten",
                     ],
                 stoppen = True,
                 kies_een = False,
@@ -530,7 +530,7 @@ class Producten(MacroTypeDatabank):
                     terug_naar = "MENU GEGEVENS/PRODUCT",
                     )
             
-            elif opdracht == "toon producten":
+            elif opdracht == "weergeef producten":
                 
                 if len(self) == 0:
                     print("\n>>> geen producten aanwezig")
@@ -791,7 +791,8 @@ class Producten(MacroTypeDatabank):
         else:
             eenheid = kies_optie
         
-        if kies_bevestiging: print(f"\n>>> eenheid \"{eenheid.meervoud}\" gekozen")
+        if kies_bevestiging:
+            print(f"\n>>> eenheid \"{eenheid.meervoud}\" gekozen")
         
         return eenheid
     

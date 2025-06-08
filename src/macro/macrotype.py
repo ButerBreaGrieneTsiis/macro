@@ -199,7 +199,7 @@ class Hoeveelheid(MacroType):
         ) -> "Hoeveelheid":
         
         return Hoeveelheid(
-            factor * self.waarde,
+            self.waarde * factor,
             self.eenheid,
             )
     
@@ -209,7 +209,17 @@ class Hoeveelheid(MacroType):
         ) -> "Hoeveelheid":
         
         return Hoeveelheid(
-            factor * self.waarde,
+            self.waarde * factor,
+            self.eenheid,
+            )
+    
+    def __truediv__(
+        self,
+        factor: float | int,
+        ) -> "Hoeveelheid":
+        
+        return Hoeveelheid(
+            self.waarde / factor,
             self.eenheid,
             )
     

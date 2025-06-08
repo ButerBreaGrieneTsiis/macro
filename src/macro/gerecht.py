@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 from uuid import uuid4
 
 from grienetsiis import invoer_kiezen, invoer_validatie, ObjectWijzer, STOP, Stop
@@ -139,15 +139,60 @@ class Gerecht(MacroType):
             
             producten = Producten.openen()
             
-            print(f"{"HOEVEELHEID":<17} PRODUCT")
+            print(f"     {"HOEVEELHEID":<17} PRODUCT")
             
             for product_uuid, hoeveelheid in self.producten_standaard.items():
                 print(f"     {f"{hoeveelheid}":<17} {producten[product_uuid]}")
+        
+        elif kies_optie == "weergeef voedingswaarde":
+            
+            versie_uuid = self.kiezen_versie(
+                terug_naar,
+                )
+            
+            if versie_uuid is STOP:
+                return STOP
+            
+            versie_naam = "standaard" if versie_uuid == "standaard" else self.versies[versie_uuid]["versie_naam"]
+            
+            print(f"\nvoedingswaarde voor versie \"{versie_naam}\" per portie ({self.porties} porties)\n")            
+            print(self.voedingswaarde(versie_uuid) / self.porties)
     
-    def toevoegen_versie(
+    def kiezen_versie(
         self,
         terug_naar: str,
-        ):
+        stoppen: bool = True,
+        ) -> str | Stop:
+        
+        while True:
+            
+            if len(self.versies) == 0:
+                
+                kies_optie = "standaard"
+            
+            else:
+                
+                optie_dict = {
+                    "standaard": "standaard"
+                } | {
+                    f"{versie["versie_naam"]}": versie_uuid for versie_uuid, versie in self.versies.items()
+                    }
+                
+                kies_optie = invoer_kiezen(
+                    "versie",
+                    optie_dict,
+                    stoppen = stoppen,
+                    terug_naar = terug_naar,
+                    )
+                
+                if kies_optie is STOP:
+                    return STOP
+            
+            return kies_optie
+    
+    def nieuwe_versie(
+        self,
+        ) -> str | Stop:
         
         versie = {}
         
@@ -276,8 +321,8 @@ class Gerecht(MacroType):
                         }
         
         if not bool(versie):
-            return self
-                
+            return STOP
+        
         versie_naam = invoer_validatie(
             "versienaam",
             type = str,
@@ -288,32 +333,49 @@ class Gerecht(MacroType):
         
         self.versies[versie_uuid] = versie
         
-        return self
+        return versie_uuid
     
     def producten(
         self,
-        versie_uuid: str = None,
+        versie_uuid: str = "standaard",
         ) -> Dict[str, Hoeveelheid]:
         
-        ...
+        producten = self.producten_standaard
+        
+        if versie_uuid is not "standaard":
+            
+            for product_uuid, hoeveelheid in self.versies[versie_uuid]["toegevoegd"].items():
+                
+                producten[product_uuid] = hoeveelheid
+            
+            for product_uuid in self.versies[versie_uuid]["verwijderd"]:
+                
+                del producten[product_uuid]
+            
+            for product_uuid, nieuw in self.versies[versie_uuid]["vervangen"].items():
+                
+                del producten[product_uuid]
+                producten[nieuw["product_uuid"]] = nieuw["hoeveelheid"]
+            
+            for product_uuid, hoeveelheid in self.versies[versie_uuid]["hoeveelheid"].items():
+                
+                producten[product_uuid] = hoeveelheid
+        
+        return producten
     
     def voedingswaarde(
         self,
-        versie_uuid: str = None,
+        versie_uuid: str = "standaard",
         ) -> Voedingswaarde:
         
-        ...
-    
-    @property
-    def ingrediënten(self) -> Dict[str, str]: # mapping van product_uuid: ingredient_uuid
+        gerecht_voedingswaarde = Voedingswaarde()
         producten = Producten.openen()
         
-        product_naar_ingrediënt = {}
+        for product_uuid, hoeveelheid in self.producten(versie_uuid).items():
+            product_voedingswaarde = producten[product_uuid].bereken_voedingswaarde(hoeveelheid)
+            gerecht_voedingswaarde += product_voedingswaarde
         
-        for product_uuid in self.producten_standaard.keys():
-            product_naar_ingrediënt[product_uuid] = producten[product_uuid].ingrediënt_uuid
-        
-        return product_naar_ingrediënt
+        return gerecht_voedingswaarde
     
     @property
     def categorie(self) -> Categorie:
@@ -345,7 +407,7 @@ class Gerechten(MacroTypeDatabank):
                     "nieuw gerecht",
                     "selecteer en bewerk",
                     "selecteer en weergeef",
-                    "toon gerechten",
+                    "weergeef gerechten",
                     ],
                 stoppen = True,
                 kies_een = False,
@@ -362,7 +424,7 @@ class Gerechten(MacroTypeDatabank):
             
             elif opdracht == "selecteer en bewerk":
                 
-                gerecht_uuid = self.kiezen(
+                gerecht_uuid = self.kiezen_gerecht(
                     terug_naar = "MENU GEGEVENS/GERECHT",
                     uitsluiten_nieuw = True,
                     )
@@ -375,7 +437,7 @@ class Gerechten(MacroTypeDatabank):
             
             elif opdracht == "selecteer en weergeef":
                 
-                gerecht_uuid = self.kiezen(
+                gerecht_uuid = self.kiezen_gerecht(
                     terug_naar = "MENU GEGEVENS/GERECHT",
                     uitsluiten_nieuw = True,
                     )
@@ -386,7 +448,7 @@ class Gerechten(MacroTypeDatabank):
                     terug_naar = "MENU GEGEVENS/GERECHT",
                     )
             
-            elif opdracht == "toon gerechten":
+            elif opdracht == "weergeef gerechten":
                 
                 if len(self) == 0:
                     print("\n>>> geen gerechten aanwezig")
@@ -424,7 +486,7 @@ class Gerechten(MacroTypeDatabank):
                 },
             kies_een = False,
             ):
-            gerecht.toevoegen_versie(
+            gerecht.nieuwe_versie(
                 terug_naar = terug_naar,
                 )
         
@@ -435,7 +497,19 @@ class Gerechten(MacroTypeDatabank):
         
         return gerecht_uuid
     
-    def kiezen(
+    def nieuwe_versie(
+        self,
+        gerecht_uuid: str = None,
+        ):
+        
+        gerecht_uuid = self.kiezen_gerecht() if gerecht_uuid is None else gerecht_uuid
+        versie_uuid = self[gerecht_uuid].nieuwe_versie()
+        
+        self.opslaan()
+        
+        return versie_uuid
+    
+    def kiezen_gerecht(
         self,
         terug_naar: str,
         kies_bevestiging: bool = True,
@@ -566,3 +640,76 @@ class Gerechten(MacroTypeDatabank):
                     return self.nieuw(
                         terug_naar,
                         )
+    
+    def kiezen_versie(
+        self,
+        terug_naar: str,
+        gerecht_uuid: str,
+        kies_bevestiging: bool = True,
+        stoppen: bool = False,
+        ) -> str | Stop:
+        
+        optie_dict = {
+            "standaard": "standaard"
+        } | {
+            f"{versie["versie_naam"]}": versie_uuid for versie_uuid, versie in self[gerecht_uuid].versies.items()
+        } | {
+            "nieuwe versie": "nieuwe versie"
+            }
+        
+        kies_optie = invoer_kiezen(
+            "bestaande versie of maakt een nieuwe",
+            optie_dict,
+            stoppen = stoppen,
+            terug_naar = terug_naar,
+            )
+        
+        if kies_optie is STOP:
+            return STOP
+        
+        elif kies_optie == "nieuwe versie":
+            versie_uuid = self.nieuwe_versie(gerecht_uuid)
+            if kies_bevestiging: 
+                print(f"\n>>> versie \"{self[gerecht_uuid].versies[versie_uuid].versie_naam}\" gekozen")
+                        
+        else:
+            versie_uuid = kies_optie
+            if kies_bevestiging: 
+                print(f"\n>>> versie \"{kies_optie}\" gekozen")
+        
+        return versie_uuid
+        
+    def kiezen_gerecht_versie(
+        self,
+        terug_naar: str,
+        kies_bevestiging: bool = True,
+        stoppen: bool = True,
+        ) -> Tuple[str | Stop, str | Stop]:
+        
+        gerecht_uuid = self.kiezen_gerecht(
+            terug_naar,
+            kies_bevestiging = kies_bevestiging,
+            stoppen = stoppen,
+            )
+        
+        if gerecht_uuid is STOP:
+            return gerecht_uuid, ...
+        
+        versie_uuid = self.kiezen_versie(
+            terug_naar,
+            gerecht_uuid,
+            kies_bevestiging = kies_bevestiging,
+            stoppen = stoppen,
+            )
+        
+        if versie_uuid is STOP:
+            return gerecht_uuid, versie_uuid
+        
+        return gerecht_uuid, versie_uuid
+    
+    def zoeken(
+        self,
+        zoekterm: str,
+        ) -> List[str]:
+        
+        return [gerecht_uuid for gerecht_uuid, gerecht in self.items() if zoekterm in gerecht.gerecht_naam]

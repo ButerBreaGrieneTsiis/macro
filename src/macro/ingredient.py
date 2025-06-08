@@ -129,7 +129,7 @@ class Ingrediënten(MacroTypeDatabank):
                 [
                     "nieuw ingrediënt",
                     "selecteer en bewerk",
-                    "toon ingrediënten",
+                    "weergeef ingrediënten",
                     ],
                 stoppen = True,
                 kies_een = False,
@@ -157,7 +157,7 @@ class Ingrediënten(MacroTypeDatabank):
                     terug_naar = "MENU GEGEVENS/INGREDIËNT",
                     )
             
-            elif opdracht == "toon ingrediënten":
+            elif opdracht == "weergeef ingrediënten":
                 
                 if len(self) == 0:
                     print("\n>>> geen ingrediënten aanwezig")

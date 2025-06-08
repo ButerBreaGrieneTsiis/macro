@@ -106,8 +106,12 @@ class Dag(MacroType):
                 [
                     "toevoegen producten",
                     "toevoegen gerechten",
-                    "toon voedingswaarde",
-                    "toon producten",
+                    "verwijderen producten",
+                    "verwijderen gerechten",
+                    "bewerken producten",
+                    "bewerken gerechten",
+                    "weergeef voedingswaarde",
+                    "weergeef producten",
                     ],
                 stoppen = True,
                 kies_een = False,
@@ -155,7 +159,7 @@ class Dag(MacroType):
             elif opdracht == "toevoegen gerechten":
                 ...
             
-            elif opdracht == "toon voedingswaarde":
+            elif opdracht == "weergeef voedingswaarde":
                 
                 if len(self.producten) == 0:
                     print(f">>> er zijn geen producten voor {self}")
@@ -163,7 +167,7 @@ class Dag(MacroType):
                 
                 print(self.voedingswaarde)
             
-            elif opdracht == "toon producten":
+            elif opdracht == "weergeef producten":
                 
                 if len(self.producten) == 0:
                     print(f">>> er zijn geen producten voor {self}")
@@ -171,7 +175,7 @@ class Dag(MacroType):
                 
                 producten = Producten.openen()
                 
-                print(f"{"HOEVEELHEID":<17} PRODUCT")
+                print(f"     {"HOEVEELHEID":<17} PRODUCT")
                 
                 for product_uuid, hoeveelheden in self.producten.items():
                     

@@ -64,6 +64,22 @@ class Voedingswaarde:
             factor * self.zout,
             )
     
+    def __truediv__(
+        self,
+        factor: float | int,
+        ) -> "Voedingswaarde":
+        
+        return Voedingswaarde(
+            self.calorieën / factor,
+            self.vetten / factor,
+            self.verzadigd / factor,
+            self.koolhydraten / factor,
+            self.suikers / factor,
+            self.eiwitten / factor,
+            self.vezels / factor,
+            self.zout / factor,
+            )
+    
     def __iadd__(
         self,
         ander: "Voedingswaarde",

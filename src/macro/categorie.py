@@ -171,7 +171,7 @@ class Hoofdcategorieën(MacroTypeDatabank):
                 [
                     "nieuwe hoofdcategorie",
                     "selecteren en bewerken",
-                    "toon hoofdcategorieën",
+                    "weergeef hoofdcategorieën",
                     ],
                 stoppen = True,
                 kies_een = False,
@@ -196,7 +196,7 @@ class Hoofdcategorieën(MacroTypeDatabank):
                 
                 self[hoofdcategorie_uuid].bewerk()
             
-            elif opdracht == "toon hoofdcategorieën":
+            elif opdracht == "weergeef hoofdcategorieën":
                 
                 if len(self) == 0:
                     print("\n>>> geen hoofdcategorieën aanwezig")
@@ -359,7 +359,7 @@ class Categorieën(MacroTypeDatabank):
                 [
                     "nieuwe categorie",
                     "selecteer en bewerk",
-                    "toon categorieën",
+                    "weergeef categorieën",
                     ],
                 stoppen = True,
                 kies_een = False,
@@ -388,7 +388,7 @@ class Categorieën(MacroTypeDatabank):
                     terug_naar = self.MENU,
                     )
             
-            elif opdracht == "toon categorieën":
+            elif opdracht == "weergeef categorieën":
                 
                 if len(self) == 0:
                     print("\n>>> geen categorieën aanwezig")
