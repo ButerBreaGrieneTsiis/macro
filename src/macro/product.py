@@ -35,11 +35,8 @@ class Merk(MacroType):
             valideren = True,
             kleine_letters = True,
             uitsluiten_leeg = True,
-            stoppen = True,
             terug_naar = terug_naar,
             )
-        if merk_naam is STOP:
-            return STOP
         
         return cls(
             merk_naam,
@@ -136,7 +133,6 @@ class Merken(MacroTypeDatabank):
         self,
         terug_naar: str,
         kies_bevestiging: bool = True,
-        stoppen: bool = True,
         uitsluiten_nieuw: bool = False,
         ) -> Merk | str | Stop:
         
@@ -153,7 +149,7 @@ class Merken(MacroTypeDatabank):
                     [
                         "nieuw merk",
                         ],
-                    stoppen = stoppen,
+                    stoppen = True,
                     kies_een = False,
                     terug_naar = terug_naar,
                     )
@@ -174,7 +170,7 @@ class Merken(MacroTypeDatabank):
                         [
                             "merknaam",
                             ],
-                        stoppen = stoppen,
+                        stoppen = True,
                         terug_naar = terug_naar,
                         )
                 
@@ -185,7 +181,7 @@ class Merken(MacroTypeDatabank):
                             "merknaam",
                             "nieuw merk",
                             ],
-                        stoppen = stoppen,
+                        stoppen = True,
                         terug_naar = terug_naar,
                         )
                 
@@ -260,7 +256,7 @@ class Product(MacroType):
         ) -> "Product":
         
         ingrediënten    = Ingrediënten.openen()
-        ingrediënt_uuid = ingrediënten.kiezen(terug_naar, stoppen = True)
+        ingrediënt_uuid = ingrediënten.kiezen(terug_naar)
         
         if ingrediënt_uuid is STOP:
             return STOP
@@ -342,7 +338,6 @@ class Product(MacroType):
                 merk_uuid = merken.kiezen(
                     terug_naar = f"MENU {f"{self}".upper()}",
                     uitsluiten_nieuw = True,
-                    stoppen = True
                     )
                 
                 if merk_uuid is STOP:
@@ -365,7 +360,6 @@ class Product(MacroType):
                 ingrediënt_uuid = ingrediënten.kiezen(
                     terug_naar = f"MENU {f"{self}".upper()}",
                     uitsluiten_nieuw = True,
-                    stoppen = True,
                     )
                 
                 if ingrediënt_uuid is STOP:
@@ -597,7 +591,6 @@ class Producten(MacroTypeDatabank):
         self,
         terug_naar: str,
         kies_bevestiging: bool = True,
-        stoppen: bool = True,
         uitsluiten_nieuw: bool = False,
         ) -> str | Stop:
         
@@ -614,7 +607,7 @@ class Producten(MacroTypeDatabank):
                     [
                         "nieuw product",
                         ],
-                    stoppen = stoppen,
+                    stoppen = True,
                     kies_een = False,
                     terug_naar = terug_naar,
                     )
@@ -636,7 +629,7 @@ class Producten(MacroTypeDatabank):
                             "selecteren product",
                             "zoek op naam",
                             ],
-                        stoppen = stoppen,
+                        stoppen = True,
                         terug_naar = terug_naar,
                         )
                 else:
@@ -647,7 +640,7 @@ class Producten(MacroTypeDatabank):
                             "zoek op naam",
                             "nieuw product",
                             ],
-                        stoppen = stoppen,
+                        stoppen = True,
                         terug_naar = terug_naar,
                         )
                 
@@ -668,7 +661,7 @@ class Producten(MacroTypeDatabank):
                     categorie_uuid = invoer_kiezen(
                         "categorie",
                         {f"{categorie}": categorie_uuid for categorie_uuid, categorie in categorieën.items() if categorie.hoofdcategorie_uuid == hoofdcategorie_uuid},
-                        stoppen = stoppen,
+                        stoppen = True,
                         terug_naar = terug_naar,
                         )
                     if categorie_uuid is STOP:
@@ -678,7 +671,7 @@ class Producten(MacroTypeDatabank):
                     ingrediënt_uuid = invoer_kiezen(
                         "ingrediënt",
                         {f"{ingrediënt}": ingrediënt_uuid for ingrediënt_uuid, ingrediënt in ingrediënten.items() if ingrediënt.categorie_uuid == categorie_uuid},
-                        stoppen = stoppen,
+                        stoppen = True,
                         terug_naar = terug_naar,
                         )
                     if ingrediënt_uuid is STOP:
@@ -687,7 +680,7 @@ class Producten(MacroTypeDatabank):
                     product_uuid = invoer_kiezen(
                         "product",
                         {f"{product}": product_uuid for product_uuid, product in self.items() if product.ingrediënt_uuid == ingrediënt_uuid},
-                        stoppen = stoppen,
+                        stoppen = True,
                         terug_naar = terug_naar,
                         )
                     if product_uuid is STOP:
@@ -738,7 +731,7 @@ class Producten(MacroTypeDatabank):
                         product_uuid = invoer_kiezen(
                         "product",
                         {f"{product}": product_uuid for product_uuid, product in self.items() if product.ingrediënt_uuid == uuid},
-                        stoppen = stoppen,
+                        stoppen = True,
                         terug_naar = terug_naar,
                         )
                         if product_uuid is STOP:
@@ -761,7 +754,6 @@ class Producten(MacroTypeDatabank):
         terug_naar: str,
         product_uuid: str,
         kies_bevestiging: bool = True,
-        stoppen: bool = False,
         ) -> Eenheid | Stop:
         
         optie_dict = {
@@ -775,7 +767,7 @@ class Producten(MacroTypeDatabank):
         kies_optie = invoer_kiezen(
             "bestaande eenheid of maakt een nieuwe",
             optie_dict,
-            stoppen = stoppen,
+            stoppen = True,
             terug_naar = terug_naar,
             )
         
@@ -800,15 +792,14 @@ class Producten(MacroTypeDatabank):
         self,
         terug_naar: str,
         kies_bevestiging: bool = True,
-        stoppen: bool = True,
         ) -> Tuple[str | Stop, Eenheid | Stop]:
         
-        product_uuid = self.kiezen_product(terug_naar, kies_bevestiging = kies_bevestiging, stoppen = stoppen)
+        product_uuid = self.kiezen_product(terug_naar, kies_bevestiging = kies_bevestiging)
         
         if product_uuid is STOP:
             return product_uuid, ...
         
-        eenheid = self.kiezen_eenheid(terug_naar, product_uuid, kies_bevestiging = kies_bevestiging, stoppen = stoppen)
+        eenheid = self.kiezen_eenheid(terug_naar, product_uuid, kies_bevestiging = kies_bevestiging)
         
         if eenheid is STOP:
             return product_uuid, eenheid

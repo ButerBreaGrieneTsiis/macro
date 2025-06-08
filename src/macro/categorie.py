@@ -224,7 +224,6 @@ class Hoofdcategorieën(MacroTypeDatabank):
         self,
         terug_naar: str,
         kies_bevestiging: bool = True,
-        stoppen: bool = True,
         uitsluiten_nieuw: bool = False,
         ) -> str | Stop:
         
@@ -242,7 +241,7 @@ class Hoofdcategorieën(MacroTypeDatabank):
                         "nieuwe hoofdcategorie",
                         ],
                     kies_een = False,
-                    stoppen = stoppen,
+                    stoppen = True,
                     terug_naar = terug_naar,
                     )
                 
@@ -261,7 +260,7 @@ class Hoofdcategorieën(MacroTypeDatabank):
                             "selecteren hoofdcategorie",
                             "zoek op hoofdcategorienaam",
                             ],
-                        stoppen = stoppen,
+                        stoppen = True,
                         terug_naar = terug_naar,
                         )
                 
@@ -273,7 +272,7 @@ class Hoofdcategorieën(MacroTypeDatabank):
                             "zoek op hoofdcategorienaam",
                             "nieuwe hoofdcategorie",
                             ],
-                        stoppen = stoppen,
+                        stoppen = True,
                         terug_naar = terug_naar,
                         )
                 
@@ -285,7 +284,7 @@ class Hoofdcategorieën(MacroTypeDatabank):
                     hoofdcategorie_uuid = invoer_kiezen(
                         "hoofdcategorie",
                         {f"{hoofdcategorie}": hoofdcategorie_uuid for hoofdcategorie_uuid, hoofdcategorie in self.items()},
-                        stoppen = stoppen,
+                        stoppen = True,
                         terug_naar = terug_naar,
                         )
                     
@@ -429,7 +428,6 @@ class Categorieën(MacroTypeDatabank):
         self,
         terug_naar: str,
         kies_bevestiging: bool = True,
-        stoppen: bool = True,
         uitsluiten_nieuw: bool = False,
         ) -> str | Stop:
         
@@ -446,7 +444,7 @@ class Categorieën(MacroTypeDatabank):
                         "nieuwe categorie",
                         ],
                     kies_een = False,
-                    stoppen = stoppen,
+                    stoppen = True,
                     terug_naar = terug_naar,
                     )
                 
@@ -467,7 +465,7 @@ class Categorieën(MacroTypeDatabank):
                             "selecteren hoofdcategorie",
                             "zoek op categorienaam",
                             ],
-                        stoppen = stoppen,
+                        stoppen = True,
                         terug_naar = terug_naar,
                         )
                 
@@ -479,7 +477,7 @@ class Categorieën(MacroTypeDatabank):
                             "zoek op categorienaam",
                             "nieuwe categorie",
                             ],
-                        stoppen = stoppen,
+                        stoppen = True,
                         terug_naar = terug_naar,
                         )
                 
@@ -499,7 +497,7 @@ class Categorieën(MacroTypeDatabank):
                     categorie_uuid = invoer_kiezen(
                         "categorie",
                         {f"{categorie}": categorie_uuid for categorie_uuid, categorie in self.items() if categorie.hoofdcategorie_uuid == hoofdcategorie_uuid},
-                        stoppen = stoppen,
+                        stoppen = True,
                         terug_naar = terug_naar,
                         )
                     if categorie_uuid is STOP:

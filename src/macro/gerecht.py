@@ -38,7 +38,7 @@ class Gerecht(MacroType):
         ) -> "Gerecht":
         
         categorieën_gerecht = CategorieënGerecht.openen()
-        categorie_uuid = categorieën_gerecht.kiezen(terug_naar, stoppen = True)
+        categorie_uuid = categorieën_gerecht.kiezen(terug_naar)
         
         if categorie_uuid is STOP:
             return STOP
@@ -161,7 +161,6 @@ class Gerecht(MacroType):
     def kiezen_versie(
         self,
         terug_naar: str,
-        stoppen: bool = True,
         ) -> str | Stop:
         
         while True:
@@ -181,7 +180,6 @@ class Gerecht(MacroType):
                 kies_optie = invoer_kiezen(
                     "versie",
                     optie_dict,
-                    stoppen = stoppen,
                     terug_naar = terug_naar,
                     )
                 
@@ -513,7 +511,6 @@ class Gerechten(MacroTypeDatabank):
         self,
         terug_naar: str,
         kies_bevestiging: bool = True,
-        stoppen: bool = True,
         uitsluiten_nieuw: bool = False,
         ) -> str | Stop:
         
@@ -531,7 +528,7 @@ class Gerechten(MacroTypeDatabank):
                         "nieuw gerecht",
                         ],
                     kies_een = False,
-                    stoppen = stoppen,
+                    stoppen = True,
                     terug_naar = terug_naar,
                     )
                 
@@ -552,7 +549,7 @@ class Gerechten(MacroTypeDatabank):
                             "selecteren gerecht",
                             "zoek op gerechtnaam",
                             ],
-                        stoppen = stoppen,
+                        stoppen = True,
                         terug_naar = terug_naar,
                         )
                 
@@ -564,7 +561,7 @@ class Gerechten(MacroTypeDatabank):
                             "zoek op gerechtnaam",
                             "nieuw gerecht",
                             ],
-                        stoppen = stoppen,
+                        stoppen = True,
                         terug_naar = terug_naar,
                         )
                 
@@ -585,7 +582,7 @@ class Gerechten(MacroTypeDatabank):
                     categorie_uuid = invoer_kiezen(
                         "categorie",
                         {f"{categorie}": categorie_uuid for categorie_uuid, categorie in categorieën_gerecht.items() if categorie.hoofdcategorie_uuid == hoofdcategorie_uuid},
-                        stoppen = stoppen,
+                        stoppen = True,
                         terug_naar = terug_naar,
                         )
                     if categorie_uuid is STOP:
@@ -594,7 +591,7 @@ class Gerechten(MacroTypeDatabank):
                     gerecht_uuid = invoer_kiezen(
                         "ingrediënt",
                         {f"{gerecht}": gerecht_uuid for gerecht_uuid, gerecht in self.items() if gerecht.categorie_uuid == categorie_uuid},
-                        stoppen = stoppen,
+                        stoppen = True,
                         terug_naar = terug_naar,
                         )
                     if gerecht_uuid is STOP:
@@ -646,7 +643,6 @@ class Gerechten(MacroTypeDatabank):
         terug_naar: str,
         gerecht_uuid: str,
         kies_bevestiging: bool = True,
-        stoppen: bool = False,
         ) -> str | Stop:
         
         optie_dict = {
@@ -660,7 +656,7 @@ class Gerechten(MacroTypeDatabank):
         kies_optie = invoer_kiezen(
             "bestaande versie of maakt een nieuwe",
             optie_dict,
-            stoppen = stoppen,
+            stoppen = True,
             terug_naar = terug_naar,
             )
         
@@ -683,13 +679,11 @@ class Gerechten(MacroTypeDatabank):
         self,
         terug_naar: str,
         kies_bevestiging: bool = True,
-        stoppen: bool = True,
         ) -> Tuple[str | Stop, str | Stop]:
         
         gerecht_uuid = self.kiezen_gerecht(
             terug_naar,
             kies_bevestiging = kies_bevestiging,
-            stoppen = stoppen,
             )
         
         if gerecht_uuid is STOP:
@@ -699,7 +693,6 @@ class Gerechten(MacroTypeDatabank):
             terug_naar,
             gerecht_uuid,
             kies_bevestiging = kies_bevestiging,
-            stoppen = stoppen,
             )
         
         if versie_uuid is STOP:

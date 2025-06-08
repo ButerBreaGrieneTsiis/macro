@@ -199,7 +199,6 @@ class Ingrediënten(MacroTypeDatabank):
         self,
         terug_naar: str,
         kies_bevestiging: bool = True,
-        stoppen: bool = False,
         uitsluiten_nieuw: bool = False,
         ) -> str | Stop:
         
@@ -217,7 +216,7 @@ class Ingrediënten(MacroTypeDatabank):
                         "nieuw ingrediënt",
                         ],
                     kies_een = False,
-                    stoppen = stoppen,
+                    stoppen = True,
                     terug_naar = terug_naar,
                     )
                 
@@ -238,7 +237,7 @@ class Ingrediënten(MacroTypeDatabank):
                             "selecteren ingrediënt",
                             "zoek op ingrediëntnaam",
                             ],
-                        stoppen = stoppen,
+                        stoppen = True,
                         terug_naar = terug_naar,
                         )
                 
@@ -250,7 +249,7 @@ class Ingrediënten(MacroTypeDatabank):
                             "zoek op ingrediëntnaam",
                             "nieuw ingrediënt",
                             ],
-                        stoppen = stoppen,
+                        stoppen = True,
                         terug_naar = terug_naar,
                         )
                 
@@ -271,7 +270,7 @@ class Ingrediënten(MacroTypeDatabank):
                     categorie_uuid = invoer_kiezen(
                         "categorie",
                         {f"{categorie}": categorie_uuid for categorie_uuid, categorie in categorieën.items() if categorie.hoofdcategorie_uuid == hoofdcategorie_uuid},
-                        stoppen = stoppen,
+                        stoppen = True,
                         terug_naar = terug_naar,
                         )
                     if categorie_uuid is STOP:
@@ -280,7 +279,7 @@ class Ingrediënten(MacroTypeDatabank):
                     ingrediënt_uuid = invoer_kiezen(
                         "ingrediënt",
                         {f"{ingrediënt}": ingrediënt_uuid for ingrediënt_uuid, ingrediënt in self.items() if ingrediënt.categorie_uuid == categorie_uuid},
-                        stoppen = stoppen,
+                        stoppen = True,
                         terug_naar = terug_naar,
                         )
                     if ingrediënt_uuid is STOP:

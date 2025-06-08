@@ -129,7 +129,6 @@ class Dag(MacroType):
                     
                     product_uuid, eenheid = producten.kiezen_product_eenheid(
                         terug_naar = f"MENU DAG/{f"{self.dag}".upper()}",
-                        stoppen = True,
                         )
                     
                     if product_uuid is STOP:
