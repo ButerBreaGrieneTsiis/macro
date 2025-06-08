@@ -142,7 +142,7 @@ class Gerecht(MacroType):
             print(f"{"HOEVEELHEID":<17} PRODUCT")
             
             for product_uuid, hoeveelheid in self.producten_standaard.items():
-                print(f"{f"{hoeveelheid}":<17} {producten[product_uuid]}")
+                print(f"     {f"{hoeveelheid}":<17} {producten[product_uuid]}")
     
     def toevoegen_versie(
         self,
