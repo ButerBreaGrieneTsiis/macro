@@ -325,7 +325,7 @@ class Product(MacroType):
                 )
             
             if kies_optie is STOP:
-                return self
+                break
             
             if kies_optie == "bewerk productnaam":
             
@@ -375,6 +375,8 @@ class Product(MacroType):
                 
                 self.ingrediënt_uuid = ingrediënt_uuid
         
+        return self
+        
     def weergeef(
         self,
         terug_naar: str,
@@ -382,35 +384,38 @@ class Product(MacroType):
         
         print(f"selecteren wat te weergeven")
         
-        kies_optie = invoer_kiezen(
-            "veld",
-            [
-                "weergeef merk",
-                "weergeef voedingswaarde",
-                "weergeef eenheden",
-                ],
-            stoppen = True,
-            terug_naar = terug_naar,
-            )
+        while True:
         
-        if kies_optie is STOP:
-            return STOP
-        
-        elif kies_optie == "weergeef merk":
+            kies_optie = invoer_kiezen(
+                "veld",
+                [
+                    "weergeef merk",
+                    "weergeef voedingswaarde",
+                    "weergeef eenheden",
+                    ],
+                stoppen = True,
+                terug_naar = terug_naar,
+                )
             
-            print(self.merk)
-        
-        elif kies_optie == "weergeef voedingswaarde":
+            if kies_optie is STOP:
+                break
             
-            print(self.voedingswaarde)
-        
-        elif kies_optie == "weergeef eenheden":
+            elif kies_optie == "weergeef merk":
+                
+                print(f"\n     {self.merk}")
             
-            if len(self.eenheden) == 0:
-                print(">>> geen eenheden gedefinieerd")
-            else:
-                print(f"     EENHEID     HOEVEELHEID")
-                [print(f"     {f"{Hoeveelheid(1, eenheid)}":<13}{Hoeveelheid(waarde, self.basis_eenheid)}") for eenheid, waarde in self.eenheden.items()]
+            elif kies_optie == "weergeef voedingswaarde":
+                
+                print(f"\nvoedingswaarde voor {Hoeveelheid(100, self.basis_eenheid)}\n")
+                print(self.voedingswaarde)
+            
+            elif kies_optie == "weergeef eenheden":
+                
+                if len(self.eenheden) == 0:
+                    print("\n>>> geen eenheden gedefinieerd")
+                else:
+                    print(f"\n     EENHEID          HOEVEELHEID CALORIEËN")
+                    [print(f"     {f"{Hoeveelheid(1, eenheid)}":<17}{f"{Hoeveelheid(waarde, self.basis_eenheid)}":<11} {self.voedingswaarde.calorieën * waarde / 100.0}") for eenheid, waarde in self.eenheden.items()]
     
     def bewerk_eenheden(self) -> Eenheid:
         

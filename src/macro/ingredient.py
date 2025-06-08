@@ -58,47 +58,49 @@ class Ingrediënt(MacroType):
         terug_naar: str,
         ):
         
-        print(f"selecteren wat te bewerken")
-        
-        kies_optie = invoer_kiezen(
-            "veld",
-            [
-                "bewerk ingrediëntnaam",
-                "bewerk categorie",
-                ],
-            stoppen = True,
-            terug_naar = terug_naar,
-            )
-        
-        if kies_optie is STOP:
-            return
-        
-        if kies_optie == "bewerk ingrediëntnaam":
-        
-            print(f"\ninvullen nieuwe naam voor {self}")
-            ingrediënt_naam = invoer_validatie(
-                "ingrediëntnaam",
-                str,
-                valideren = True,
-                kleine_letters = True,
-                uitsluiten_leeg = True,
-                )
+        while True:
             
-            self.ingrediënt_naam = ingrediënt_naam
-        
-        elif kies_optie == "bewerk categorie":
+            print(f"selecteren wat te bewerken")
             
-            categorieën = Categorieën.openen()
-            categorie_uuid = categorieën.kiezen(
+            kies_optie = invoer_kiezen(
+                "veld",
+                [
+                    "bewerk ingrediëntnaam",
+                    "bewerk categorie",
+                    ],
+                stoppen = True,
                 terug_naar = terug_naar,
-                uitsluiten_nieuw = True,
                 )
             
-            if categorie_uuid is STOP:
-                return
+            if kies_optie is STOP:
+                break
             
-            self.categorie_uuid = categorie_uuid
-        
+            if kies_optie == "bewerk ingrediëntnaam":
+            
+                print(f"\ninvullen nieuwe naam voor {self}")
+                ingrediënt_naam = invoer_validatie(
+                    "ingrediëntnaam",
+                    str,
+                    valideren = True,
+                    kleine_letters = True,
+                    uitsluiten_leeg = True,
+                    )
+                
+                self.ingrediënt_naam = ingrediënt_naam
+            
+            elif kies_optie == "bewerk categorie":
+                
+                categorieën = Categorieën.openen()
+                categorie_uuid = categorieën.kiezen(
+                    terug_naar = terug_naar,
+                    uitsluiten_nieuw = True,
+                    )
+                
+                if categorie_uuid is STOP:
+                    return
+                
+                self.categorie_uuid = categorie_uuid
+            
         return self
     
     @property
