@@ -11,7 +11,13 @@ from .voedingswaarde import Voedingswaarde
 
 class Gerecht(MacroType):
     
-    VELDEN = frozenset(("gerecht_naam", "categorie_uuid", "producten_standaard", "porties", "versies",))
+    VELDEN = frozenset((
+        "gerecht_naam",
+        "categorie_uuid",
+        "producten_standaard",
+        "porties",
+        "versies",
+        ))
     
     def __init__(
         self,

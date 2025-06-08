@@ -7,7 +7,16 @@ from .macrotype import Hoeveelheid, Eenheid
 
 class Voedingswaarde:
     
-    VELDEN = frozenset(("calorieën", "vetten", "verzadigd", "koolhydraten", "suikers", "eiwitten", "vezels", "zout", ))
+    VELDEN = frozenset((
+        "calorieën",
+        "vetten",
+        "verzadigd",
+        "koolhydraten",
+        "suikers",
+        "eiwitten",
+        "vezels",
+        "zout",
+        ))
     
     CALORIE_PER_GRAM_VET            =   9.0
     CALORIE_PER_GRAM_KOOLHYDRAAT    =   4.0

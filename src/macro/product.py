@@ -11,7 +11,9 @@ from .voedingswaarde import Voedingswaarde
 
 class Merk(MacroType):
     
-    VELDEN = frozenset(("merk_naam", ))
+    VELDEN = frozenset((
+        "merk_naam",
+        ))
     
     def __init__(
         self,
@@ -223,7 +225,15 @@ class Merken(MacroTypeDatabank):
 
 class Product(MacroType):
     
-    VELDEN = frozenset(("product_naam", "merk_uuid", "voedingswaarde", "basis_eenheid", "ingrediënt_uuid", "opmerking", "eenheden",))
+    VELDEN = frozenset((
+        "product_naam",
+        "merk_uuid",
+        "voedingswaarde",
+        "basis_eenheid",
+        "ingrediënt_uuid",
+        "opmerking",
+        "eenheden",
+        ))
     
     def __init__(
         self,
