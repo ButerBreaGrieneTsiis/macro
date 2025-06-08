@@ -177,7 +177,7 @@ class Dag(MacroType):
                     
                     for hoeveelheid in hoeveelheden:
                     
-                        print(f"{f"{hoeveelheid}":<17} {producten[product_uuid].product_naam}")
+                        print(f"{f"{hoeveelheid}":<17} {producten[product_uuid]}")
             
             else:
                 ...

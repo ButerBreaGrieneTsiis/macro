@@ -1,7 +1,7 @@
 from typing import List
 from uuid import uuid4
 
-from grienetsiis import invoer_kiezen, invoer_validatie, ObjectWijzer, STOP
+from grienetsiis import invoer_kiezen, invoer_validatie, ObjectWijzer, STOP, Stop
 
 from .macrotype import MacroType, MacroTypeDatabank
 
@@ -226,7 +226,7 @@ class Hoofdcategorieën(MacroTypeDatabank):
         kies_bevestiging: bool = True,
         stoppen: bool = True,
         uitsluiten_nieuw: bool = False,
-        ) -> str | Hoofdcategorie:
+        ) -> str | Stop:
         
         while True:
             
@@ -315,7 +315,7 @@ class Hoofdcategorieën(MacroTypeDatabank):
                     print(f"\n>>> {len(hoofdcategorieën_mogelijk)} hoofdcategorie{"ën" if len(hoofdcategorieën_mogelijk) > 1 else ""} gevonden")
                     hoofdcategorie_uuid = invoer_kiezen(
                         "hoofdcategorie",
-                        {self[hoofdcategorie_uuid].hoofdcategorie_naam: hoofdcategorie_uuid for hoofdcategorie_uuid in hoofdcategorieën_mogelijk},
+                        {self[hoofdcategorie_uuid]: hoofdcategorie_uuid for hoofdcategorie_uuid in hoofdcategorieën_mogelijk},
                         stoppen = True,
                         terug_naar = terug_naar,
                         )
@@ -431,7 +431,7 @@ class Categorieën(MacroTypeDatabank):
         kies_bevestiging: bool = True,
         stoppen: bool = True,
         uitsluiten_nieuw: bool = False,
-        ) -> str | Categorie:
+        ) -> str | Stop:
         
         while True:
             if len(self) == 0:
@@ -528,7 +528,7 @@ class Categorieën(MacroTypeDatabank):
                     print(f"\n>>> {len(categorieën_mogelijk)} categorie{"ën" if len(categorieën_mogelijk) > 1 else ""} gevonden")
                     categorie_uuid = invoer_kiezen(
                         "categorie",
-                        {self[categorie_uuid].categorie_naam: categorie_uuid for categorie_uuid in categorieën_mogelijk},
+                        {self[categorie_uuid]: categorie_uuid for categorie_uuid in categorieën_mogelijk},
                         stoppen = True,
                         terug_naar = terug_naar,
                         )
@@ -539,6 +539,7 @@ class Categorieën(MacroTypeDatabank):
                     if kies_bevestiging: 
                         print(f"\n>>> {self[categorie_uuid]} gekozen")
                     
+                    return categorie_uuid
                 
                 elif kies_optie == "nieuwe categorie":
                     return self.nieuw(

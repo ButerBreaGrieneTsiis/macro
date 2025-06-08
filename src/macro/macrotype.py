@@ -93,6 +93,7 @@ class MacroTypeDatabank(dict):
         "Product":          "naar_json",
         "Merk":             "naar_json",
         "Gerecht":          "naar_json",
+        "Hoeveelheid":      "naar_json",
         }
     
     def __repr__(self) -> str:
@@ -174,7 +175,6 @@ class Hoeveelheid(MacroType):
         
         formaat = ".1f" if self.eenheid in self.BASIS_EENHEDEN else ".3f"
         return f"{f"{self.waarde:{formaat}}".rstrip("0").rstrip(".")} {eenheid}"
-        
     
     def __add__(
         self,

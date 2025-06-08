@@ -265,7 +265,7 @@ class Product(MacroType):
         if ingrediënt_uuid is STOP:
             return STOP
         
-        print(f"\ninvullen gegevens nieuw product onder ingrediënt \"{ingrediënten[ingrediënt_uuid].ingrediënt_naam}\"")
+        print(f"\ninvullen gegevens nieuw product onder \"{ingrediënten[ingrediënt_uuid]}\"")
         product_naam    = invoer_validatie(
             "productnaam",
             str,
@@ -408,7 +408,7 @@ class Product(MacroType):
                 print(">>> geen eenheden gedefinieerd")
             else:
                 print(f"     EENHEID     HOEVEELHEID")
-                [print(f"     {f"{Hoeveelheid(1, eenheid)}":<12}{Hoeveelheid(waarde, self.basis_eenheid)}") for eenheid, waarde in self.eenheden.items()]
+                [print(f"     {f"{Hoeveelheid(1, eenheid)}":<13}{Hoeveelheid(waarde, self.basis_eenheid)}") for eenheid, waarde in self.eenheden.items()]
     
     def bewerk_eenheden(self) -> Eenheid:
         
@@ -566,7 +566,10 @@ class Producten(MacroTypeDatabank):
         
         if invoer_kiezen(
             "toevoegen nieuwe eenheid",
-            {"ja": True, "nee": False},
+            {
+                "ja": True,
+                "nee": False,
+                },
             kies_een = False,
             ):
             product.bewerk_eenheden()
@@ -596,7 +599,7 @@ class Producten(MacroTypeDatabank):
         kies_bevestiging: bool = True,
         stoppen: bool = True,
         uitsluiten_nieuw: bool = False,
-        ) -> Product | str | Stop:
+        ) -> str | Stop:
         
         while True:
             
@@ -723,7 +726,7 @@ class Producten(MacroTypeDatabank):
                     
                     uuid = invoer_kiezen(
                         "ingrediënt of product",
-                        {ingrediënten[ingrediënt_uuid].ingrediënt_naam: ingrediënt_uuid for ingrediënt_uuid in ingrediënten_mogelijk} | {self[product_uuid].product_naam: product_uuid for product_uuid in producten_mogelijk},
+                        {ingrediënten[ingrediënt_uuid]: ingrediënt_uuid for ingrediënt_uuid in ingrediënten_mogelijk} | {self[product_uuid]: product_uuid for product_uuid in producten_mogelijk},
                         stoppen = True,
                         terug_naar = terug_naar,
                         )
@@ -755,6 +758,7 @@ class Producten(MacroTypeDatabank):
     
     def kiezen_eenheid(
         self,
+        terug_naar: str,
         product_uuid: str,
         kies_bevestiging: bool = True,
         stoppen: bool = False,
@@ -772,6 +776,7 @@ class Producten(MacroTypeDatabank):
             "bestaande eenheid of maakt een nieuwe",
             optie_dict,
             stoppen = stoppen,
+            terug_naar = terug_naar,
             )
         
         if kies_optie is STOP:
@@ -795,19 +800,19 @@ class Producten(MacroTypeDatabank):
         terug_naar: str,
         kies_bevestiging: bool = True,
         stoppen: bool = True,
-        ) -> Tuple[Product | Stop, Eenheid | Stop]:
+        ) -> Tuple[str | Stop, Eenheid | Stop]:
         
         product_uuid = self.kiezen_product(terug_naar, kies_bevestiging = kies_bevestiging, stoppen = stoppen)
         
         if product_uuid is STOP:
-            return STOP, ...
+            return product_uuid, ...
         
         eenheid = self.kiezen_eenheid(terug_naar, product_uuid, kies_bevestiging = kies_bevestiging, stoppen = stoppen)
         
         if eenheid is STOP:
-            return product_uuid
+            return product_uuid, eenheid
         
-        return product_uuid
+        return product_uuid, eenheid
     
     def zoeken(
         self,

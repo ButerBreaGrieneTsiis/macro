@@ -1,7 +1,7 @@
 from typing import List
 from uuid import uuid4
 
-from grienetsiis import invoer_kiezen, invoer_validatie, ObjectWijzer, STOP
+from grienetsiis import invoer_kiezen, invoer_validatie, ObjectWijzer, STOP, Stop
 
 from .categorie import Categorie, Categorieën, Hoofdcategorie, Hoofdcategorieën
 from .macrotype import MacroType, MacroTypeDatabank
@@ -201,7 +201,7 @@ class Ingrediënten(MacroTypeDatabank):
         kies_bevestiging: bool = True,
         stoppen: bool = False,
         uitsluiten_nieuw: bool = False,
-        ) -> str | Ingrediënt:
+        ) -> str | Stop:
         
         while True:
             
@@ -309,7 +309,7 @@ class Ingrediënten(MacroTypeDatabank):
                     print(f"\n>>> {len(ingrediënten_mogelijk)} ingrediënt{"en" if len(ingrediënten_mogelijk) > 1 else ""} gevonden")
                     ingrediënt_uuid = invoer_kiezen(
                         "ingrediënt",
-                        {self[ingrediënt_uuid].ingrediënt_naam: ingrediënt_uuid for ingrediënt_uuid in ingrediënten_mogelijk},
+                        {self[ingrediënt_uuid]: ingrediënt_uuid for ingrediënt_uuid in ingrediënten_mogelijk},
                         stoppen = True,
                         terug_naar = terug_naar,
                         )
@@ -318,7 +318,7 @@ class Ingrediënten(MacroTypeDatabank):
                         continue
                     
                     if kies_bevestiging:
-                        print(f"\n>>> {self[ingrediënt_uuid].ingrediënt_naam} gekozen")
+                        print(f"\n>>> {self[ingrediënt_uuid]} gekozen")
                     
                     return ingrediënt_uuid
                 
