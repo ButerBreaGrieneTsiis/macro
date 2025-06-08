@@ -38,14 +38,14 @@ class Voedingswaarde:
     def __repr__(self):
         
         return (
-            f"    {"calorieën":<21}{self.calorieën} ({self.kilojoule})\n"
-            f"    {"vetten":<21}{self.vetten}\n"
-            f"      {"waarvan verzadigd":<19}{self.verzadigd}\n"
-            f"    {"koolydraten":<21}{self.koolhydraten}\n"
-            f"      {"waarvan suikers":<19}{self.suikers}\n"
-            f"    {"eiwitten":<21}{self.eiwitten}\n"
-            f"    {"vezels":<21}{self.vezels}\n"
-            f"    {"zout":<21}{self.zout}"
+            f"     {"calorieën":<21}{self.calorieën} ({self.kilojoule})\n"
+            f"     {"vetten":<21}{self.vetten}\n"
+            f"       {"waarvan verzadigd":<19}{self.verzadigd}\n"
+            f"     {"koolydraten":<21}{self.koolhydraten}\n"
+            f"       {"waarvan suikers":<19}{self.suikers}\n"
+            f"     {"eiwitten":<21}{self.eiwitten}\n"
+            f"     {"vezels":<21}{self.vezels}\n"
+            f"     {"zout":<21}{self.zout}"
             )
     
     def __mul__(
@@ -181,7 +181,10 @@ class Voedingswaarde:
                 print(f"calorieën ingevuld ({Hoeveelheid(calorieën, Eenheid("kcal"))}) en berekend ({Hoeveelheid(calorieën_berekend, Eenheid("kcal"))}) verschillen meer dan 10%")
                 if invoer_kiezen(
                     "doorgaan",
-                    {"ja": False, "nee": True},
+                    {
+                        "ja": False,
+                        "nee": True,
+                        },
                     ):
                     continue
             
