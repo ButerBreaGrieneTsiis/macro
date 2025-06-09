@@ -174,13 +174,13 @@ class Dag(MacroType):
                 
                 producten = Producten.openen()
                 
-                print(f"     {"HOEVEELHEID":<17} PRODUCT")
+                print(f"     {"HOEVEELHEID":<26} PRODUCT")
                 
                 for product_uuid, hoeveelheden in self.producten.items():
                     
                     for hoeveelheid in hoeveelheden:
                     
-                        print(f"     {f"{hoeveelheid}":<17} {producten[product_uuid]}")
+                        print(f"     {f"{hoeveelheid}":<17} {f"({Hoeveelheid(producten[product_uuid].eenheden[hoeveelheid.eenheid], producten[product_uuid].basis_eenheid)})":<8} {producten[product_uuid]}")
             
             else:
                 ...
