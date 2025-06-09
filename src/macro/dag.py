@@ -335,13 +335,13 @@ class Dag(MacroType):
                         
                         print(f"     {f"{hoeveelheid}":<11} {gerechten[gerecht_uuid]} (versie \"{versie_naam}\")")
             
-            # elif opdracht == "weergeef voedingswaarde":
+            elif opdracht == "weergeef voedingswaarde":
                 
-            #     if len(self.producten) == 0 and len(self.gerechten) == 0:
-            #         print(f"\n>>> er zijn geen producten of gerechten voor {self}")
-            #         continue
+                if len(self.producten) == 0 and len(self.gerechten) == 0:
+                    print(f"\n>>> er zijn geen producten of gerechten voor {self}")
+                    continue
                 
-            #     print(self.voedingswaarde)
+                print(self.voedingswaarde)
         
         return self
         
@@ -365,8 +365,9 @@ class Dag(MacroType):
                 product_voedingswaarde = producten[product_uuid].bereken_voedingswaarde(hoeveelheid)
                 dag_voedingswaarde += product_voedingswaarde
         
-        for gerecht_uuid, gerecht_dict in self.gerechten.items():
-            gerecht_voedingswaarde = gerechten[gerecht_uuid].voedingswaarde(gerecht_dict["versie_uuid"]) * gerecht_dict["hoeveelheid"].waarde
-            dag_voedingswaarde += gerecht_voedingswaarde
-            
+        for gerecht_uuid, versie_dict in self.gerechten.items():
+            for versie_uuid, hoeveelheid in versie_dict.items():
+                gerecht_voedingswaarde = gerechten[gerecht_uuid].voedingswaarde(versie_uuid) * hoeveelheid.waarde
+                dag_voedingswaarde += gerecht_voedingswaarde
+        
         return dag_voedingswaarde
