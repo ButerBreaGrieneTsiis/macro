@@ -107,10 +107,11 @@ class Dag(MacroType):
                 [
                     "toevoegen producten",
                     "toevoegen gerechten",
-                    "verwijderen product",
-                    "verwijderen gerecht",
-                    "aanpassen producten",
-                    "aanpassen gerechten",
+                    "verwijderen producten",
+                    "verwijderen gerechten",
+                    "aanpassen hoeveelheid producten",
+                    "aanpassen porties gerechten",
+                    "aanpassen versie gerechten",
                     "weergeef producten",
                     "weergeef gerechten",
                     "weergeef voedingswaarde",
@@ -196,10 +197,40 @@ class Dag(MacroType):
                     break
             
             elif opdracht == "verwijderen producten":
-                ...
+                
+                producten = Producten.openen()
+                
+                product_uuid = invoer_kiezen(
+                    "een product om te verwijderen",
+                    {producten[product_uuid]: product_uuid for product_uuid in self.producten.keys()},
+                    stoppen = True,
+                    terug_naar = f"MENU DAG/{f"{self.dag}".upper()}",
+                    )
+                
+                if product_uuid is STOP:
+                    continue
+                
+                del self.producten[product_uuid]
+                
+                print(f"\n>>> {producten[product_uuid]} verwijderd")
             
             elif opdracht == "verwijderen gerechten":
-                ...
+                
+                gerechten = Gerechten.openen()
+                
+                gerecht_uuid = invoer_kiezen(
+                    "een product om te verwijderen",
+                    {gerechten[gerecht_uuid]: gerecht_uuid for gerecht_uuid in self.gerechten.keys()},
+                    stoppen = True,
+                    terug_naar = f"MENU DAG/{f"{self.dag}".upper()}",
+                    )
+                
+                if gerecht_uuid is STOP:
+                    continue
+                
+                del self.gerechten[gerecht_uuid]
+                
+                print(f"\n>>> {gerechten[gerecht_uuid]} verwijderd")
             
             elif opdracht == "aanpassen producten":
                 ...
@@ -242,8 +273,8 @@ class Dag(MacroType):
             
             elif opdracht == "weergeef voedingswaarde":
                 
-                if len(self.producten) == 0:
-                    print(f"\n>>> er zijn geen producten voor {self}")
+                if len(self.producten) == 0 and len(self.gerechten) == 0:
+                    print(f"\n>>> er zijn geen producten of gerechten voor {self}")
                     continue
                 
                 print(self.voedingswaarde)
