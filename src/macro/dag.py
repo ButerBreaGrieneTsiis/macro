@@ -289,7 +289,7 @@ class Dag(MacroType):
                     
                     for hoeveelheid in hoeveelheden:
                         
-                        print(f"     {f"{hoeveelheid}":<17} {f"({Hoeveelheid(hoeveelheid.waarde * producten[product_uuid].eenheden[hoeveelheid.eenheid], producten[product_uuid].basis_eenheid)})":<8} {producten[product_uuid]}")
+                        print(f"     {f"{hoeveelheid}":<17} {f"({Hoeveelheid(hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid.BASIS_EENHEDEN else hoeveelheid.waarde * producten[product_uuid].eenheden[hoeveelheid.eenheid], producten[product_uuid].basis_eenheid)})":<8} {producten[product_uuid]}")
             
             elif opdracht == "weergeef gerechten":
                 
