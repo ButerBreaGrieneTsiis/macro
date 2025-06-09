@@ -103,7 +103,7 @@ class Dag(MacroType):
         while True:
             
             opdracht = invoer_kiezen(
-                f"MENU DAG/{f"{self.dag}".upper()}",
+                f"MENU DAG {f"{self.dag}".upper()}",
                 [
                     "toevoegen producten",
                     "toevoegen gerechten",
@@ -130,7 +130,7 @@ class Dag(MacroType):
                 while True:
                     
                     product_uuid, eenheid = producten.kiezen_product_eenheid(
-                        terug_naar = f"MENU DAG/{f"{self.dag}".upper()}",
+                        terug_naar = f"MENU DAG {f"{self.dag}".upper()}",
                         )
                     
                     if product_uuid is STOP:
@@ -167,7 +167,7 @@ class Dag(MacroType):
                 while True:
                     
                     gerecht_uuid, versie_uuid = gerechten.kiezen_gerecht_versie(
-                        terug_naar = f"MENU DAG/{f"{self.dag}".upper()}",
+                        terug_naar = f"MENU DAG {f"{self.dag}".upper()}",
                         )
                     
                     if gerecht_uuid is STOP:
@@ -207,7 +207,7 @@ class Dag(MacroType):
                     "een product en hoeveelheid om te verwijderen",
                     {f"{f"{hoeveelheid}":<17} {producten[product_uuid]}": (product_uuid, ihoeveelheid) for product_uuid, hoeveelheden in self.producten.items() for ihoeveelheid, hoeveelheid in enumerate(hoeveelheden)},
                     stoppen = True,
-                    terug_naar = f"MENU DAG/{f"{self.dag}".upper()}",
+                    terug_naar = f"MENU DAG {f"{self.dag}".upper()}",
                     )
                 
                 if kies_optie is STOP:
@@ -227,7 +227,7 @@ class Dag(MacroType):
                     "een gerecht en versie om te verwijderen",
                     {f"{f"{hoeveelheid}":<11} {gerechten[gerecht_uuid]} (versie \"{versie_naam}\")": (gerecht_uuid, versie_uuid) for gerecht_uuid, versie_dict in self.gerechten.items() for versie_uuid, hoeveelheid in versie_dict.items() if (versie_naam := "standaard" if versie_uuid == "standaard" else gerechten[gerecht_uuid].versies[versie_uuid]["versie_naam"])},
                     stoppen = True,
-                    terug_naar = f"MENU DAG/{f"{self.dag}".upper()}",
+                    terug_naar = f"MENU DAG {f"{self.dag}".upper()}",
                     )
                 
                 if kies_optie is STOP:
@@ -248,7 +248,7 @@ class Dag(MacroType):
                     "een product en hoeveelheid om aan te passen",
                     {f"{f"{hoeveelheid}":<17} {producten[product_uuid]}": (product_uuid, ihoeveelheid) for product_uuid, hoeveelheden in self.producten.items() for ihoeveelheid, hoeveelheid in enumerate(hoeveelheden)},
                     stoppen = True,
-                    terug_naar = f"MENU DAG/{f"{self.dag}".upper()}",
+                    terug_naar = f"MENU DAG {f"{self.dag}".upper()}",
                     )
                 
                 if kies_optie is STOP:
@@ -257,7 +257,7 @@ class Dag(MacroType):
                 product_uuid, ihoeveelheid = kies_optie
                 
                 eenheid = producten.kiezen_eenheid(
-                    terug_naar = f"MENU DAG/{f"{self.dag}".upper()}",
+                    terug_naar = f"MENU DAG {f"{self.dag}".upper()}",
                     product_uuid = product_uuid,
                     )
                 
@@ -283,7 +283,7 @@ class Dag(MacroType):
                     "een gerecht en versie om aan te passen",
                     {f"{f"{hoeveelheid}":<11} {gerechten[gerecht_uuid]} (versie \"{versie_naam}\")": (gerecht_uuid, versie_uuid) for gerecht_uuid, versie_dict in self.gerechten.items() for versie_uuid, hoeveelheid in versie_dict.items() if (versie_naam := "standaard" if versie_uuid == "standaard" else gerechten[gerecht_uuid].versies[versie_uuid]["versie_naam"])},
                     stoppen = True,
-                    terug_naar = f"MENU DAG/{f"{self.dag}".upper()}",
+                    terug_naar = f"MENU DAG {f"{self.dag}".upper()}",
                     )
                 
                 if kies_optie is STOP:
