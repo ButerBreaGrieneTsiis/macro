@@ -111,7 +111,6 @@ class Dag(MacroType):
                     "verwijderen gerechten",
                     "aanpassen hoeveelheid producten",
                     "aanpassen porties gerechten",
-                    "aanpassen versie gerechten",
                     "weergeef producten",
                     "weergeef gerechten",
                     "weergeef voedingswaarde",
@@ -179,17 +178,21 @@ class Dag(MacroType):
                     
                     eenheid = Eenheid("portie")
                     
-                    aantal = invoer_validatie(
+                    porties = invoer_validatie(
                         f"hoeveel {eenheid.meervoud}",
                         float,
                         )
                     
-                    hoeveelheid = Hoeveelheid(aantal, eenheid)
+                    hoeveelheid = Hoeveelheid(porties, eenheid)
                     
-                    self.gerechten[gerecht_uuid] = {
-                        "versie_uuid": versie_uuid,
-                        "hoeveelheid": hoeveelheid,
-                        }
+                    if gerecht_uuid in self.gerechten.keys():
+                        if versie_uuid in self.gerechten[gerecht_uuid]:
+                            self.gerechten[gerecht_uuid][versie_uuid].waarde += porties
+                        else:
+                            self.gerechten[gerecht_uuid][versie_uuid] = hoeveelheid
+                    else:
+                        self.gerechten[gerecht_uuid] = {}
+                        self.gerechten[gerecht_uuid][versie_uuid] = hoeveelheid
                     
                     versie_naam = "standaard" if versie_uuid == "standaard" else gerechten[gerecht_uuid].versies[versie_uuid]["versie_naam"]
                     print(f"\n>>> {hoeveelheid} toegevoegd van {gerechten[gerecht_uuid]} (versie \"{versie_naam}\")")
@@ -201,7 +204,7 @@ class Dag(MacroType):
                 producten = Producten.openen()
                 
                 kies_optie = invoer_kiezen(
-                    "een product om te verwijderen",
+                    "een product en hoeveelheid om te verwijderen",
                     {f"{f"{hoeveelheid}":<17} {producten[product_uuid]}": (product_uuid, ihoeveelheid) for product_uuid, hoeveelheden in self.producten.items() for ihoeveelheid, hoeveelheid in enumerate(hoeveelheden)},
                     stoppen = True,
                     terug_naar = f"MENU DAG/{f"{self.dag}".upper()}",
@@ -220,26 +223,29 @@ class Dag(MacroType):
                 
                 gerechten = Gerechten.openen()
                 
-                gerecht_uuid = invoer_kiezen(
-                    "een product om te verwijderen",
-                    {gerechten[gerecht_uuid]: gerecht_uuid for gerecht_uuid in self.gerechten.keys()},
+                kies_optie = invoer_kiezen(
+                    "een gerecht en versie om te verwijderen",
+                    {f"{f"{hoeveelheid}":<11} {gerechten[gerecht_uuid]} (versie \"{versie_naam}\")": (gerecht_uuid, versie_uuid) for gerecht_uuid, versie_dict in self.gerechten.items() for versie_uuid, hoeveelheid in versie_dict.items() if (versie_naam := "standaard" if versie_uuid == "standaard" else gerechten[gerecht_uuid].versies[versie_uuid]["versie_naam"])},
                     stoppen = True,
                     terug_naar = f"MENU DAG/{f"{self.dag}".upper()}",
                     )
                 
-                if gerecht_uuid is STOP:
+                if kies_optie is STOP:
                     continue
                 
-                del self.gerechten[gerecht_uuid]
+                gerecht_uuid, versie_uuid = kies_optie
                 
-                print(f"\n>>> {gerechten[gerecht_uuid]} verwijderd")
+                versie_naam = "standaard" if versie_uuid == "standaard" else gerechten[gerecht_uuid].versies[versie_uuid]["versie_naam"]
+                print(f"\n>>> versie \"{versie_naam}\" van {gerechten[gerecht_uuid]} verwijderd")
+                
+                del self.gerechten[gerecht_uuid][versie_uuid]
             
             elif opdracht == "aanpassen hoeveelheid producten":
                 
                 producten = Producten.openen()
                 
                 kies_optie = invoer_kiezen(
-                    "een product om aan te passen",
+                    "een product en hoeveelheid om aan te passen",
                     {f"{f"{hoeveelheid}":<17} {producten[product_uuid]}": (product_uuid, ihoeveelheid) for product_uuid, hoeveelheden in self.producten.items() for ihoeveelheid, hoeveelheid in enumerate(hoeveelheden)},
                     stoppen = True,
                     terug_naar = f"MENU DAG/{f"{self.dag}".upper()}",
@@ -270,10 +276,31 @@ class Dag(MacroType):
                 self.producten[product_uuid][ihoeveelheid] = hoeveelheid
             
             elif opdracht == "aanpassen porties gerechten":
-                ...
-            
-            elif opdracht == "aanpassen versie gerechten":
-                ...
+                
+                gerechten = Gerechten.openen()
+                
+                kies_optie = invoer_kiezen(
+                    "een gerecht en versie om aan te passen",
+                    {f"{f"{hoeveelheid}":<11} {gerechten[gerecht_uuid]} (versie \"{versie_naam}\")": (gerecht_uuid, versie_uuid) for gerecht_uuid, versie_dict in self.gerechten.items() for versie_uuid, hoeveelheid in versie_dict.items() if (versie_naam := "standaard" if versie_uuid == "standaard" else gerechten[gerecht_uuid].versies[versie_uuid]["versie_naam"])},
+                    stoppen = True,
+                    terug_naar = f"MENU DAG/{f"{self.dag}".upper()}",
+                    )
+                
+                if kies_optie is STOP:
+                    continue
+                
+                gerecht_uuid, versie_uuid = kies_optie
+                
+                eenheid = Eenheid("portie")
+                    
+                porties = invoer_validatie(
+                    f"hoeveel {eenheid.meervoud}",
+                    float,
+                    )
+                
+                hoeveelheid = Hoeveelheid(porties, eenheid)
+                
+                self.gerechten[gerecht_uuid][versie_uuid] = hoeveelheid
             
             elif opdracht == "weergeef producten":
                 
@@ -301,20 +328,20 @@ class Dag(MacroType):
                 
                 print(f"\n     HOEVEELHEID GERECHT")
                 
-                for gerecht_uuid, gerecht_dict in self.gerechten.items():
-                    
-                    versie_uuid = gerecht_dict["versie_uuid"]
-                    versie_naam = "standaard" if versie_uuid == "standaard" else gerechten[gerecht_uuid].versies[versie_uuid]["versie_naam"]
-                    
-                    print(f"     {f"{gerecht_dict["hoeveelheid"]}":<11} {gerechten[gerecht_uuid]} (versie \"{versie_naam}\")")
+                for gerecht_uuid, versie_dict in self.gerechten.items():
+                    for versie_uuid, hoeveelheid in versie_dict.items():
+                        
+                        versie_naam = "standaard" if versie_uuid == "standaard" else gerechten[gerecht_uuid].versies[versie_uuid]["versie_naam"]
+                        
+                        print(f"     {f"{hoeveelheid}":<11} {gerechten[gerecht_uuid]} (versie \"{versie_naam}\")")
             
-            elif opdracht == "weergeef voedingswaarde":
+            # elif opdracht == "weergeef voedingswaarde":
                 
-                if len(self.producten) == 0 and len(self.gerechten) == 0:
-                    print(f"\n>>> er zijn geen producten of gerechten voor {self}")
-                    continue
+            #     if len(self.producten) == 0 and len(self.gerechten) == 0:
+            #         print(f"\n>>> er zijn geen producten of gerechten voor {self}")
+            #         continue
                 
-                print(self.voedingswaarde)
+            #     print(self.voedingswaarde)
         
         return self
         
