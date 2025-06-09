@@ -80,7 +80,16 @@ class Gerecht(MacroType):
                 )
             
             hoeveelheid = Hoeveelheid(aantal, eenheid)
-            producten_standaard[product_uuid] = hoeveelheid
+            
+            if product_uuid in producten_standaard.keys():
+                for ihoeveelheid_aanwezig, hoeveelheid_aanwezig in enumerate(producten_standaard[product_uuid]):
+                    if hoeveelheid == hoeveelheid_aanwezig:
+                        producten_standaard[product_uuid][ihoeveelheid_aanwezig] = hoeveelheid + hoeveelheid_aanwezig
+                        break
+                else:
+                    producten_standaard[product_uuid].append(hoeveelheid)
+            else:
+                producten_standaard[product_uuid] = [hoeveelheid]
         
         porties = invoer_validatie(
             f"hoeveel porties",
@@ -227,8 +236,9 @@ class Gerecht(MacroType):
                 
                 print(f"\n     {"HOEVEELHEID":<17} PRODUCT")
                 
-                for product_uuid, hoeveelheid in self.producten_standaard.items():
-                    print(f"     {f"{hoeveelheid}":<17} {producten[product_uuid]}")
+                for product_uuid, hoeveelheden in self.producten_standaard.items():
+                    for hoeveelheid in hoeveelheden:
+                        print(f"     {f"{hoeveelheid}":<17} {producten[product_uuid]}")
             
             elif kies_optie == "weergeef voedingswaarde":
                 
@@ -502,9 +512,10 @@ class Gerecht(MacroType):
         gerecht_voedingswaarde = Voedingswaarde()
         producten = Producten.openen()
         
-        for product_uuid, hoeveelheid in self.producten(versie_uuid).items():
-            product_voedingswaarde = producten[product_uuid].bereken_voedingswaarde(hoeveelheid)
-            gerecht_voedingswaarde += product_voedingswaarde
+        for product_uuid, hoeveelheden in self.producten(versie_uuid).items():
+            for hoeveelheid in hoeveelheden:
+                product_voedingswaarde = producten[product_uuid].bereken_voedingswaarde(hoeveelheid)
+                gerecht_voedingswaarde += product_voedingswaarde
         
         aantal_porties = self.porties if versie_uuid == "standaard" else self.versies[versie_uuid].get("porties", self.porties)
         gerecht_voedingswaarde /= aantal_porties
