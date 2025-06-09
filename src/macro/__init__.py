@@ -2,5 +2,6 @@ from .categorie import Hoofdcategorie, Categorie, Hoofdcategorieën, Categorieë
 from .dag import Dag
 from .gerecht import Gerecht, Gerechten
 from .ingredient import Ingrediënt, Ingrediënten
+from .macrotype import Eenheid
 from .product import Product, Producten
 

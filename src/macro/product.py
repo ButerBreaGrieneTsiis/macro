@@ -438,7 +438,10 @@ class Product(MacroType):
                 
                 if invoer_kiezen(
                     "keuze",
-                    {"ja": True, "nee": False},
+                    {
+                        "ja": True,
+                        "nee": False,
+                        },
                     kies_een = False,
                     ):
                     self.eenheden[eenheid] = waarde

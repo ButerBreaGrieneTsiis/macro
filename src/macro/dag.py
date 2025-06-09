@@ -5,7 +5,8 @@ from typing import Dict, List
 
 from grienetsiis import invoer_kiezen, invoer_validatie, openen_json, ObjectWijzer, STOP
 
-from .macrotype import MacroType, Hoeveelheid
+from .gerecht import Gerechten
+from .macrotype import MacroType, Eenheid, Hoeveelheid
 from .product import Producten
 from .voedingswaarde import Voedingswaarde
 
@@ -106,12 +107,13 @@ class Dag(MacroType):
                 [
                     "toevoegen producten",
                     "toevoegen gerechten",
-                    "verwijderen producten",
-                    "verwijderen gerechten",
-                    "bewerken producten",
-                    "bewerken gerechten",
-                    "weergeef voedingswaarde",
+                    "verwijderen product",
+                    "verwijderen gerecht",
+                    "aanpassen producten",
+                    "aanpassen gerechten",
                     "weergeef producten",
+                    "weergeef gerechten",
+                    "weergeef voedingswaarde",
                     ],
                 stoppen = True,
                 kies_een = False,
@@ -153,18 +155,57 @@ class Dag(MacroType):
                             self.producten[product_uuid].append(hoeveelheid)
                     else:
                         self.producten[product_uuid] = [hoeveelheid]
+                    
+                    print(f"\n>>> {hoeveelheid} toegevoegd van {producten[product_uuid]}")
+                    
                     break
             
             elif opdracht == "toevoegen gerechten":
+                
+                gerechten = Gerechten.openen()
+                
+                while True:
+                    
+                    gerecht_uuid, versie_uuid = gerechten.kiezen_gerecht_versie(
+                        terug_naar = f"MENU DAG/{f"{self.dag}".upper()}",
+                        )
+                    
+                    if gerecht_uuid is STOP:
+                        break
+                    
+                    if versie_uuid is STOP:
+                        continue
+                    
+                    eenheid = Eenheid("portie")
+                    
+                    aantal = invoer_validatie(
+                        f"hoeveel {eenheid.meervoud}",
+                        float,
+                        )
+                    
+                    hoeveelheid = Hoeveelheid(aantal, eenheid)
+                    
+                    self.gerechten[gerecht_uuid] = {
+                        "versie_uuid": versie_uuid,
+                        "hoeveelheid": hoeveelheid,
+                        }
+                    
+                    versie_naam = "standaard" if versie_uuid == "standaard" else gerechten[gerecht_uuid].versies[versie_uuid]["versie_naam"]
+                    print(f"\n>>> {hoeveelheid} toegevoegd van {gerechten[gerecht_uuid]} (versie \"{versie_naam}\")")
+                    
+                    break
+            
+            elif opdracht == "verwijderen producten":
                 ...
             
-            elif opdracht == "weergeef voedingswaarde":
-                
-                if len(self.producten) == 0:
-                    print(f">>> er zijn geen producten voor {self}")
-                    continue
-                
-                print(self.voedingswaarde)
+            elif opdracht == "verwijderen gerechten":
+                ...
+            
+            elif opdracht == "aanpassen producten":
+                ...
+            
+            elif opdracht == "aanpassen gerechten":
+                ...
             
             elif opdracht == "weergeef producten":
                 
@@ -174,17 +215,41 @@ class Dag(MacroType):
                 
                 producten = Producten.openen()
                 
-                print(f"     {"HOEVEELHEID":<26} PRODUCT")
+                print(f"\n     {"HOEVEELHEID":<26} PRODUCT")
                 
                 for product_uuid, hoeveelheden in self.producten.items():
                     
                     for hoeveelheid in hoeveelheden:
                     
-                        print(f"     {f"{hoeveelheid}":<17} {f"({Hoeveelheid(producten[product_uuid].eenheden[hoeveelheid.eenheid], producten[product_uuid].basis_eenheid)})":<8} {producten[product_uuid]}")
+                        print(f"     {f"{hoeveelheid}":<17} {f"({Hoeveelheid(hoeveelheid.waarde * producten[product_uuid].eenheden[hoeveelheid.eenheid], producten[product_uuid].basis_eenheid)})":<8} {producten[product_uuid]}")
             
-            else:
-                ...
+            elif opdracht == "weergeef gerechten":
+                
+                if len(self.gerechten) == 0:
+                    print(f"\n>>> er zijn geen gerechten voor {self}")
+                    continue
+                
+                gerechten = Gerechten.openen()
+                
+                print(f"\n     HOEVEELHEID GERECHT")
+                
+                for gerecht_uuid, gerecht_dict in self.gerechten.items():
+                    
+                    versie_uuid = gerecht_dict["versie_uuid"]
+                    versie_naam = "standaard" if versie_uuid == "standaard" else gerechten[gerecht_uuid].versies[versie_uuid]["versie_naam"]
+                    
+                    print(f"     {f"{gerecht_dict["hoeveelheid"]}":<11} {gerechten[gerecht_uuid]} (versie \"{versie_naam}\")")
             
+            elif opdracht == "weergeef voedingswaarde":
+                
+                if len(self.producten) == 0:
+                    print(f"\n>>> er zijn geen producten voor {self}")
+                    continue
+                
+                print(self.voedingswaarde)
+        
+        return self
+        
     @property
     def bestandsnaam(self) -> str:
         return f"{self.datum.year}\\{self.datum.strftime("%Y-%m-%d")}"
@@ -198,10 +263,15 @@ class Dag(MacroType):
         
         dag_voedingswaarde = Voedingswaarde()
         producten = Producten.openen()
+        gerechten = Gerechten.openen()
         
         for product_uuid, hoeveelheden in self.producten.items():
             for hoeveelheid in hoeveelheden:
                 product_voedingswaarde = producten[product_uuid].bereken_voedingswaarde(hoeveelheid)
                 dag_voedingswaarde += product_voedingswaarde
         
+        for gerecht_uuid, gerecht_dict in self.gerechten.items():
+            gerecht_voedingswaarde = gerechten[gerecht_uuid].voedingswaarde(gerecht_dict["versie_uuid"]) * gerecht_dict["hoeveelheid"].waarde
+            dag_voedingswaarde += gerecht_voedingswaarde
+            
         return dag_voedingswaarde

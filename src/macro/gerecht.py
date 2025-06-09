@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Any, Dict, List, Tuple
 from uuid import uuid4
 
@@ -134,7 +135,7 @@ class Gerecht(MacroType):
             
             elif kies_optie == "bewerk producten":
                 
-                print("NOT IMPLEMENTED YET")
+                print("!!! NOG NIET GEÏMPLEMENTEERD")
                 continue
             
             elif kies_optie == "bewerk categorie":
@@ -181,7 +182,7 @@ class Gerecht(MacroType):
                 
                 else:
                     
-                    print("NOT IMPLEMENTED YET")
+                    print("!!! NOG NIET GEÏMPLEMENTEERD")
                     continue
                     
                     # while True:
@@ -209,7 +210,7 @@ class Gerecht(MacroType):
                 "veld",
                 [
                     "weergeef producten",
-                    "weergeef voedingswaarde", # benoem hier ook erbij voor hoeveel porties
+                    "weergeef voedingswaarde",
                     "weergeef versies",
                     "weergeef recept",
                     ],
@@ -224,7 +225,7 @@ class Gerecht(MacroType):
                 
                 producten = Producten.openen()
                 
-                print(f"     {"HOEVEELHEID":<17} PRODUCT")
+                print(f"\n     {"HOEVEELHEID":<17} PRODUCT")
                 
                 for product_uuid, hoeveelheid in self.producten_standaard.items():
                     print(f"     {f"{hoeveelheid}":<17} {producten[product_uuid]}")
@@ -239,9 +240,10 @@ class Gerecht(MacroType):
                     return STOP
                 
                 versie_naam = "standaard" if versie_uuid == "standaard" else self.versies[versie_uuid]["versie_naam"]
+                aantal_porties = self.porties if versie_uuid == "standaard" else self.versies[versie_uuid].get("porties", self.porties)
                 
-                print(f"\n     voedingswaarde voor versie \"{versie_naam}\" per portie ({self.porties} porties)\n")
-                print(self.voedingswaarde(versie_uuid) / self.porties)
+                print(f"\n     voedingswaarde voor versie \"{versie_naam}\" per portie ({aantal_porties} porties)\n")
+                print(self.voedingswaarde(versie_uuid))
             
             elif kies_optie == "weergeef versies":
                 
@@ -254,17 +256,29 @@ class Gerecht(MacroType):
                     
                     print(f"\n     versie \"{versie["versie_naam"]}\"")
                     
-                    for product_uuid in versie.get("verwijderd", []):
-                        print(f"       verwijderd {producten[product_uuid]}")
+                    if "porties" in versie.keys():
+                        print("       porties")
+                        print(f"         {self.porties} porties --> {versie["porties"]} porties")
                     
-                    for product_uuid, hoeveelheid in versie.get("toegevoegd", {}).items():
-                        print(f"       toegevoegd {f"{hoeveelheid}":<17} {producten[product_uuid]}")
+                    if "verwijderd" in versie.keys():
+                        print("       verwijderd")
+                        for product_uuid in versie["verwijderd"]:
+                            print(f"         {producten[product_uuid]}")
                     
-                    for oud_product_uuid, vervangen_dict in versie.get("vervangen", {}).items():
-                        print(f"       vervangen  {f"{vervangen_dict["hoeveelheid"]}":<17} {producten[vervangen_dict["product_uuid"]]} (van {self.producten_standaard[oud_product_uuid]} {producten[oud_product_uuid]})")
+                    if "toegevoegd" in versie.keys():
+                        print("       toegevoegd")
+                        for product_uuid, hoeveelheid in versie["toegevoegd"].items():
+                            print(f"         {f"{hoeveelheid}":<17} {producten[product_uuid]}")
                     
-                    for product_uuid, hoeveelheid in versie.get("hoeveelheid", {}).items():
-                        print(f"       aangepast  {f"{hoeveelheid}":<17} {producten[product_uuid]} (van {producten[product_uuid]})")
+                    if "vervangen" in versie.keys():
+                        print("       vervangen")
+                        for oud_product_uuid, vervangen_dict in versie["vervangen"].items():
+                            print(f"         {f"{vervangen_dict["hoeveelheid"]}":<17} {producten[vervangen_dict["product_uuid"]]} (van {self.producten_standaard[oud_product_uuid]} {producten[oud_product_uuid]})")
+                    
+                    if "hoeveelheid" in versie.keys():
+                        print("       aangepast")
+                        for product_uuid, hoeveelheid in versie["hoeveelheid"].items():
+                            print(f"         {f"{self.producten_standaard[product_uuid]}":<17} --> {f"{hoeveelheid}":<17} {producten[product_uuid]}")
     
     def kiezen_versie(
         self,
@@ -313,7 +327,8 @@ class Gerecht(MacroType):
                     "toevoegen product",
                     "verwijderen product",
                     "vervangen product",
-                    "aanpassen hoeveelheid",
+                    "aanpassen hoeveelheid product",
+                    "aanpassen aantal porties",
                     ],
                 kies_een = False,
                 stoppen = True,
@@ -325,7 +340,16 @@ class Gerecht(MacroType):
             
             producten = Producten.openen()
             
-            if kies_optie == "toevoegen product":
+            if kies_optie == "aanpassen aantal porties":
+                
+                porties = invoer_validatie(
+                    f"hoeveel porties",
+                    int,
+                    )
+                
+                versie["porties"] = porties
+            
+            elif kies_optie == "toevoegen product":
                 
                 product_uuid, eenheid = producten.kiezen_product_eenheid(
                     terug_naar = f"MENU TOEVOEGEN VERSIE {f"{self}".upper()}",
@@ -353,7 +377,7 @@ class Gerecht(MacroType):
             else:
                 
                 product_uuid = invoer_kiezen(
-                    "product",
+                    "product om te verwijderen",
                     {f"{producten[product_uuid]} ({hoeveelheid})": product_uuid for product_uuid, hoeveelheid in self.producten_standaard.items()},
                     stoppen = True,
                     terug_naar = f"MENU TOEVOEGEN VERSIE {f"{self}".upper()}",
@@ -382,7 +406,7 @@ class Gerecht(MacroType):
                     if vervangend_product_uuid is STOP:
                         continue
                     
-                    eenheid = Producten.kiezen_eenheid(
+                    eenheid = producten.kiezen_eenheid(
                         terug_naar = f"MENU TOEVOEGEN VERSIE {f"{self}".upper()}",
                         product_uuid = vervangend_product_uuid,
                         )
@@ -405,7 +429,7 @@ class Gerecht(MacroType):
                         "hoeveelheid": hoeveelheid,
                         }
                 
-                elif kies_optie == "aanpassen hoeveelheid":
+                elif kies_optie == "aanpassen hoeveelheid product":
                     
                     eenheid = producten.kiezen_eenheid(
                         terug_naar = f"MENU TOEVOEGEN VERSIE {f"{self}".upper()}",
@@ -447,7 +471,7 @@ class Gerecht(MacroType):
         versie_uuid: str = "standaard",
         ) -> Dict[str, Hoeveelheid]:
         
-        producten = self.producten_standaard
+        producten = deepcopy(self.producten_standaard)
         
         if versie_uuid != "standaard":
             
@@ -481,6 +505,9 @@ class Gerecht(MacroType):
         for product_uuid, hoeveelheid in self.producten(versie_uuid).items():
             product_voedingswaarde = producten[product_uuid].bereken_voedingswaarde(hoeveelheid)
             gerecht_voedingswaarde += product_voedingswaarde
+        
+        aantal_porties = self.porties if versie_uuid == "standaard" else self.versies[versie_uuid].get("porties", self.porties)
+        gerecht_voedingswaarde /= aantal_porties
         
         return gerecht_voedingswaarde
     
@@ -770,11 +797,11 @@ class Gerechten(MacroTypeDatabank):
         
         elif kies_optie == "nieuwe versie":
             versie_uuid = self.nieuwe_versie(gerecht_uuid)
-            print(f"\n>>> versie \"{self[gerecht_uuid].versies[versie_uuid].versie_naam}\" gekozen")
-                        
         else:
             versie_uuid = kies_optie
-            print(f"\n>>> versie \"{kies_optie}\" gekozen")
+        
+        versie_naam = "standaard" if kies_optie == "standaard" else self[gerecht_uuid].versies[versie_uuid]["versie_naam"]
+        print(f"\n>>> versie \"{versie_naam}\" gekozen")
         
         return versie_uuid
         
