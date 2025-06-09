@@ -144,8 +144,108 @@ class Gerecht(MacroType):
             
             elif kies_optie == "bewerk producten":
                 
-                print("!!! NOG NIET GEÏMPLEMENTEERD")
-                continue
+                while True:
+                
+                    kies_optie_bewerken = invoer_kiezen(
+                        f"MENU BEWERKEN {f"{self}".upper()}",
+                        [
+                            "toevoegen producten",
+                            "verwijderen producten",
+                            "aanpassen hoeveelheid producten",
+                            ],
+                        kies_een = False,
+                        stoppen = True,
+                        terug_naar = f"KLAAR MET BEWERKEN",
+                        )
+                    
+                    if kies_optie_bewerken is STOP:
+                        break
+                    
+                    elif kies_optie_bewerken == "toevoegen producten":
+                        
+                        producten = Producten.openen()
+                        
+                        product_uuid, eenheid = producten.kiezen_product_eenheid(
+                            terug_naar = f"MENU BEWERKEN {f"{self}".upper()}",
+                            )
+                        
+                        if product_uuid is STOP:
+                            continue
+                        
+                        if eenheid is STOP:
+                            continue
+                        
+                        aantal = invoer_validatie(
+                            f"hoeveel {eenheid.meervoud}",
+                            float,
+                            )
+                        
+                        hoeveelheid = Hoeveelheid(aantal, eenheid)
+                        
+                        if product_uuid in self.producten_standaard.keys():
+                            for ihoeveelheid_aanwezig, hoeveelheid_aanwezig in enumerate(self.producten_standaard[product_uuid]):
+                                if hoeveelheid == hoeveelheid_aanwezig:
+                                    self.producten_standaard[product_uuid][ihoeveelheid_aanwezig] = hoeveelheid + hoeveelheid_aanwezig
+                                    break
+                            else:
+                                self.producten_standaard[product_uuid].append(hoeveelheid)
+                        else:
+                            self.producten_standaard[product_uuid] = [hoeveelheid]
+                    
+                    elif kies_optie_bewerken == "verwijderen producten":
+                        
+                        producten = Producten.openen()
+                        
+                        kies_optie_verwijderen = invoer_kiezen(
+                            "een product en hoeveelheid om te verwijderen",
+                            {f"{f"{hoeveelheid}":<17} {producten[product_uuid]}": (product_uuid, ihoeveelheid) for product_uuid, hoeveelheden in self.producten_standaard.items() for ihoeveelheid, hoeveelheid in enumerate(hoeveelheden)},
+                            stoppen = True,
+                            terug_naar = f"MENU BEWERKEN {f"{self}".upper()}",
+                            )
+                        
+                        if kies_optie_verwijderen is STOP:
+                            continue
+                        
+                        product_uuid, ihoeveelheid = kies_optie_verwijderen
+                        
+                        print(f"\n>>> {self.producten_standaard[product_uuid][ihoeveelheid]} van {producten[product_uuid]} verwijderd")
+                        
+                        del self.producten_standaard[product_uuid][ihoeveelheid]
+                    
+                    elif kies_optie_bewerken == "aanpassen hoeveelheid producten":
+                        
+                        producten = Producten.openen()
+                        
+                        kies_optie_aanpassen = invoer_kiezen(
+                            "een product en hoeveelheid om aan te passen",
+                            {f"{f"{hoeveelheid}":<17} {producten[product_uuid]}": (product_uuid, ihoeveelheid) for product_uuid, hoeveelheden in self.producten_standaard.items() for ihoeveelheid, hoeveelheid in enumerate(hoeveelheden)},
+                            stoppen = True,
+                            terug_naar = f"MENU BEWERKEN {f"{self}".upper()}",
+                            )
+                        
+                        if kies_optie_aanpassen is STOP:
+                            continue
+                        
+                        product_uuid, ihoeveelheid = kies_optie_aanpassen
+                
+                        eenheid = producten.kiezen_eenheid(
+                            terug_naar = f"MENU BEWERKEN {f"{self}".upper()}",
+                            product_uuid = product_uuid,
+                            )
+                        
+                        if eenheid is STOP:
+                            continue
+                        
+                        aantal = invoer_validatie(
+                            f"hoeveel {eenheid.meervoud}",
+                            float,
+                            )
+                        
+                        hoeveelheid = Hoeveelheid(aantal, eenheid)
+                        
+                        print(f"\n>>> hoeveelheid {self.producten_standaard[product_uuid][ihoeveelheid]} aangepast naar {hoeveelheid}")
+                        
+                        self.producten_standaard[product_uuid][ihoeveelheid] = hoeveelheid
             
             elif kies_optie == "bewerk categorie":
                 
