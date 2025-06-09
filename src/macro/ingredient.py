@@ -73,9 +73,9 @@ class Ingrediënt(MacroType):
                 )
             
             if kies_optie is STOP:
-                break
+                return self
             
-            if kies_optie == "bewerk ingrediëntnaam":
+            elif kies_optie == "bewerk ingrediëntnaam":
             
                 print(f"\ninvullen nieuwe naam voor {self}")
                 ingrediënt_naam = invoer_validatie(
@@ -100,8 +100,6 @@ class Ingrediënt(MacroType):
                     return
                 
                 self.categorie_uuid = categorie_uuid
-            
-        return self
     
     @property
     def categorie(self) -> Categorie:

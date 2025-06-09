@@ -310,6 +310,8 @@ class Product(MacroType):
         
         while True:
             
+            print(f"selecteren wat te bewerken")
+            
             kies_optie = invoer_kiezen(
                 f"MENU {f"{self}".upper()}",
                 [
@@ -325,9 +327,9 @@ class Product(MacroType):
                 )
             
             if kies_optie is STOP:
-                break
+                return self
             
-            if kies_optie == "bewerk productnaam":
+            elif kies_optie == "bewerk productnaam":
             
                 print(f"\ninvullen nieuwe naam voor {self}")
                 product_naam = invoer_validatie(
@@ -374,8 +376,6 @@ class Product(MacroType):
                     continue
                 
                 self.ingrediënt_uuid = ingrediënt_uuid
-        
-        return self
         
     def weergeef(
         self,

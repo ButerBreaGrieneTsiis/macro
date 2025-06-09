@@ -103,49 +103,49 @@ class Categorie(MacroType):
         terug_naar: str,
         ):
         
-        print(f"selecteren wat te bewerken")
-        
-        kies_optie = invoer_kiezen(
-            "veld",
-            [
-                "bewerk categorienaam",
-                "bewerk hoofdcategorie",
-                ],
-            stoppen = True,
-            terug_naar = terug_naar,
-            )
-        
-        if kies_optie is STOP:
-            return
-        
-        if kies_optie == "bewerk categorienaam":
-        
-            print(f"\ninvullen nieuwe naam voor {self}")
-            categorie_naam = invoer_validatie(
-                "categorienaam",
-                str,
-                valideren = True,
-                kleine_letters = True,
-                uitsluiten_leeg = True,
-                )
+        while True:
             
-            self.categorie_naam = categorie_naam
+            print(f"selecteren wat te bewerken")
         
-        elif kies_optie == "bewerk hoofdcategorie":
-            
-            hoofdcategorieën = Hoofdcategorieën.openen()
-            hoofdcategorie_uuid = hoofdcategorieën.kiezen(
+            kies_optie = invoer_kiezen(
+                "veld",
+                [
+                    "bewerk categorienaam",
+                    "bewerk hoofdcategorie",
+                    ],
+                stoppen = True,
                 terug_naar = terug_naar,
-                uitsluiten_nieuw = True,
                 )
             
-            if hoofdcategorie_uuid is STOP:
-                return
+            if kies_optie is STOP:
+                return self
             
-            self.hoofdcategorie_uuid = hoofdcategorie_uuid
-        
-        return self
-        
+            elif kies_optie == "bewerk categorienaam":
+            
+                print(f"\ninvullen nieuwe naam voor {self}")
+                categorie_naam = invoer_validatie(
+                    "categorienaam",
+                    str,
+                    valideren = True,
+                    kleine_letters = True,
+                    uitsluiten_leeg = True,
+                    )
+                
+                self.categorie_naam = categorie_naam
+            
+            elif kies_optie == "bewerk hoofdcategorie":
+                
+                hoofdcategorieën = Hoofdcategorieën.openen()
+                hoofdcategorie_uuid = hoofdcategorieën.kiezen(
+                    terug_naar = terug_naar,
+                    uitsluiten_nieuw = True,
+                    )
+                
+                if hoofdcategorie_uuid is STOP:
+                    return
+                
+                self.hoofdcategorie_uuid = hoofdcategorie_uuid
+    
     @property
     def hoofdcategorie(self):
         hoofdcategorieën = Hoofdcategorieën.openen()

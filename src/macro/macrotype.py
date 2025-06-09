@@ -153,7 +153,10 @@ class Eenheid(Enum):
 
 class Hoeveelheid(MacroType):
     
-    VELDEN              = frozenset(("waarde", "eenheid", ))
+    VELDEN              = frozenset((
+        "waarde",
+        "eenheid",
+        ))
     BASIS_EENHEDEN      = [Eenheid("g"), Eenheid("ml")]
     ENERGIE_EENHEDEN    = [Eenheid("kcal"), Eenheid("kJ")]
     
