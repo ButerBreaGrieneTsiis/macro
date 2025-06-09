@@ -787,7 +787,9 @@ class Producten(MacroTypeDatabank):
             return STOP
         
         elif kies_optie == "nieuwe eenheid":
-            eenheid =  self.nieuwe_eenheid(product_uuid)
+            eenheid =  self.nieuwe_eenheid(
+                product_uuid = product_uuid,
+                )
                         
         elif kies_optie == "basiseenheid":
             eenheid = self[product_uuid].basis_eenheid
@@ -804,12 +806,17 @@ class Producten(MacroTypeDatabank):
         terug_naar: str,
         ) -> Tuple[str | Stop, Eenheid | Stop]:
         
-        product_uuid = self.kiezen_product(terug_naar)
+        product_uuid = self.kiezen_product(
+            terug_naar = terug_naar,
+            )
         
         if product_uuid is STOP:
             return product_uuid, ...
         
-        eenheid = self.kiezen_eenheid(terug_naar, product_uuid)
+        eenheid = self.kiezen_eenheid(
+            terug_naar = terug_naar,
+            product_uuid = product_uuid,
+            )
         
         if eenheid is STOP:
             return product_uuid, eenheid

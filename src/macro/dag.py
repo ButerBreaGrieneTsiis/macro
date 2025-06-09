@@ -232,10 +232,45 @@ class Dag(MacroType):
                 
                 print(f"\n>>> {gerechten[gerecht_uuid]} verwijderd")
             
-            elif opdracht == "aanpassen producten":
+            elif opdracht == "aanpassen hoeveelheid producten":
+                
+                producten = Producten.openen()
+                
+                kies_optie = invoer_kiezen(
+                    "een product om aan te passen",
+                    {f"{f"{hoeveelheid}":<17} {producten[product_uuid]}": (product_uuid, ihoeveelheid) for product_uuid, hoeveelheden in self.producten.items() for ihoeveelheid, hoeveelheid in enumerate(hoeveelheden)},
+                    stoppen = True,
+                    terug_naar = f"MENU DAG/{f"{self.dag}".upper()}",
+                    )
+                
+                if kies_optie is STOP:
+                    continue
+                
+                product_uuid, ihoeveelheid = kies_optie
+                
+                eenheid = producten.kiezen_eenheid(
+                    terug_naar = f"MENU DAG/{f"{self.dag}".upper()}",
+                    product_uuid = product_uuid,
+                    )
+                
+                if eenheid is STOP:
+                    continue
+                
+                aantal = invoer_validatie(
+                    f"hoeveel {eenheid.meervoud}",
+                    float,
+                    )
+                
+                hoeveelheid = Hoeveelheid(aantal, eenheid)
+                
+                print(f"\n>>> hoeveelheid {self.producten[product_uuid][ihoeveelheid]} aangepast naar {hoeveelheid}")
+                
+                self.producten[product_uuid][ihoeveelheid] = hoeveelheid
+            
+            elif opdracht == "aanpassen porties gerechten":
                 ...
             
-            elif opdracht == "aanpassen gerechten":
+            elif opdracht == "aanpassen versie gerechten":
                 ...
             
             elif opdracht == "weergeef producten":
@@ -251,7 +286,7 @@ class Dag(MacroType):
                 for product_uuid, hoeveelheden in self.producten.items():
                     
                     for hoeveelheid in hoeveelheden:
-                    
+                        
                         print(f"     {f"{hoeveelheid}":<17} {f"({Hoeveelheid(hoeveelheid.waarde * producten[product_uuid].eenheden[hoeveelheid.eenheid], producten[product_uuid].basis_eenheid)})":<8} {producten[product_uuid]}")
             
             elif opdracht == "weergeef gerechten":
