@@ -200,19 +200,21 @@ class Dag(MacroType):
                 
                 producten = Producten.openen()
                 
-                product_uuid = invoer_kiezen(
+                kies_optie = invoer_kiezen(
                     "een product om te verwijderen",
-                    {producten[product_uuid]: product_uuid for product_uuid in self.producten.keys()},
+                    {f"{f"{hoeveelheid}":<17} {producten[product_uuid]}": (product_uuid, ihoeveelheid) for product_uuid, hoeveelheden in self.producten.items() for ihoeveelheid, hoeveelheid in enumerate(hoeveelheden)},
                     stoppen = True,
                     terug_naar = f"MENU DAG/{f"{self.dag}".upper()}",
                     )
                 
-                if product_uuid is STOP:
+                if kies_optie is STOP:
                     continue
                 
-                del self.producten[product_uuid]
+                product_uuid, ihoeveelheid = kies_optie
                 
-                print(f"\n>>> {producten[product_uuid]} verwijderd")
+                print(f"\n>>> {self.producten[product_uuid][ihoeveelheid]} van {producten[product_uuid]} verwijderd")
+                
+                del self.producten[product_uuid][ihoeveelheid]
             
             elif opdracht == "verwijderen gerechten":
                 
