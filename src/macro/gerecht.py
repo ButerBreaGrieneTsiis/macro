@@ -50,7 +50,7 @@ class Gerecht(MacroType):
         if categorie_uuid is STOP:
             return STOP
         
-        gerecht_naam    = invoer_validatie(
+        gerecht_naam = invoer_validatie(
             "gerechtnaam",
             str,
             valideren = True,
@@ -127,7 +127,7 @@ class Gerecht(MacroType):
                 )
             
             if kies_optie is STOP:
-                return self
+                break
             
             elif kies_optie == "bewerk gerechtnaam":
                 
@@ -145,7 +145,7 @@ class Gerecht(MacroType):
             elif kies_optie == "bewerk producten":
                 
                 while True:
-                
+                    
                     kies_optie_bewerken = invoer_kiezen(
                         f"MENU BEWERKEN {f"{self}".upper()}",
                         [
@@ -291,20 +291,326 @@ class Gerecht(MacroType):
                 
                 else:
                     
-                    print("!!! NOG NIET GEÏMPLEMENTEERD")
-                    continue
+                    versie_uuid = kies_optie
+                    producten = Producten.openen()
                     
-                    # while True:
-                    
-                    #     kies_optie = invoer_kiezen(
-                    #         "opdracht",
-                    #         {
-                    #             "verwijderen versie": "verwijderen versie",
-                    #             "verwijderen versie": "verwijderen versie",
-                    #         },
-                    #         stoppen = True,
-                    #         terug_naar = f"MENU {f"{self}".upper()}",
-                    #         )
+                    while True:
+                        
+                        kies_optie_bewerken = invoer_kiezen(
+                            f"MENU BEWERKEN VERSIE {f"{self.versies[versie_uuid]["versie_naam"]}".upper()}",
+                            [
+                                "toevoegen toevoeging product",
+                                "verwijderen toevoeging product",
+                                "aanpassen toevoeging product",
+                                "toevoegen verwijdering product",
+                                "verwijderen verwijdering product",
+                                "toevoegen aanpassing hoeveelheid",
+                                "verwijderen aanpassing hoeveelheid",
+                                "aanpassen aanpassing hoeveelheid",
+                                "toevoegen aanpassing aantal porties",
+                                "verwijderen aanpassing aantal porties",
+                                "aanpassen aanpassing aantal porties",
+                                "verwijderen versie",
+                                ],
+                            kies_een = False,
+                            stoppen = True,
+                            terug_naar = f"KLAAR MET BEWERKEN",
+                            )
+                        
+                        if kies_optie_bewerken is STOP:
+                            break
+                        
+                        elif kies_optie_bewerken == "toevoegen toevoeging product":
+                            
+                            product_uuid, eenheid = producten.kiezen_product_eenheid(
+                                terug_naar = f"MENU BEWERKEN VERSIE {f"{self.versies[versie_uuid]["versie_naam"]}".upper()}",
+                                )
+                            
+                            if product_uuid is STOP or eenheid is STOP:
+                                continue
+                            
+                            if product_uuid in self.producten_standaard.keys() and eenheid in [hoeveelheid.eenheid for hoeveelheid in self.producten_standaard[product_uuid]]:
+                                print(f">>> eenheid \"{eenheid.meervoud}\" voor {producten[product_uuid]} reeds aanwezig, probeer optie \"aanpassen toevoeging product\"")
+                                continue
+                            
+                            if not "toegevoegd" in self.versies[versie_uuid]:
+                                self.versies[versie_uuid]["toegevoegd"] = {}
+                            else:
+                                if product_uuid in self.versies[versie_uuid]["toegevoegd"].keys() and eenheid in [hoeveelheid.eenheid for hoeveelheid in self.versies[versie_uuid]["toegevoegd"][product_uuid]]:
+                                    print(f"\n>>> eenheid \"{hoeveelheid.eenheid.meervoud}\" van {producten[product_uuid]} reeds aanwezig in toevoegingen, probeer toevoeging aan te passen")
+                                    continue
+                            
+                            aantal = invoer_validatie(
+                                f"hoeveel {eenheid.meervoud}",
+                                float,
+                                )
+                            
+                            hoeveelheid = Hoeveelheid(aantal, eenheid)
+                            
+                            if product_uuid in self.versies[versie_uuid]["toegevoegd"].keys():
+                                self.versies[versie_uuid]["toegevoegd"][product_uuid].append(hoeveelheid)
+                            else:
+                                self.versies[versie_uuid]["toegevoegd"][product_uuid] = [hoeveelheid]
+                            
+                            if not "toegevoegd" in self.versies[versie_uuid]:
+                                self.versies[versie_uuid]["toegevoegd"] = {}
+                            
+                            print(f"\n>>> {hoeveelheid} van {producten[product_uuid]} toegevoegd aan toevoegingen")
+                        
+                        elif kies_optie_bewerken == "verwijderen toevoeging product":
+                            
+                            if len(self.versies[versie_uuid].get("toegevoegd", {})) == 0:
+                                print(f">>> geen toevoegingen om te verwijderen")
+                                continue
+                            
+                            kies_optie = invoer_kiezen(
+                                "product en hoeveelheid om te verwijderen uit toevoegingen",
+                                {f"{producten[product_uuid]} ({hoeveelheid})": (product_uuid, hoeveelheid) for product_uuid, hoeveelheden in self.versies[versie_uuid]["toegevoegd"].items() for hoeveelheid in hoeveelheden},
+                                stoppen = True,
+                                terug_naar = f"MENU BEWERKEN VERSIE {f"{self.versies[versie_uuid]["versie_naam"]}".upper()}",
+                                )
+                            
+                            if kies_optie is STOP:
+                                continue
+                            
+                            product_uuid, hoeveelheid = kies_optie
+                            
+                            print(f"\n>>> {hoeveelheid} van {producten[product_uuid]} verwijderd uit toevoegingen")
+                            
+                            self.versies[versie_uuid]["toegevoegd"][product_uuid].remove(hoeveelheid)
+                            
+                            if not bool(self.versies[versie_uuid]["toegevoegd"][product_uuid]):
+                                del self.versies[versie_uuid]["toegevoegd"][product_uuid]
+                            
+                            if not bool(self.versies[versie_uuid]["toegevoegd"]):
+                                del self.versies[versie_uuid]["toegevoegd"]
+                        
+                        elif kies_optie_bewerken == "aanpassen toevoeging product":
+                            
+                            if len(self.versies[versie_uuid].get("toegevoegd", {})) == 0:
+                                print(f">>> geen toevoegingen om de hoeveelheid van aan te passen")
+                                continue
+                            
+                            kies_optie = invoer_kiezen(
+                                "product en hoeveelheid om aan te passen uit toevoegingen",
+                                {f"{producten[product_uuid]} ({hoeveelheid})": (product_uuid, ihoeveelheid) for product_uuid, hoeveelheden in self.versies[versie_uuid]["toegevoegd"].items() for ihoeveelheid, hoeveelheid in enumerate(hoeveelheden)},
+                                stoppen = True,
+                                terug_naar = f"MENU BEWERKEN VERSIE {f"{self.versies[versie_uuid]["versie_naam"]}".upper()}",
+                                )
+                            
+                            if kies_optie is STOP:
+                                continue
+                            
+                            product_uuid, ihoeveelheid = kies_optie
+                            
+                            hoeveelheid = self.versies[versie_uuid]["toegevoegd"][product_uuid][ihoeveelheid]
+                            
+                            aantal = invoer_validatie(
+                                f"hoeveel {hoeveelheid.eenheid.meervoud}",
+                                float,
+                                )
+                            
+                            hoeveelheid_nieuw = Hoeveelheid(aantal, hoeveelheid.eenheid)
+                            
+                            print(f"\n>>> {hoeveelheid} van {producten[product_uuid]} aangepast naar {hoeveelheid_nieuw} in toevoegingen")
+                            
+                            self.versies[versie_uuid]["toegevoegd"][product_uuid][ihoeveelheid] = hoeveelheid_nieuw
+                        
+                        elif kies_optie_bewerken == "toevoegen verwijdering product":
+                            
+                            kies_optie = invoer_kiezen(
+                                "product en hoeveelheid om te toe te voegen aan verwijderingen",
+                                {f"{f"{hoeveelheid}":<17} {producten[product_uuid]}": (product_uuid, hoeveelheid) for product_uuid, hoeveelheden in self.producten_standaard.items() for  hoeveelheid in hoeveelheden},
+                                stoppen = True,
+                                terug_naar = f"MENU BEWERKEN VERSIE {f"{self.versies[versie_uuid]["versie_naam"]}".upper()}",
+                                )
+                            
+                            if kies_optie is STOP:
+                                continue
+                            
+                            product_uuid, hoeveelheid = kies_optie
+                            
+                            
+                            if not "verwijderd" in self.versies[versie_uuid]:
+                                self.versies[versie_uuid]["verwijderd"] = {}
+                            
+                            if product_uuid in self.versies[versie_uuid]["verwijderd"].keys():
+                                if hoeveelheid not in self.versies[versie_uuid]["verwijderd"][product_uuid]:
+                                    self.versies[versie_uuid]["verwijderd"][product_uuid].append(hoeveelheid)
+                                else:
+                                    print(f"\n>>> eenheid \"{hoeveelheid.eenheid.meervoud}\" van {producten[product_uuid]} reeds aanwezig in verwijderingen")
+                                    continue
+                            else:
+                                self.versies[versie_uuid]["verwijderd"][product_uuid] = [hoeveelheid]
+                                
+                            print(f"\n>>> {hoeveelheid} van {producten[product_uuid]} toegevoegd aan verwijderingen")
+                        
+                        elif kies_optie_bewerken == "verwijderen verwijdering product":
+                            
+                            if len(self.versies[versie_uuid].get("verwijderd", {})) == 0:
+                                print(f">>> geen verwijderingen om te verwijderen")
+                                continue
+                            
+                            kies_optie = invoer_kiezen(
+                                "product en hoeveelheid om te verwijderen uit verwijderingen",
+                                {f"{f"{hoeveelheid}":<17} {producten[product_uuid]}": (product_uuid, hoeveelheid) for product_uuid, hoeveelheden in self.versies[versie_uuid]["verwijderd"].items() for hoeveelheid in hoeveelheden},
+                                stoppen = True,
+                                terug_naar = f"MENU BEWERKEN VERSIE {f"{self.versies[versie_uuid]["versie_naam"]}".upper()}",
+                                )
+                            
+                            if kies_optie is STOP:
+                                continue
+                            
+                            product_uuid, hoeveelheid = kies_optie
+                            
+                            print(f"\n>>> {hoeveelheid} van {producten[product_uuid]} verwijderd uit verwijderingen")
+                            
+                            self.versies[versie_uuid]["verwijderd"][product_uuid].remove(hoeveelheid)
+                            
+                            if not bool(self.versies[versie_uuid]["verwijderd"][product_uuid]):
+                                del self.versies[versie_uuid]["verwijderd"][product_uuid]
+                            
+                            if not bool(self.versies[versie_uuid]["verwijderd"]):
+                                del self.versies[versie_uuid]["verwijderd"]
+                        
+                        elif kies_optie_bewerken == "toevoegen aanpassing hoeveelheid":
+                            
+                            kies_optie = invoer_kiezen(
+                                "een product en hoeveelheid om toe te voegen aan aanpassen hoeveelheid",
+                                {f"{f"{hoeveelheid}":<17} {producten[product_uuid]}": (product_uuid, hoeveelheid) for product_uuid, hoeveelheden in self.producten_standaard.items() for hoeveelheid in hoeveelheden},
+                                stoppen = True,
+                                terug_naar = f"MENU BEWERKEN VERSIE {f"{self.versies[versie_uuid]["versie_naam"]}".upper()}",
+                                )
+                            
+                            if kies_optie is STOP:
+                                continue
+                            
+                            product_uuid, hoeveelheid = kies_optie
+                            
+                            if not "hoeveelheid" in self.versies[versie_uuid].keys():
+                                self.versies[versie_uuid]["hoeveelheid"] = {}
+                            
+                            if product_uuid in self.versies[versie_uuid]["hoeveelheid"] and hoeveelheid in self.versies[versie_uuid]["hoeveelheid"][product_uuid]:
+                                print(f"\n>>> eenheid \"{hoeveelheid.eenheid.meervoud}\" van {producten[product_uuid]} reeds aanwezig in aanpassingen")
+                                continue
+                            
+                            aantal = invoer_validatie(
+                                f"hoeveel {hoeveelheid.eenheid.meervoud}",
+                                float,
+                                )
+                            
+                            hoeveelheid_nieuw = Hoeveelheid(aantal, hoeveelheid.eenheid)
+                            
+                            if product_uuid in self.versies[versie_uuid]["hoeveelheid"].keys():
+                                self.versies[versie_uuid]["hoeveelheid"][product_uuid].append(hoeveelheid_nieuw)
+                            else:
+                                self.versies[versie_uuid]["hoeveelheid"][product_uuid] = [hoeveelheid_nieuw]
+                            
+                            print(f"\n>>> {hoeveelheid} --> {hoeveelheid_nieuw} van {producten[product_uuid]} toegevoegd aan aanpassingen")
+                        
+                        elif kies_optie_bewerken == "verwijderen aanpassing hoeveelheid":
+                            
+                            if len(self.versies[versie_uuid].get("hoeveelheid", {})) == 0:
+                                print(f">>> geen aanpassing om te verwijderen")
+                                continue
+                            
+                            kies_optie = invoer_kiezen(
+                                "product en hoeveelheid om te verwijderen uit aanpassingen",
+                                {f"{producten[product_uuid]} ({hoeveelheid})": (product_uuid, hoeveelheid) for product_uuid, hoeveelheden in self.versies[versie_uuid]["hoeveelheid"].items() for hoeveelheid in hoeveelheden},
+                                stoppen = True,
+                                terug_naar = f"MENU BEWERKEN VERSIE {f"{self.versies[versie_uuid]["versie_naam"]}".upper()}",
+                                )
+                            
+                            if kies_optie is STOP:
+                                continue
+                            
+                            product_uuid, hoeveelheid_nieuw = kies_optie
+                            
+                            hoeveelheid = next(hoeveelheid for hoeveelheid in self.producten_standaard[product_uuid] if hoeveelheid == hoeveelheid_nieuw)
+                            
+                            print(f"\n>>> {hoeveelheid} --> {hoeveelheid_nieuw} van {producten[product_uuid]} verwijderd uit aanpassingen")
+                            
+                            self.versies[versie_uuid]["hoeveelheid"][product_uuid].remove(hoeveelheid)
+                            
+                            if not bool(self.versies[versie_uuid]["hoeveelheid"][product_uuid]):
+                                del self.versies[versie_uuid]["hoeveelheid"][product_uuid]
+                            
+                            if not bool(self.versies[versie_uuid]["hoeveelheid"]):
+                                del self.versies[versie_uuid]["hoeveelheid"]
+                        
+                        elif kies_optie_bewerken == "aanpassen aanpassing hoeveelheid":
+                            
+                            if len(self.versies[versie_uuid].get("hoeveelheid", {})) == 0:
+                                print(f">>> geen aanpassing om de hoeveelheid van aan te passen")
+                                continue
+                            
+                            kies_optie = invoer_kiezen(
+                                "product en hoeveelheid om te verwijderen uit aanpassingen",
+                                {f"{producten[product_uuid]} ({hoeveelheid})": (product_uuid, ihoeveelheid) for product_uuid, hoeveelheden in self.versies[versie_uuid]["hoeveelheid"].items() for ihoeveelheid, hoeveelheid in enumerate(hoeveelheden)},
+                                stoppen = True,
+                                terug_naar = f"MENU BEWERKEN VERSIE {f"{self.versies[versie_uuid]["versie_naam"]}".upper()}",
+                                )
+                            
+                            if kies_optie is STOP:
+                                continue
+                            
+                            product_uuid, ihoeveelheid = kies_optie
+                            
+                            hoeveelheid = self.versies[versie_uuid]["hoeveelheid"][product_uuid][ihoeveelheid]
+                            
+                            aantal = invoer_validatie(
+                                f"hoeveel {hoeveelheid.eenheid.meervoud}",
+                                float,
+                                )
+                            
+                            hoeveelheid_nieuw = Hoeveelheid(aantal, hoeveelheid.eenheid)
+                            
+                            print(f"\n>>> {hoeveelheid} van {producten[product_uuid]} aangepast naar {hoeveelheid_nieuw} in toevoegingen")
+                            
+                            self.versies[versie_uuid]["hoeveelheid"][product_uuid][ihoeveelheid] = hoeveelheid_nieuw
+                        
+                        elif kies_optie_bewerken == "toevoegen aanpassing aantal porties":
+                            
+                            if "porties" in self.versies[versie_uuid]:
+                                print(f">>> toevoeging aanpassing aantal porties ({self.versies[versie_uuid]["porties"]} reeds aanwezig)")
+                                continue
+                            
+                            porties = invoer_validatie(
+                                f"hoeveel porties",
+                                int,
+                                )
+                            
+                            self.versies[versie_uuid]["porties"] = porties
+                        
+                        elif kies_optie_bewerken == "verwijderen aanpassing aantal porties":
+                            
+                            if "porties" not in self.versies[versie_uuid]:
+                                print(f">>> geen aanpassing aantal porties aanwezig)")
+                                continue
+                            
+                            del self.versies[versie_uuid]["porties"]
+                        
+                        elif kies_optie_bewerken == "aanpassen aanpassing aantal porties":
+                            
+                            if "porties" not in self.versies[versie_uuid]:
+                                print(f">>> geen aanpassing aantal porties aanwezig)")
+                                continue
+                            
+                            porties = invoer_validatie(
+                                f"hoeveel porties",
+                                int,
+                                )
+                            
+                            self.versies[versie_uuid]["porties"] = porties
+                        
+                        elif kies_optie_bewerken == "verwijderen versie":
+                            
+                            print(f">>> versie \"{self.versies[versie_uuid]["versie_naam"]} verwijderd\"")
+                            
+                            del self.versies[versie_uuid]
+                            break
+        
+        return self
     
     def weergeef(
         self,
@@ -332,11 +638,18 @@ class Gerecht(MacroType):
             
             elif kies_optie == "weergeef producten":
                 
+                versie_uuid = self.kiezen_versie(
+                    terug_naar,
+                    )
+                
+                if versie_uuid is STOP:
+                    return STOP
+                
                 producten = Producten.openen()
                 
                 print(f"\n     {"HOEVEELHEID":<17} PRODUCT")
                 
-                for product_uuid, hoeveelheden in self.producten_standaard.items():
+                for product_uuid, hoeveelheden in self.producten(versie_uuid).items():
                     for hoeveelheid in hoeveelheden:
                         print(f"     {f"{hoeveelheid}":<17} {producten[product_uuid]}")
             
@@ -364,7 +677,7 @@ class Gerecht(MacroType):
                 
                 for versie in self.versies.values():
                     
-                    print(f"\n     versie \"{versie["versie_naam"]}\"")
+                    print(f"\n     versie \"{versie["versie_naam"]}\"".upper())
                     
                     if "porties" in versie.keys():
                         print("       porties")
@@ -372,23 +685,22 @@ class Gerecht(MacroType):
                     
                     if "verwijderd" in versie.keys():
                         print("       verwijderd")
-                        for product_uuid in versie["verwijderd"]:
-                            print(f"         {producten[product_uuid]}")
+                        for product_uuid, hoeveelheden in versie["verwijderd"].items():
+                            for hoeveelheid in hoeveelheden:
+                                print(f"         {f"{hoeveelheid}":<17} {producten[product_uuid]}")
                     
                     if "toegevoegd" in versie.keys():
                         print("       toegevoegd")
-                        for product_uuid, hoeveelheid in versie["toegevoegd"].items():
-                            print(f"         {f"{hoeveelheid}":<17} {producten[product_uuid]}")
-                    
-                    if "vervangen" in versie.keys():
-                        print("       vervangen")
-                        for oud_product_uuid, vervangen_dict in versie["vervangen"].items():
-                            print(f"         {f"{vervangen_dict["hoeveelheid"]}":<17} {producten[vervangen_dict["product_uuid"]]} (van {self.producten_standaard[oud_product_uuid]} {producten[oud_product_uuid]})")
+                        for product_uuid, hoeveelheden in versie["toegevoegd"].items():
+                            for hoeveelheid in hoeveelheden:
+                                print(f"         {f"{hoeveelheid}":<17} {producten[product_uuid]}")
                     
                     if "hoeveelheid" in versie.keys():
-                        print("       aangepast")
-                        for product_uuid, hoeveelheid in versie["hoeveelheid"].items():
-                            print(f"         {f"{self.producten_standaard[product_uuid]}":<17} --> {f"{hoeveelheid}":<17} {producten[product_uuid]}")
+                        print("       hoeveelheid aangepast")
+                        for product_uuid, hoeveelheden in versie["hoeveelheid"].items():
+                            for hoeveelheid in hoeveelheden:
+                                hoeveelheid_oud = next(hoeveelheid_oud for hoeveelheid_oud in self.producten_standaard[product_uuid] if hoeveelheid_oud == hoeveelheid)
+                                print(f"         {f"{hoeveelheid_oud}":<17} --> {f"{hoeveelheid}":<17} {producten[product_uuid]}")
     
     def kiezen_versie(
         self,
@@ -432,11 +744,10 @@ class Gerecht(MacroType):
         while True:
             
             kies_optie = invoer_kiezen(
-                f"MENU TOEVOEGEN VERSIE {f"{self}".upper()}",
+                f"MENU NIEUWE VERSIE {f"{self}".upper()}",
                 [
                     "toevoegen product",
                     "verwijderen product",
-                    "vervangen product",
                     "aanpassen hoeveelheid product",
                     "aanpassen aantal porties",
                     ],
@@ -450,27 +761,25 @@ class Gerecht(MacroType):
             
             producten = Producten.openen()
             
-            if kies_optie == "aanpassen aantal porties":
-                
-                porties = invoer_validatie(
-                    f"hoeveel porties",
-                    int,
-                    )
-                
-                versie["porties"] = porties
-            
-            elif kies_optie == "toevoegen product":
+            if kies_optie == "toevoegen product":
                 
                 product_uuid, eenheid = producten.kiezen_product_eenheid(
-                    terug_naar = f"MENU TOEVOEGEN VERSIE {f"{self}".upper()}",
+                    terug_naar = f"MENU NIEUWE VERSIE {f"{self}".upper()}",
                     )
                 
                 if product_uuid is STOP or eenheid is STOP:
                     continue
                 
-                if product_uuid in self.producten_standaard.keys():
-                    print(f">>> {producten[product_uuid]} reeds aanwezig, kies een andere optie")
+                if product_uuid in self.producten_standaard.keys() and eenheid in [hoeveelheid.eenheid for hoeveelheid in self.producten_standaard[product_uuid]]:
+                    print(f">>> eenheid \"{eenheid.meervoud}\" van {producten[product_uuid]} reeds aanwezig, probeer een aanpassing")
                     continue
+                
+                if not "toegevoegd" in versie:
+                    versie["toegevoegd"] = {}
+                else:
+                    if product_uuid in versie["toegevoegd"].keys() and eenheid in [hoeveelheid.eenheid for hoeveelheid in versie["toegevoegd"][product_uuid]]:
+                        print(f"\n>>> eenheid \"{hoeveelheid.eenheid.meervoud}\" van {producten[product_uuid]} reeds aanwezig in toevoegingen, probeer toevoeging aan te passen")
+                        continue
                 
                 aantal = invoer_validatie(
                     f"hoeveel {eenheid.meervoud}",
@@ -479,88 +788,85 @@ class Gerecht(MacroType):
                 
                 hoeveelheid = Hoeveelheid(aantal, eenheid)
                 
-                if not "toegevoegd" in versie:
-                    versie["toegevoegd"] = {}
+                if product_uuid in versie["toegevoegd"].keys():
+                    versie["toegevoegd"][product_uuid].append(hoeveelheid)
+                else:
+                    versie["toegevoegd"][product_uuid] = [hoeveelheid]
                 
-                versie["toegevoegd"][product_uuid] = hoeveelheid
+                print(f"\n>>> {hoeveelheid} van {producten[product_uuid]} toegevoegd aan toevoegingen")
             
-            else:
+            elif kies_optie == "verwijderen product":
                 
-                product_uuid = invoer_kiezen(
-                    "product om te verwijderen",
-                    {f"{producten[product_uuid]} ({hoeveelheid})": product_uuid for product_uuid, hoeveelheid in self.producten_standaard.items()},
+                kies_optie = invoer_kiezen(
+                    "een product en hoeveelheid om te verwijderen",
+                    {f"{f"{hoeveelheid}":<17} {producten[product_uuid]}": (product_uuid, hoeveelheid) for product_uuid, hoeveelheden in self.producten_standaard.items() for hoeveelheid in hoeveelheden},
                     stoppen = True,
-                    terug_naar = f"MENU TOEVOEGEN VERSIE {f"{self}".upper()}",
+                    terug_naar = f"MENU NIEUWE VERSIE {f"{self}".upper()}",
                     )
                 
-                if product_uuid is STOP:
+                if kies_optie is STOP:
                     continue
                 
-                if kies_optie == "verwijderen product":
-                    
-                    if not "verwijderd" in versie:
-                        versie["verwijderd"] = []
-                    
-                    if not product_uuid in versie["verwijderd"]:
-                        versie["verwijderd"].append(product_uuid)
+                product_uuid, hoeveelheid = kies_optie
                 
-                elif kies_optie == "vervangen product":
-                    
-                    vervangend_product_uuid = invoer_kiezen(
-                        "vervangend product",
-                        {f"{vervangend_product}": vervangend_product_uuid for vervangend_product_uuid, vervangend_product in producten.items() if vervangend_product.ingrediënt_uuid == producten[product_uuid].ingrediënt_uuid and vervangend_product_uuid != product_uuid},
-                        stoppen = True,
-                        terug_naar = f"MENU TOEVOEGEN VERSIE {f"{self}".upper()}",
-                        )
-                    
-                    if vervangend_product_uuid is STOP:
-                        continue
-                    
-                    eenheid = producten.kiezen_eenheid(
-                        terug_naar = f"MENU TOEVOEGEN VERSIE {f"{self}".upper()}",
-                        product_uuid = vervangend_product_uuid,
-                        )
-                    
-                    if eenheid is STOP:
-                        continue
-                    
-                    aantal = invoer_validatie(
-                        f"hoeveel {eenheid.meervoud}",
-                        float,
-                        )
-                    
-                    hoeveelheid = Hoeveelheid(aantal, eenheid)
-                    
-                    if not "vervangen" in versie:
-                        versie["vervangen"] = {}
-                    
-                    versie["vervangen"][product_uuid] = {
-                        "product_uuid": vervangend_product_uuid,
-                        "hoeveelheid": hoeveelheid,
-                        }
+                if not "verwijderd" in versie:
+                    versie["verwijderd"] = {}
                 
-                elif kies_optie == "aanpassen hoeveelheid product":
-                    
-                    eenheid = producten.kiezen_eenheid(
-                        terug_naar = f"MENU TOEVOEGEN VERSIE {f"{self}".upper()}",
-                        product_uuid = product_uuid,
-                        )
-                    
-                    if eenheid is STOP:
+                if product_uuid in versie["verwijderd"].keys():
+                    if hoeveelheid not in versie["verwijderd"][product_uuid]:
+                        versie["verwijderd"][product_uuid].append(hoeveelheid)
+                    else:
+                        print(f"\n>>> eenheid \"{hoeveelheid.eenheid.meervoud}\" van {producten[product_uuid]} reeds aanwezig in verwijderingen")
                         continue
-                    
-                    aantal = invoer_validatie(
-                        f"hoeveel {eenheid.meervoud}",
-                        float,
-                        )
-                    
-                    hoeveelheid = Hoeveelheid(aantal, eenheid)
-                    
-                    if not "hoeveelheid" in versie:
-                        versie["hoeveelheid"] = {}
-                    
-                    versie["hoeveelheid"][product_uuid] = hoeveelheid
-        
+                else:
+                    versie["verwijderd"][product_uuid] = [hoeveelheid]
+                
+                print(f"\n>>> {hoeveelheid} van {producten[product_uuid]} toegevoegd aan verwijderingen")
+                
+            elif kies_optie == "aanpassen hoeveelheid product":
+                
+                kies_optie = invoer_kiezen(
+                    "een product en hoeveelheid om de hoeveelheid van aan te passen",
+                    {f"{f"{hoeveelheid}":<17} {producten[product_uuid]}": (product_uuid, hoeveelheid) for product_uuid, hoeveelheden in self.producten_standaard.items() for hoeveelheid in hoeveelheden},
+                    stoppen = True,
+                    terug_naar = f"MENU NIEUWE VERSIE {f"{self}".upper()}",
+                    )
+                
+                if kies_optie is STOP:
+                    continue
+                
+                product_uuid, hoeveelheid = kies_optie
+                
+                if not "hoeveelheid" in versie:
+                    versie["hoeveelheid"] = {}
+                
+                if product_uuid in versie["hoeveelheid"] and hoeveelheid in versie["hoeveelheid"][product_uuid]:
+                    print(f"\n>>> eenheid \"{hoeveelheid.eenheid.meervoud}\" van {producten[product_uuid]} reeds aanwezig in aanpassingen")
+                    continue
+                
+                aantal = invoer_validatie(
+                    f"hoeveel {hoeveelheid.eenheid.meervoud}",
+                    float,
+                    )
+                
+                hoeveelheid_nieuw = Hoeveelheid(aantal, hoeveelheid.eenheid)
+                
+                if product_uuid in versie["hoeveelheid"].keys():
+                    versie["hoeveelheid"][product_uuid].append(hoeveelheid_nieuw)
+                else:
+                    versie["hoeveelheid"][product_uuid] = [hoeveelheid_nieuw]
+                
+                print(f"\n>>> {hoeveelheid} --> {hoeveelheid_nieuw} van {producten[product_uuid]} toegevoegd aan aanpassingen")
+            
+            elif kies_optie == "aanpassen aantal porties":
+                
+                porties = invoer_validatie(
+                    f"hoeveel porties",
+                    int,
+                    )
+                
+                versie["porties"] = porties
+            
         if not bool(versie):
             return STOP
         
@@ -585,22 +891,21 @@ class Gerecht(MacroType):
         
         if versie_uuid != "standaard":
             
-            for product_uuid, hoeveelheid in self.versies[versie_uuid].get("toegevoegd", {}).items():
-                
-                producten[product_uuid] = hoeveelheid
+            for product_uuid, hoeveelheden in self.versies[versie_uuid].get("toegevoegd", {}).items():
+                for hoeveelheid in hoeveelheden:
+                    if product_uuid not in producten.keys():
+                        producten[product_uuid] = [hoeveelheid]
+                    else:
+                        producten[product_uuid].append(hoeveelheid)
             
-            for product_uuid in self.versies[versie_uuid].get("verwijderd", []):
-                
-                del producten[product_uuid]
+            for product_uuid, hoeveelheden in self.versies[versie_uuid].get("verwijderd", {}).items():
+                for hoeveelheid in hoeveelheden:
+                    producten[product_uuid].remove(hoeveelheid)
             
-            for product_uuid, nieuw in self.versies[versie_uuid].get("vervangen", {}).items():
-                
-                del producten[product_uuid]
-                producten[nieuw["product_uuid"]] = nieuw["hoeveelheid"]
-            
-            for product_uuid, hoeveelheid in self.versies[versie_uuid].get("hoeveelheid", {}).items():
-                
-                producten[product_uuid] = hoeveelheid
+            for product_uuid, hoeveelheden in self.versies[versie_uuid].get("hoeveelheid", {}).items():
+                for hoeveelheid in hoeveelheden:
+                    producten[product_uuid].remove(hoeveelheid)
+                    producten[product_uuid].append(hoeveelheid)
         
         return producten
     
