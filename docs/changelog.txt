@@ -1,3 +1,5 @@
+[ ] flow van programma aanpassen; soms gaat een stoppen = True meerdere stappen terug -> kijken waar dit bijv. naar één stap terug kan gaan (door een while True: toe te voegen)
+
 TOEVOEGINGEN
     
     0.3.0
@@ -6,26 +8,70 @@ TOEVOEGINGEN
             grafiek met relatieve hoeveelheid macro's
     
     0.2.0
-        [ ] Gerecht
-            [ ] onderzoeken gebruikmaken van Categorie/Hoofdcategorie
-                [?] simpele inheritance met anders cls.BESTANDSNAAM?
-            [ ] toevoegen producten en diens hoeveelheden
-            [ ] toevoegen recept
-            [ ] toevoegen bewerkingen, en deze een naam geven
+        [v] Gerecht
+            [v] onderzoeken gebruikmaken van Categorie/Hoofdcategorie
+                [v] simpele inheritance met anders cls.BESTANDSNAAM?
+            [v] toevoegen producten en diens hoeveelheden
+            [v] toevoegen bewerkingen, en deze een naam geven
         [ ] MENU GEGEVENS:
             [ ] gerecht
-                [ ] print alle
-                [ ] selecteren en bewerken zonder NIEUW
-
-        [ ] Dag
-            [ ] toevoegen gerecht
-                [ ] selecteren gerecht
-                    [ ] selecteren op basis van naam
-                    [ ] selecteren op basis van hoofdcategorie/categorie
-                [ ] selecteren bewerking indien aanwezig
-                [ ] selecteren portiegrootte
+                [v] print alle
+                [v] selecteren en bewerken/weergeven
+                    [v] selecteren zonder NIEUW
+                        [v] zoeken op hoofdcategorie (nummer intypen)
+                            [v] zoeken op categorie (nummer intypen)
+                                [v] zoeken op gerecht (nummer intypen)
+                        [v] direct zoeken op gerechtnaam (naam intypen)
+                    [ ] bewerken
+                        [v] gerechtnaam
+                        [v] porties
+                        [v] categorie
+                        [ ] recept
+                        [v] versies
+                            [v] nieuwe versie -> rekening houden met meerdere hoeveelheden
+                                [v] toevoegingen
+                                [v] verwijderingen
+                                [v] aanpassingen
+                                [x] vervangingen
+                                    [i] dit wordt te ingewikkeld met meerdere hoeveelheden
+                                    [i] tevens zou dit betekenen dat voor elk product onder een ingrediënt de gelijke eenheden gedefinieerd dienen te worden
+                                    [i] enkel toevoegingen/verwijderingen zijn dan simpelweg logischer
+                                [v] porties
+!                           [v] bewerken versie
+                                [v] rekening mee houden dat er meerdere hoeveelheiden per product_uuid kunnen zijn
+                        [v] producten
+                    [ ] weergeven
+                        [ ] recept
+                        [v] versies
+                            [v] opnieuw doen i.v.m. meerdere hoeveelheden
+                        [v] producten
+                            [v] opnieuw doen i.v.m. meerdere hoeveelheden
+                        [v] voedingswaarde
+                            [v] als functie van een zekere versie
+                            [v] laat ook porties zien ("voedingswaarde voor XX porties")
+                            [v] opnieuw doen i.v.m. meerdere hoeveelheden
+        
+        [v] Dag
+            [v] weergeef producten
+                [v] toon omgerekende som in g/ml
+            [v] weergeef gerechten
+            [v] weergeef voedingswaarde
+            [v] toevoegen gerecht
+                [v] selecteren gerecht
+                    [v] selecteren op basis van naam
+                    [v] selecteren op basis van hoofdcategorie/categorie
+                [v] selecteren versie indien aanwezig
+                    [x] meerdere versies toelaten?
+                [v] selecteren portiegrootte
+            [v] verwijderen product
+            [v] verwijderen gerecht
+            [v] bewerken hoeveelheid product
+            [v] bewerken portie gerecht
+            [x] bewerken versie gerecht
     
-    [ ] uitsluiten nieuw weghalen???
+    [x] uitsluiten nieuw weghalen???
+    [v] stoppen overal weghalen want standaard True
+    [v] kiesbevestiging weghalen want standaard True
     
     0.1.0
         [v] MENU GEGEVENS: mogelijkheid tot simpel inzien:
