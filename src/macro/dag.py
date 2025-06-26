@@ -309,14 +309,37 @@ class Dag(MacroType):
                     continue
                 
                 producten = Producten.openen()
+                gerechten = Gerechten.openen()
                 
-                print(f"\n     {"HOEVEELHEID":<26} PRODUCT")
+                if len(self.producten) > 0:
+                    print("\n     los toegevoegde producten")
+                    print(f"\n     {"HOEVEELHEID":<17} CALORIEËN EIWITTEN PRODUCT")
                 
                 for product_uuid, hoeveelheden in self.producten.items():
                     
                     for hoeveelheid in hoeveelheden:
                         
-                        print(f"     {f"{hoeveelheid}":<17} {f"({Hoeveelheid(hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid.BASIS_EENHEDEN else hoeveelheid.waarde * producten[product_uuid].eenheden[hoeveelheid.eenheid], producten[product_uuid].basis_eenheid)})":<8} {producten[product_uuid]}")
+                        print(f"     {f"{hoeveelheid}":<17} {f"{producten[product_uuid].voedingswaarde.calorieën * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid.BASIS_EENHEDEN else hoeveelheid.waarde * producten[product_uuid].eenheden[hoeveelheid.eenheid]) / 100}":>9} {f"{producten[product_uuid].voedingswaarde.eiwitten * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid.BASIS_EENHEDEN else hoeveelheid.waarde * producten[product_uuid].eenheden[hoeveelheid.eenheid]) / 100}":>8} {producten[product_uuid]}")
+                
+                if len(self.gerechten) > 0:
+                    print("\n     los toegevoegde gerechten")
+                
+                for gerecht_uuid, versies in self.gerechten.items():
+                    
+                    for versie_uuid, versie_hoeveelheid  in versies.items():
+                        versie_naam = "standaard" if versie_uuid == "standaard" else gerechten[gerecht_uuid].versies[versie_uuid]["versie_naam"]
+                        print(f"\n     {gerechten[gerecht_uuid]} (versie \"{versie_naam}\")")
+                        print(f"\n     {"HOEVEELHEID":<17} CALORIEËN EIWITTEN PRODUCT")
+                        
+                        aantal_porties = gerechten[gerecht_uuid].porties if versie_uuid == "standaard" else gerechten[gerecht_uuid].versies[versie_uuid].get("porties", gerechten[gerecht_uuid].porties)
+                        
+                        for product_uuid, hoeveelheden in gerechten[gerecht_uuid].producten(versie_uuid).items():
+                    
+                            for hoeveelheid in hoeveelheden:
+                                
+                                print(f"     {f"{hoeveelheid}":<17} {f"{producten[product_uuid].voedingswaarde.calorieën * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid.BASIS_EENHEDEN else hoeveelheid.waarde * producten[product_uuid].eenheden[hoeveelheid.eenheid]) / 100 * versie_hoeveelheid.waarde/aantal_porties}":>9} {f"{producten[product_uuid].voedingswaarde.eiwitten * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid.BASIS_EENHEDEN else hoeveelheid.waarde * producten[product_uuid].eenheden[hoeveelheid.eenheid]) / 100 * versie_hoeveelheid.waarde/aantal_porties}":>8} {producten[product_uuid]}")
+                
+                print(f"\n     {"TOTAAL":<17} {f"{self.voedingswaarde.calorieën}":>9} {f"{self.voedingswaarde.eiwitten}":>8}")
             
             elif opdracht == "weergeef gerechten":
                 
