@@ -647,11 +647,13 @@ class Gerecht(MacroType):
                 
                 producten = Producten.openen()
                 
-                print(f"\n     {"HOEVEELHEID":<17} PRODUCT")
+                print(f"\n     {"HOEVEELHEID":<17} CALORIEËN EIWITTEN PRODUCT")
                 
                 for product_uuid, hoeveelheden in self.producten(versie_uuid).items():
                     for hoeveelheid in hoeveelheden:
-                        print(f"     {f"{hoeveelheid}":<17} {producten[product_uuid]}")
+                        print(f"     {f"{hoeveelheid}":<17} {f"{producten[product_uuid].voedingswaarde.calorieën * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid.BASIS_EENHEDEN else hoeveelheid.waarde * producten[product_uuid].eenheden[hoeveelheid.eenheid]) / 100}":>9} {f"{producten[product_uuid].voedingswaarde.eiwitten * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid.BASIS_EENHEDEN else hoeveelheid.waarde * producten[product_uuid].eenheden[hoeveelheid.eenheid]) / 100}":>8} {producten[product_uuid]}")
+                
+                print(f"\n     {"TOTAAL":<17} {f"{self.voedingswaarde(versie_uuid).calorieën}":>9} {f"{self.voedingswaarde(versie_uuid).eiwitten}":>8}")
             
             elif kies_optie == "weergeef voedingswaarde":
                 
