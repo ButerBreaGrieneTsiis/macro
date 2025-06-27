@@ -163,17 +163,72 @@ class Ingrediënten(MacroTypeDatabank):
                     print("\n>>> geen ingrediënten aanwezig")
                     continue
                 
-                print()
-                hoofdcategorieën = Hoofdcategorieën.openen()
-                categorieën = Categorieën.openen()
-                for hoofdcategorie_uuid, hoofdcategorie in hoofdcategorieën.items():
-                    print(f"     {hoofdcategorie}")
-                    for categorie_uuid, categorie in categorieën.items():
-                        if categorie.hoofdcategorie_uuid == hoofdcategorie_uuid:
-                            print(f"       {categorie}")
-                            for ingrediënt in self.lijst:
-                                if ingrediënt.categorie_uuid == categorie_uuid:
-                                    print(f"         {ingrediënt}")
+                while True:
+                    
+                    opdracht_weergeef = invoer_kiezen(
+                        "MENU GEGEVENS/INGREDIËNT/WEERGEEF",
+                        [
+                            "alle ingrediënten",
+                            "alle ingrediënten onder een hoofdcategorie",
+                            "alle ingrediënten onder een categorie",
+                            ],
+                        stoppen = True,
+                        kies_een = False,
+                        terug_naar = "MENU GEGEVENS/INGREDIËNT",
+                        )
+                    if opdracht_weergeef is STOP:
+                        break
+                    
+                    elif opdracht_weergeef == "alle ingrediënten":
+                        
+                        print()
+                        hoofdcategorieën = Hoofdcategorieën.openen()
+                        categorieën = Categorieën.openen()
+                        for hoofdcategorie_uuid, hoofdcategorie in hoofdcategorieën.items():
+                            print(f"     {hoofdcategorie}")
+                            for categorie_uuid, categorie in categorieën.items():
+                                if categorie.hoofdcategorie_uuid == hoofdcategorie_uuid:
+                                    print(f"       {categorie}")
+                                    for ingrediënt in self.lijst:
+                                        if ingrediënt.categorie_uuid == categorie_uuid:
+                                            print(f"         {ingrediënt}")
+                    
+                    elif opdracht_weergeef == "alle ingrediënten onder een hoofdcategorie":
+                        
+                        hoofdcategorieën = Hoofdcategorieën.openen()
+                        
+                        hoofdcategorie_uuid = hoofdcategorieën.kiezen(
+                            terug_naar = "MENU GEGEVENS/INGREDIËNT/WEERGEEF",
+                            )
+                        
+                        if hoofdcategorie_uuid is STOP:
+                            continue
+                        
+                        print()
+                        categorieën = Categorieën.openen()
+                        for categorie_uuid, categorie in categorieën.items():
+                            if categorie.hoofdcategorie_uuid == hoofdcategorie_uuid:
+                                print(f"     {categorie}")
+                                for ingrediënt in self.lijst:
+                                    if ingrediënt.categorie_uuid == categorie_uuid:
+                                        print(f"       {ingrediënt}")
+                    
+                    elif opdracht_weergeef == "alle ingrediënten onder een categorie":
+                        
+                        categorieën = Categorieën.openen()
+                        
+                        categorie_uuid = categorieën.kiezen(
+                            terug_naar = "MENU GEGEVENS/INGREDIËNT/WEERGEEF",
+                            )
+                        
+                        if categorie_uuid is STOP:
+                            continue
+                        
+                        print()
+                        
+                        for ingrediënt in self.lijst:
+                            if ingrediënt.categorie_uuid == categorie_uuid:
+                                print(f"     {ingrediënt}")
         
         return self
     
