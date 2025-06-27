@@ -91,6 +91,9 @@ class Gerecht(MacroType):
             else:
                 producten_standaard[product_uuid] = [hoeveelheid]
         
+        if len(producten_standaard) == 0:
+            return STOP
+        
         porties = invoer_validatie(
             f"hoeveel porties",
             int,
