@@ -380,6 +380,7 @@ class Dag(MacroType):
                     print(f"\n>>> geen producten of gerechten aanwezig om een voedingswaarde te berekenen")
                     continue
                 
+                print(f"\n     voedingswaarde voor {self}\n")
                 print(self.voedingswaarde)
         
         return self
