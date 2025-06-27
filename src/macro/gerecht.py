@@ -64,6 +64,12 @@ class Gerecht(MacroType):
         
         while True:
             
+            if len(producten_standaard) > 0:
+                print(f"\n     {"HOEVEELHEID":<17} CALORIEËN EIWITTEN PRODUCT")
+                for product_uuid, hoeveelheden in producten_standaard.items():
+                    for hoeveelheid in hoeveelheden:
+                        print(f"     {f"{hoeveelheid}":<17} {f"{producten[product_uuid].voedingswaarde.calorieën * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid.BASIS_EENHEDEN else hoeveelheid.waarde * producten[product_uuid].eenheden[hoeveelheid.eenheid]) / 100}":>9} {f"{producten[product_uuid].voedingswaarde.eiwitten * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid.BASIS_EENHEDEN else hoeveelheid.waarde * producten[product_uuid].eenheden[hoeveelheid.eenheid]) / 100}":>8} {producten[product_uuid]}")
+            
             product_uuid, eenheid = producten.kiezen_product_eenheid(
                 terug_naar = "GERECHT KLAAR",
                 )
