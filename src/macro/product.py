@@ -546,21 +546,102 @@ class Producten(MacroTypeDatabank):
                     print("\n>>> geen producten aanwezig")
                     continue
                 
-                print()
-                hoofdcategorieën = Hoofdcategorieën.openen()
-                categorieën = Categorieën.openen()
-                ingrediënten = Ingrediënten.openen()
-                for hoofdcategorie_uuid, hoofdcategorie in hoofdcategorieën.items():
-                    print(f"     {hoofdcategorie}")
-                    for categorie_uuid, categorie in categorieën.items():
-                        if categorie.hoofdcategorie_uuid == hoofdcategorie_uuid:
-                            print(f"       {categorie}")
-                            for ingrediënt_uuid, ingrediënt in ingrediënten.items():
-                                if ingrediënt.categorie_uuid == categorie_uuid:
-                                    print(f"         {ingrediënt}")
-                                    for product in self.lijst:
-                                        if product.ingrediënt_uuid == ingrediënt_uuid:
-                                            print(f"           {product}")
+                while True:
+                    
+                    opdracht_weergeef = invoer_kiezen(
+                        "MENU GEGEVENS/PRODUCT/WEERGEEF",
+                        [
+                            "alle producten",
+                            "alle producten onder een hoofdcategorie",
+                            "alle producten onder een categorie",
+                            "alle producten onder een ingrediënt",
+                            ],
+                        stoppen = True,
+                        kies_een = False,
+                        terug_naar = "MENU GEGEVENS/PRODUCT",
+                        )
+                    if opdracht_weergeef is STOP:
+                        break
+                    
+                    elif opdracht_weergeef == "alle producten":
+                        
+                        print()
+                        hoofdcategorieën = Hoofdcategorieën.openen()
+                        categorieën = Categorieën.openen()
+                        ingrediënten = Ingrediënten.openen()
+                        for hoofdcategorie_uuid, hoofdcategorie in hoofdcategorieën.items():
+                            print(f"     {hoofdcategorie}")
+                            for categorie_uuid, categorie in categorieën.items():
+                                if categorie.hoofdcategorie_uuid == hoofdcategorie_uuid:
+                                    print(f"       {categorie}")
+                                    for ingrediënt_uuid, ingrediënt in ingrediënten.items():
+                                        if ingrediënt.categorie_uuid == categorie_uuid:
+                                            print(f"         {ingrediënt}")
+                                            for product in self.lijst:
+                                                if product.ingrediënt_uuid == ingrediënt_uuid:
+                                                    print(f"           {product}")
+                    
+                    elif opdracht_weergeef == "alle producten onder een hoofdcategorie":
+                        
+                        hoofdcategorieën = Hoofdcategorieën.openen()
+                        
+                        hoofdcategorie_uuid = hoofdcategorieën.kiezen(
+                            terug_naar = "MENU GEGEVENS/PRODUCT/WEERGEEF",
+                            )
+                        
+                        if hoofdcategorie_uuid is STOP:
+                            continue
+                        
+                        print()
+                        categorieën = Categorieën.openen()
+                        ingrediënten = Ingrediënten.openen()
+                        for categorie_uuid, categorie in categorieën.items():
+                            if categorie.hoofdcategorie_uuid == hoofdcategorie_uuid:
+                                print(f"     {categorie}")
+                                for ingrediënt_uuid, ingrediënt in ingrediënten.items():
+                                    if ingrediënt.categorie_uuid == categorie_uuid:
+                                        print(f"       {ingrediënt}")
+                                        for product in self.lijst:
+                                            if product.ingrediënt_uuid == ingrediënt_uuid:
+                                                print(f"         {product}")
+                    
+                    elif opdracht_weergeef == "alle producten onder een categorie":
+                        
+                        categorieën = Categorieën.openen()
+                        
+                        categorie_uuid = categorieën.kiezen(
+                            terug_naar = "MENU GEGEVENS/PRODUCT/WEERGEEF",
+                            )
+                        
+                        if categorie_uuid is STOP:
+                            continue
+                        
+                        print()
+                        
+                        ingrediënten = Ingrediënten.openen()
+                        for ingrediënt_uuid, ingrediënt in ingrediënten.items():
+                            if ingrediënt.categorie_uuid == categorie_uuid:
+                                print(f"     {ingrediënt}")
+                                for product in self.lijst:
+                                    if product.ingrediënt_uuid == ingrediënt_uuid:
+                                        print(f"       {product}")
+                    
+                    elif opdracht_weergeef == "alle producten onder een ingrediënt":
+                        
+                        ingrediënten = Ingrediënten.openen()
+                        
+                        ingrediënt_uuid = ingrediënten.kiezen(
+                            terug_naar = "MENU GEGEVENS/PRODUCT/WEERGEEF",
+                            )
+                        
+                        if ingrediënt_uuid is STOP:
+                            continue
+                        
+                        print()
+                        
+                        for product in self.lijst:
+                            if product.ingrediënt_uuid == ingrediënt_uuid:
+                                print(f"     {product}")
         
         return self
     
