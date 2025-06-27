@@ -201,6 +201,10 @@ class Dag(MacroType):
             
             elif opdracht == "verwijderen producten":
                 
+                if len(self.producten) == 0:
+                    print("\n>>> geen producten aanwezig om te verwijderen")
+                    continue
+                
                 producten = Producten.openen()
                 
                 kies_optie = invoer_kiezen(
@@ -220,6 +224,10 @@ class Dag(MacroType):
                 del self.producten[product_uuid][ihoeveelheid]
             
             elif opdracht == "verwijderen gerechten":
+                
+                if len(self.gerechten) == 0:
+                    print("\n>>> geen gerechten aanwezig om te verwijderen")
+                    continue
                 
                 gerechten = Gerechten.openen()
                 
@@ -241,6 +249,10 @@ class Dag(MacroType):
                 del self.gerechten[gerecht_uuid][versie_uuid]
             
             elif opdracht == "aanpassen hoeveelheid producten":
+                
+                if len(self.producten) == 0:
+                    print("\n>>> geen producten aanwezig om de hoeveelheid van aan te passen")
+                    continue
                 
                 producten = Producten.openen()
                 
@@ -277,6 +289,10 @@ class Dag(MacroType):
             
             elif opdracht == "aanpassen porties gerechten":
                 
+                if len(self.gerechten) == 0:
+                    print("\n>>> geen gerechten aanwezig om het aantal porties van aan te passen")
+                    continue
+                
                 gerechten = Gerechten.openen()
                 
                 kies_optie = invoer_kiezen(
@@ -305,7 +321,7 @@ class Dag(MacroType):
             elif opdracht == "weergeef producten":
                 
                 if len(self.producten) == 0:
-                    print(f">>> er zijn geen producten voor {self}")
+                    print(f"\n>>> geen producten aanwezig om te weergeven")
                     continue
                 
                 producten = Producten.openen()
@@ -344,7 +360,7 @@ class Dag(MacroType):
             elif opdracht == "weergeef gerechten":
                 
                 if len(self.gerechten) == 0:
-                    print(f"\n>>> er zijn geen gerechten voor {self}")
+                    print(f"\n>>> geen gerechten aanwezig om te weergeven")
                     continue
                 
                 gerechten = Gerechten.openen()
@@ -361,7 +377,7 @@ class Dag(MacroType):
             elif opdracht == "weergeef voedingswaarde":
                 
                 if len(self.producten) == 0 and len(self.gerechten) == 0:
-                    print(f"\n>>> er zijn geen producten of gerechten voor {self}")
+                    print(f"\n>>> geen producten of gerechten aanwezig om een voedingswaarde te berekenen")
                     continue
                 
                 print(self.voedingswaarde)
