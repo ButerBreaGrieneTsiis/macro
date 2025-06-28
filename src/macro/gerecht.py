@@ -1015,17 +1015,72 @@ class Gerechten(MacroTypeDatabank):
                     print("\n>>> geen gerechten aanwezig")
                     continue
                 
-                print()
-                hoofdcategorieën = HoofdcategorieënGerecht.openen()
-                categorieën = CategorieënGerecht.openen()
-                for hoofdcategorie_uuid, hoofdcategorie in hoofdcategorieën.items():
-                    print(f"     {hoofdcategorie}")
-                    for categorie_uuid, categorie in categorieën.items():
-                        if categorie.hoofdcategorie_uuid == hoofdcategorie_uuid:
-                            print(f"       {categorie}")
-                            for gerecht in self.lijst:
-                                if gerecht.categorie_uuid == categorie_uuid:
-                                    print(f"         {gerecht}")
+                while True:
+                    
+                    opdracht_weergeef = invoer_kiezen(
+                        "MENU GEGEVENS/GERECHT/WEERGEEF",
+                        [
+                            "alle gerechten",
+                            "alle gerechten onder een hoofdcategorie",
+                            "alle gerechten onder een categorie",
+                            ],
+                        stoppen = True,
+                        kies_een = False,
+                        terug_naar = "MENU GEGEVENS/GERECHT",
+                        )
+                    if opdracht_weergeef is STOP:
+                        break
+                    
+                    elif opdracht_weergeef == "alle gerechten":
+                        
+                        print()
+                        hoofdcategorieën = HoofdcategorieënGerecht.openen()
+                        categorieën = CategorieënGerecht.openen()
+                        for hoofdcategorie_uuid, hoofdcategorie in hoofdcategorieën.items():
+                            print(f"     {hoofdcategorie}")
+                            for categorie_uuid, categorie in categorieën.items():
+                                if categorie.hoofdcategorie_uuid == hoofdcategorie_uuid:
+                                    print(f"       {categorie}")
+                                    for gerecht in self.lijst:
+                                        if gerecht.categorie_uuid == categorie_uuid:
+                                            print(f"         {gerecht}")
+                    
+                    elif opdracht_weergeef == "alle gerechten onder een hoofdcategorie":
+                        
+                        hoofdcategorieën = HoofdcategorieënGerecht.openen()
+                        
+                        hoofdcategorie_uuid = hoofdcategorieën.kiezen(
+                            terug_naar = "MENU GEGEVENS/GERECHT/WEERGEEF",
+                            )
+                        
+                        if hoofdcategorie_uuid is STOP:
+                            continue
+                        
+                        print()
+                        categorieën = CategorieënGerecht.openen()
+                        for categorie_uuid, categorie in categorieën.items():
+                            if categorie.hoofdcategorie_uuid == hoofdcategorie_uuid:
+                                print(f"     {categorie}")
+                                for gerecht in self.lijst:
+                                        if gerecht.categorie_uuid == categorie_uuid:
+                                            print(f"       {gerecht}")
+                    
+                    elif opdracht_weergeef == "alle gerechten onder een categorie":
+                        
+                        categorieën = CategorieënGerecht.openen()
+                        
+                        categorie_uuid = categorieën.kiezen(
+                            terug_naar = "MENU GEGEVENS/GERECHT/WEERGEEF",
+                            )
+                        
+                        if categorie_uuid is STOP:
+                            continue
+                        
+                        print()
+                        
+                        for gerecht in self.lijst:
+                            if gerecht.categorie_uuid == categorie_uuid:
+                                print(f"     {gerecht}")
         
         return self
     
