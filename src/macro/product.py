@@ -723,7 +723,7 @@ class Producten(MacroTypeDatabank):
                         "product op naam, ingrediënt of categorie, of maak een nieuwe",
                         [
                             "selecteren product",
-                            "zoek op naam",
+                            "zoek op productnaam",
                             ],
                         stoppen = True,
                         terug_naar = terug_naar,
@@ -733,7 +733,7 @@ class Producten(MacroTypeDatabank):
                         "product op naam, ingrediënt of categorie, of maak een nieuwe",
                         [
                             "selecteren product",
-                            "zoek op naam",
+                            "zoek op productnaam",
                             "nieuw product",
                             ],
                         stoppen = True,
@@ -786,7 +786,7 @@ class Producten(MacroTypeDatabank):
                     
                     return product_uuid
                 
-                if kies_optie == "zoek op naam":
+                if kies_optie == "zoek op productnaam":
                     
                     print("\ngeef een zoekterm op")
                     
