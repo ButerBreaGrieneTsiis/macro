@@ -392,6 +392,9 @@ class Product(MacroType):
                     "weergeef merk",
                     "weergeef voedingswaarde",
                     "weergeef eenheden",
+                    "weergeef hoofdcategorie",
+                    "weergeef categorie",
+                    "weergeef ingrediënt",
                     ],
                 stoppen = True,
                 terug_naar = terug_naar,
@@ -416,6 +419,18 @@ class Product(MacroType):
                 else:
                     print(f"\n     EENHEID          HOEVEELHEID CALORIEËN")
                     [print(f"     {f"{Hoeveelheid(1, eenheid)}":<17}{f"{Hoeveelheid(waarde, self.basis_eenheid)}":<11} {self.voedingswaarde.calorieën * waarde / 100.0}") for eenheid, waarde in self.eenheden.items()]
+            
+            elif kies_optie == "weergeef hoofdcategorie":
+                
+                print(f"\n     {self.hoofdcategorie}")
+            
+            elif kies_optie == "weergeef categorie":
+                
+                print(f"\n     {self.categorie}")
+            
+            elif kies_optie == "weergeef ingrediënt":
+                
+                print(f"\n     {self.ingrediënt}")
     
     def bewerk_eenheden(self) -> Eenheid:
         
@@ -771,6 +786,10 @@ class Producten(MacroTypeDatabank):
                         terug_naar = terug_naar,
                         )
                     if ingrediënt_uuid is STOP:
+                        return STOP
+                    
+                    if len([product for product in self.lijst if product.ingrediënt_uuid == ingrediënt_uuid]) == 0:
+                        print(f"\n>>> geen producten aanwezig onder {ingrediënten[ingrediënt_uuid]}")
                         return STOP
                     
                     product_uuid = invoer_kiezen(
