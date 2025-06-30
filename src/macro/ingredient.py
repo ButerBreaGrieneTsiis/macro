@@ -365,6 +365,11 @@ class Ingrediënten(MacroTypeDatabank):
                         return STOP
                     
                     categorieën = Categorieën.openen()
+                    
+                    if len([categorie for categorie in categorieën.lijst if categorie.hoofdcategorie_uuid == hoofdcategorie_uuid]) == 0:
+                        print(f"\n>>> geen categorieën aanwezig onder {hoofdcategorieën[hoofdcategorie_uuid]}")
+                        return STOP
+                    
                     categorie_uuid = invoer_kiezen(
                         "categorie",
                         {f"{categorie}": categorie_uuid for categorie_uuid, categorie in categorieën.items() if categorie.hoofdcategorie_uuid == hoofdcategorie_uuid},
@@ -372,6 +377,10 @@ class Ingrediënten(MacroTypeDatabank):
                         terug_naar = terug_naar,
                         )
                     if categorie_uuid is STOP:
+                        return STOP
+                    
+                    if len([ingrediënt for ingrediënt in self.lijst if ingrediënt.categorie_uuid == categorie_uuid]) == 0:
+                        print(f"\n>>> geen ingrediënten aanwezig onder {categorieën[categorie_uuid]}")
                         return STOP
                     
                     ingrediënt_uuid = invoer_kiezen(

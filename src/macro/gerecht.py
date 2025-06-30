@@ -1196,6 +1196,11 @@ class Gerechten(MacroTypeDatabank):
                         return STOP
                     
                     categorieën_gerecht = CategorieënGerecht.openen()
+                    
+                    if len([categorie for categorie in categorieën_gerecht.lijst if categorie.hoofdcategorie_uuid == hoofdcategorie_uuid]) == 0:
+                        print(f"\n>>> geen categorieën aanwezig onder {hoofdcategorieën_gerecht[hoofdcategorie_uuid]}")
+                        return STOP
+                    
                     categorie_uuid = invoer_kiezen(
                         "categorie",
                         {f"{categorie}": categorie_uuid for categorie_uuid, categorie in categorieën_gerecht.items() if categorie.hoofdcategorie_uuid == hoofdcategorie_uuid},
@@ -1203,6 +1208,10 @@ class Gerechten(MacroTypeDatabank):
                         terug_naar = terug_naar,
                         )
                     if categorie_uuid is STOP:
+                        return STOP
+                    
+                    if len([gerecht for gerecht in self.lijst if gerecht.categorie_uuid == categorie_uuid]) == 0:
+                        print(f"\n>>> geen gerechten aanwezig onder {categorieën_gerecht[categorie_uuid]}")
                         return STOP
                     
                     gerecht_uuid = invoer_kiezen(

@@ -428,6 +428,7 @@ class Categorieën(MacroTypeDatabank):
         ) -> str | Stop:
         
         while True:
+            
             if len(self) == 0:
                 
                 if uitsluiten_nieuw:
@@ -488,6 +489,10 @@ class Categorieën(MacroTypeDatabank):
                         uitsluiten_nieuw = True,
                         )
                     if hoofdcategorie_uuid is STOP:
+                        return STOP
+                    
+                    if len([categorie for categorie in self.lijst if categorie.hoofdcategorie_uuid == hoofdcategorie_uuid]) == 0:
+                        print(f"\n>>> geen categorieën aanwezig onder {hoofdcategorieën[hoofdcategorie_uuid]}")
                         return STOP
                     
                     categorie_uuid = invoer_kiezen(
