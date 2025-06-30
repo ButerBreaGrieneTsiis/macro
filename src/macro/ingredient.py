@@ -101,6 +101,36 @@ class Ingrediënt(MacroType):
                 
                 self.categorie_uuid = categorie_uuid
     
+    def weergeef(
+        self,
+        terug_naar: str,
+        ):
+        
+        print(f"selecteren wat te weergeven")
+        
+        while True:
+        
+            kies_optie = invoer_kiezen(
+                "veld",
+                [
+                    "weergeef hoofdcategorie",
+                    "weergeef categorie",
+                    ],
+                stoppen = True,
+                terug_naar = terug_naar,
+                )
+            
+            if kies_optie is STOP:
+                break
+            
+            elif kies_optie == "weergeef hoofdcategorie":
+                
+                print(f"\n     {self.hoofdcategorie}")
+            
+            elif kies_optie == "weergeef categorie":
+                
+                print(f"\n     {self.categorie}")
+    
     @property
     def categorie(self) -> Categorie:
         categorieën = Categorieën.openen()
@@ -129,6 +159,7 @@ class Ingrediënten(MacroTypeDatabank):
                 [
                     "nieuw ingrediënt",
                     "selecteer en bewerk",
+                    "selecteer en weergeef",
                     "weergeef ingrediënten",
                     ],
                 stoppen = True,
@@ -154,6 +185,19 @@ class Ingrediënten(MacroTypeDatabank):
                     continue
                 
                 self[ingrediënt_uuid].bewerk(
+                    terug_naar = "MENU GEGEVENS/INGREDIËNT",
+                    )
+            
+            elif opdracht == "selecteer en weergeef":
+                
+                ingrediënt_uuid = self.kiezen(
+                    terug_naar = "MENU GEGEVENS/INGREDIËNT",
+                    uitsluiten_nieuw = True,
+                    )
+                if ingrediënt_uuid is STOP:
+                    continue
+                
+                self[ingrediënt_uuid].weergeef(
                     terug_naar = "MENU GEGEVENS/INGREDIËNT",
                     )
             
