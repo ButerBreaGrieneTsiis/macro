@@ -5,7 +5,7 @@ from uuid import uuid4
 from grienetsiis import invoer_kiezen, invoer_validatie, ObjectWijzer, STOP, Stop
 
 from .categorie import Hoofdcategorie, Categorie, HoofdcategorieënGerecht, CategorieënGerecht
-from .macrotype import MacroType, MacroTypeDatabank, Hoeveelheid
+from .macrotype import MacroType, MacroTypeDatabank, Hoeveelheid, Eenheid
 from .product import Producten
 from .voedingswaarde import Voedingswaarde
 
@@ -65,11 +65,19 @@ class Gerecht(MacroType):
         while True:
             
             if len(producten_standaard) > 0:
+                
+                calorieën_totaal    = Hoeveelheid(0, Eenheid("kcal"))
+                eiwitten_totaal     = Hoeveelheid(0, Eenheid("g"))
+                
                 print(f"\n     {"HOEVEELHEID":<17} CALORIEËN EIWITTEN PRODUCT")
                 for product_uuid, hoeveelheden in producten_standaard.items():
                     for hoeveelheid in hoeveelheden:
                         print(f"     {f"{hoeveelheid}":<17} {f"{producten[product_uuid].voedingswaarde.calorieën * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid.BASIS_EENHEDEN else hoeveelheid.waarde * producten[product_uuid].eenheden[hoeveelheid.eenheid]) / 100}":>9} {f"{producten[product_uuid].voedingswaarde.eiwitten * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid.BASIS_EENHEDEN else hoeveelheid.waarde * producten[product_uuid].eenheden[hoeveelheid.eenheid]) / 100}":>8} {producten[product_uuid]}")
-            
+                        calorieën_totaal += producten[product_uuid].voedingswaarde.calorieën * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid.BASIS_EENHEDEN else hoeveelheid.waarde * producten[product_uuid].eenheden[hoeveelheid.eenheid]) / 100
+                        eiwitten_totaal  += producten[product_uuid].voedingswaarde.eiwitten * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid.BASIS_EENHEDEN else hoeveelheid.waarde * producten[product_uuid].eenheden[hoeveelheid.eenheid]) / 100
+                
+                print(f"\n     {"TOTAAL":<17} {f"{calorieën_totaal}":>9} {f"{eiwitten_totaal}":>8}")
+                
             product_uuid, eenheid = producten.kiezen_product_eenheid(
                 terug_naar = "GERECHT KLAAR",
                 )
