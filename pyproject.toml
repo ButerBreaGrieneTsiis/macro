@@ -6,5 +6,5 @@ authors = [
     ]
 
 dependencies = [
-    "grienetsiis @ git+https://github.com/ButerBreaGrieneTsiis/grienetsiis.git@v1.4.5",
+    "grienetsiis @ git+https://github.com/ButerBreaGrieneTsiis/grienetsiis.git@v1.4.6",
 ]

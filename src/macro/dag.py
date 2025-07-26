@@ -114,6 +114,7 @@ class Dag(MacroType):
                     "weergeef producten",
                     "weergeef gerechten",
                     "weergeef voedingswaarde",
+                    "kopiëren producten van andere dag",
                     ],
                 stoppen = True,
                 kies_een = False,
@@ -382,7 +383,135 @@ class Dag(MacroType):
                 
                 print(f"\n     voedingswaarde voor {self}\n")
                 print(self.voedingswaarde)
-        
+            
+            elif opdracht == "kopiëren producten van andere dag":
+                
+                if self.datum == dt.date.today() - dt.timedelta(days = 2):
+                
+                    opdracht_dag = invoer_kiezen(
+                        "dag om van te kopiëren",
+                        [
+                            "vandaag",
+                            "gisteren",
+                            "aangepast",
+                            ],
+                        stoppen = True,
+                        terug_naar = f"MENU DAG {f"{self.dag}".upper()}",
+                        )
+                
+                elif self.datum == dt.date.today() - dt.timedelta(days = 1):
+                
+                    opdracht_dag = invoer_kiezen(
+                        "dag om van te kopiëren",
+                        [
+                            "vandaag",
+                            "eergisteren",
+                            "aangepast",
+                            ],
+                        stoppen = True,
+                        terug_naar = f"MENU DAG {f"{self.dag}".upper()}",
+                        )
+                
+                elif self.datum == dt.date.today():
+                    
+                    opdracht_dag = invoer_kiezen(
+                        "dag om van te kopiëren",
+                        [
+                            "gisteren",
+                            "eergisteren",
+                            "aangepast",
+                            ],
+                        stoppen = True,
+                        terug_naar = f"MENU DAG {f"{self.dag}".upper()}",
+                        )
+                
+                elif self.datum == dt.date.today() + dt.timedelta(days = 1):
+                    
+                    opdracht_dag = invoer_kiezen(
+                        "dag om van te kopiëren",
+                        [
+                            "vandaag",
+                            "gisteren",
+                            "eergisteren",
+                            "aangepast",
+                            ],
+                        stoppen = True,
+                        terug_naar = f"MENU DAG {f"{self.dag}".upper()}",
+                        )
+                
+                elif self.datum == dt.date.today() + dt.timedelta(days = 2):
+                    
+                    opdracht_dag = invoer_kiezen(
+                        "dag om van te kopiëren",
+                        [
+                            "vandaag",
+                            "gisteren",
+                            "eergisteren",
+                            "morgen",
+                            "aangepast",
+                            ],
+                        stoppen = True,
+                        terug_naar = f"MENU DAG {f"{self.dag}".upper()}",
+                        )
+                
+                else:
+                    
+                    opdracht_dag = invoer_kiezen(
+                        "dag om van te kopiëren",
+                        [
+                            "vandaag",
+                            "gisteren",
+                            "eergisteren",
+                            "morgen",
+                            "overmorgen",
+                            "aangepast",
+                            ],
+                        stoppen = True,
+                        terug_naar = f"MENU DAG {f"{self.dag}".upper()}",
+                        )
+                
+                if opdracht_dag is STOP:
+                    continue
+                
+                andere_dag = self.openen(opdracht_dag)
+                
+                if andere_dag.datum == self.datum:
+                    print(f"\n>>> kan niet producten kopiëren van en naar dezelfde dag")
+                    continue
+                
+                if len(andere_dag.producten) == 0:
+                    print(f"\n>>> geen producten aanwezig bij {andere_dag}")
+                    continue
+                
+                producten = Producten.openen()
+                
+                kies_optie = invoer_kiezen(
+                    "één of meerdere product(en) om te kopiëren",
+                    {f"{f"{hoeveelheid}":<17} {producten[product_uuid]}": (product_uuid, hoeveelheid) for product_uuid, hoeveelheden in andere_dag.producten.items() for hoeveelheid in hoeveelheden},
+                    stoppen = True,
+                    terug_naar = f"MENU DAG {f"{self.dag}".upper()}",
+                    meerdere_keuzes = True,
+                    )
+                
+                if kies_optie is STOP:
+                    continue
+                
+                print("")
+                for product_uuid, hoeveelheid in kies_optie:
+                    
+                    if product_uuid in self.producten.keys():
+                        for ihoeveelheid_aanwezig, hoeveelheid_aanwezig in enumerate(self.producten[product_uuid]):
+                            if hoeveelheid == hoeveelheid_aanwezig:
+                                self.producten[product_uuid][ihoeveelheid_aanwezig] = hoeveelheid + hoeveelheid_aanwezig
+                                break
+                        else:
+                            self.producten[product_uuid].append(hoeveelheid)
+                    else:
+                        self.producten[product_uuid] = [hoeveelheid]
+                    
+                    print(f">>> {hoeveelheid} toegevoegd van {producten[product_uuid]}")
+                
+            
         return self
         
     @property
