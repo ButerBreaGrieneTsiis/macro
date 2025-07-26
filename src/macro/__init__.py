@@ -6,4 +6,4 @@ from .macrotype import Eenheid
 from .product import Product, Producten
 
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"
