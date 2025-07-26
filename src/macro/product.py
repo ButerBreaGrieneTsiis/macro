@@ -357,7 +357,10 @@ class Product(MacroType):
             
             elif kies_optie == "bewerk voedingswaarde":
                 
-                voedingswaarde = Voedingswaarde.nieuw()
+                print(f"\nhuidige voedingswaarde voor {Hoeveelheid(100, self.basis_eenheid)}\n")
+                print(self.voedingswaarde)
+                
+                voedingswaarde = Voedingswaarde.nieuw(self.basis_eenheid)
                 self.voedingswaarde = voedingswaarde
             
             elif kies_optie == "bewerk eenheden":

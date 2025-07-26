@@ -157,7 +157,7 @@ class Voedingswaarde:
         
         while True:
             
-            print(f"vul de voedingswaarde in per {Hoeveelheid(100, basis_eenheid)}")
+            print(f"vul de voedingswaarde in per {Hoeveelheid(100, basis_eenheid)}\n")
             
             calorieën = invoer_validatie(
                 "calorieën",
