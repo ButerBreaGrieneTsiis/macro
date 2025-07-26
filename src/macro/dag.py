@@ -341,11 +341,11 @@ class Dag(MacroType):
                 if len(self.gerechten) > 0:
                     print("\n     los toegevoegde gerechten")
                 
-                for gerecht_uuid, versies in self.gerechten.items():
+                for gerecht_uuid, versie_dict in self.gerechten.items():
                     
-                    for versie_uuid, versie_hoeveelheid  in versies.items():
+                    for versie_uuid, versie_hoeveelheid  in versie_dict.items():
                         versie_naam = "standaard" if versie_uuid == "standaard" else gerechten[gerecht_uuid].versies[versie_uuid]["versie_naam"]
-                        print(f"\n     {gerechten[gerecht_uuid]} (versie \"{versie_naam}\")")
+                        print(f"\n     {versie_hoeveelheid} van {gerechten[gerecht_uuid]} (versie \"{versie_naam}\")")
                         print(f"\n     {"HOEVEELHEID":<17} CALORIEËN EIWITTEN PRODUCT")
                         
                         aantal_porties = gerechten[gerecht_uuid].porties if versie_uuid == "standaard" else gerechten[gerecht_uuid].versies[versie_uuid].get("porties", gerechten[gerecht_uuid].porties)
@@ -369,11 +369,11 @@ class Dag(MacroType):
                 print(f"\n     HOEVEELHEID GERECHT")
                 
                 for gerecht_uuid, versie_dict in self.gerechten.items():
-                    for versie_uuid, hoeveelheid in versie_dict.items():
+                    for versie_uuid, versie_hoeveelheid in versie_dict.items():
                         
                         versie_naam = "standaard" if versie_uuid == "standaard" else gerechten[gerecht_uuid].versies[versie_uuid]["versie_naam"]
                         
-                        print(f"     {f"{hoeveelheid}":<11} {gerechten[gerecht_uuid]} (versie \"{versie_naam}\")")
+                        print(f"     {f"{versie_hoeveelheid}":<11} {gerechten[gerecht_uuid]} (versie \"{versie_naam}\")")
             
             elif opdracht == "weergeef voedingswaarde":
                 
