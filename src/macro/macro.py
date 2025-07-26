@@ -1,5 +1,7 @@
 from grienetsiis import invoer_kiezen, STOP
 
+
+from ._version import __version__
 from .categorie import Hoofdcategorieën, Categorieën, HoofdcategorieënGerecht, CategorieënGerecht
 from .dag import Dag
 from .gerecht import Gerechten
@@ -7,7 +9,21 @@ from .ingredient import Ingrediënten
 from .product import Merken, Producten
 
 
+def welkomstscherm():
+    
+    print(f"""
+`7MMM.     ,MMF'                                  
+  MMMb    dPMM                                    
+  M YM   ,M MM   ,6"Yb.  ,p6"bo `7Mb,od8 ,pW"Wq.  
+  M  Mb  M' MM  8)   MM 6M'  OO   MM' "'6W'   `Wb 
+  M  YM.P'  MM   ,pm9MM 8M        MM    8M     M8 
+  M  `YM'   MM  8M   MM YM.    ,  MM    YA.   ,A9 
+.JML. `'  .JMML.`Moo9^Yo.YMbmd' .JMML.   `Ybmd9'  
+                                     versie {__version__}""")
+
 def uitvoeren():
+    
+    welkomstscherm()
     
     while True:
         
