@@ -766,6 +766,33 @@ class Gerecht(MacroType):
         
         while True:
             
+            if len(versie) > 0:
+                
+                print("\ntot nu toe aangebrachte wijzigingen voor deze versie\n")
+                
+                if "porties" in versie.keys():
+                    print("       porties")
+                    print(f"         {self.porties} porties --> {versie["porties"]} porties")
+                
+                if "verwijderd" in versie.keys():
+                    print("       verwijderd")
+                    for product_uuid, hoeveelheden in versie["verwijderd"].items():
+                        for hoeveelheid in hoeveelheden:
+                            print(f"         {f"{hoeveelheid}":<17} {producten[product_uuid]}")
+                
+                if "toegevoegd" in versie.keys():
+                    print("       toegevoegd")
+                    for product_uuid, hoeveelheden in versie["toegevoegd"].items():
+                        for hoeveelheid in hoeveelheden:
+                            print(f"         {f"{hoeveelheid}":<17} {producten[product_uuid]}")
+                
+                if "hoeveelheid" in versie.keys():
+                    print("       hoeveelheid aangepast")
+                    for product_uuid, hoeveelheden in versie["hoeveelheid"].items():
+                        for hoeveelheid in hoeveelheden:
+                            hoeveelheid_oud = next(hoeveelheid_oud for hoeveelheid_oud in self.producten_standaard[product_uuid] if hoeveelheid_oud == hoeveelheid)
+                            print(f"         {f"{hoeveelheid_oud}":<17} --> {f"{hoeveelheid}":<17} {producten[product_uuid]}")
+            
             kies_optie = invoer_kiezen(
                 f"MENU NIEUWE VERSIE {f"{self}".upper()}",
                 [
