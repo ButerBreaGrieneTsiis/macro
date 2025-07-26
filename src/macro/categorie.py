@@ -396,9 +396,9 @@ class Categorieën(MacroTypeDatabank):
                 
                 if uitsluiten_nieuw:
                     kies_optie = invoer_kiezen(
-                        "bestaande hoofdcategorie of maak een nieuwe",
+                        "bestaande categorie of maak een nieuwe",
                         [
-                            "selecteren hoofdcategorie",
+                            "selecteren categorie",
                             "zoek op categorienaam",
                             ],
                         stoppen = True,
