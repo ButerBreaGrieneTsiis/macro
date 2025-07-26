@@ -855,12 +855,17 @@ class Producten(MacroTypeDatabank):
                         continue
                     
                     if uuid in ingrediënten_mogelijk:
+                        
+                        if len([product for product in self.lijst if product.ingrediënt_uuid == uuid]) == 0:
+                            print(f"\n>>> geen producten aanwezig onder {ingrediënten[uuid]}")
+                            continue
+                        
                         product_uuid = invoer_kiezen(
-                        "product",
-                        {f"{product}": product_uuid for product_uuid, product in self.items() if product.ingrediënt_uuid == uuid},
-                        stoppen = True,
-                        terug_naar = terug_naar,
-                        )
+                            "product",
+                            {f"{product}": product_uuid for product_uuid, product in self.items() if product.ingrediënt_uuid == uuid},
+                            stoppen = True,
+                            terug_naar = terug_naar,
+                            )
                         if product_uuid is STOP:
                             return STOP
                     else:
