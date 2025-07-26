@@ -77,7 +77,7 @@ class Gerecht(MacroType):
                         eiwitten_totaal  += producten[product_uuid].voedingswaarde.eiwitten * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid.BASIS_EENHEDEN else hoeveelheid.waarde * producten[product_uuid].eenheden[hoeveelheid.eenheid]) / 100
                 
                 print(f"\n     {"TOTAAL":<17} {f"{calorieën_totaal}":>9} {f"{eiwitten_totaal}":>8}")
-                
+            
             product_uuid, eenheid = producten.kiezen_product_eenheid(
                 terug_naar = "GERECHT KLAAR",
                 )
@@ -637,7 +637,7 @@ class Gerecht(MacroType):
         print(f"selecteren wat te weergeven")
         
         while True:
-        
+            
             kies_optie = invoer_kiezen(
                 "veld",
                 [
@@ -664,13 +664,17 @@ class Gerecht(MacroType):
                 
                 producten = Producten.openen()
                 
+                versie_naam = "standaard" if versie_uuid == "standaard" else self.versies[versie_uuid]["versie_naam"]
+                print(f"\n     {self} (versie \"{versie_naam}\")")
                 print(f"\n     {"HOEVEELHEID":<17} CALORIEËN EIWITTEN PRODUCT")
                 
                 for product_uuid, hoeveelheden in self.producten(versie_uuid).items():
                     for hoeveelheid in hoeveelheden:
                         print(f"     {f"{hoeveelheid}":<17} {f"{producten[product_uuid].voedingswaarde.calorieën * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid.BASIS_EENHEDEN else hoeveelheid.waarde * producten[product_uuid].eenheden[hoeveelheid.eenheid]) / 100}":>9} {f"{producten[product_uuid].voedingswaarde.eiwitten * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid.BASIS_EENHEDEN else hoeveelheid.waarde * producten[product_uuid].eenheden[hoeveelheid.eenheid]) / 100}":>8} {producten[product_uuid]}")
                 
-                print(f"\n     {"TOTAAL":<17} {f"{self.voedingswaarde(versie_uuid).calorieën}":>9} {f"{self.voedingswaarde(versie_uuid).eiwitten}":>8}")
+                aantal_porties = self.porties if versie_uuid == "standaard" else self.versies[versie_uuid].get("porties", self.porties)
+                print(f"\n     {"TOTAAL":<17} {f"{self.voedingswaarde(versie_uuid).calorieën*aantal_porties}":>9} {f"{self.voedingswaarde(versie_uuid).eiwitten*aantal_porties}":>8} (voor {aantal_porties} porties)")
+                print(f"     {"PER PORTIE":<17} {f"{self.voedingswaarde(versie_uuid).calorieën}":>9} {f"{self.voedingswaarde(versie_uuid).eiwitten}":>8}")
             
             elif kies_optie == "weergeef voedingswaarde":
                 
@@ -1102,6 +1106,8 @@ class Gerechten(MacroTypeDatabank):
         if gerecht is STOP:
             return STOP
         
+        gerecht_uuid = str(uuid4())
+        
         if invoer_kiezen(
             "toevoegen versie",
             {
@@ -1111,10 +1117,9 @@ class Gerechten(MacroTypeDatabank):
             kies_een = False,
             ):
             gerecht.nieuwe_versie(
-                terug_naar = terug_naar,
+                gerecht_uuid = gerecht_uuid,
                 )
         
-        gerecht_uuid = str(uuid4())
         self[gerecht_uuid] = gerecht
         
         self.opslaan()
