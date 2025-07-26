@@ -252,80 +252,19 @@ class Hoofdcategorieën(MacroTypeDatabank):
             
             else:
                 
-                if uitsluiten_nieuw:
-                    kies_optie = invoer_kiezen(
-                        "bestaande hoofdcategorie of maak een nieuwe",
-                        [
-                            "selecteren hoofdcategorie",
-                            "zoek op hoofdcategorienaam",
-                            ],
-                        stoppen = True,
-                        terug_naar = terug_naar,
-                        )
+                hoofdcategorie_uuid = invoer_kiezen(
+                    "hoofdcategorie",
+                    {f"{hoofdcategorie}": hoofdcategorie_uuid for hoofdcategorie_uuid, hoofdcategorie in self.items()},
+                    stoppen = True,
+                    terug_naar = terug_naar,
+                    )
                 
-                else:
-                    kies_optie = invoer_kiezen(
-                        "bestaande hoofdcategorie of maak een nieuwe",
-                        [
-                            "selecteren hoofdcategorie",
-                            "zoek op hoofdcategorienaam",
-                            "nieuwe hoofdcategorie",
-                            ],
-                        stoppen = True,
-                        terug_naar = terug_naar,
-                        )
-                
-                if kies_optie is STOP:
+                if hoofdcategorie_uuid is STOP: 
                     return STOP
                 
-                elif kies_optie == "selecteren hoofdcategorie":
-                    
-                    hoofdcategorie_uuid = invoer_kiezen(
-                        "hoofdcategorie",
-                        {f"{hoofdcategorie}": hoofdcategorie_uuid for hoofdcategorie_uuid, hoofdcategorie in self.items()},
-                        stoppen = True,
-                        terug_naar = terug_naar,
-                        )
-                    
-                    if hoofdcategorie_uuid is STOP: 
-                        continue
-                    
-                    print(f"\n>>> {self[hoofdcategorie_uuid]} gekozen")
-                    
-                    return hoofdcategorie_uuid
+                print(f"\n>>> {self[hoofdcategorie_uuid]} gekozen")
                 
-                elif kies_optie == "zoek op hoofdcategorienaam":
-                    
-                    print("\ngeef een zoekterm op")
-                    
-                    zoekterm = invoer_validatie(
-                        "hoofdcategorienaam",
-                        str,
-                        kleine_letters = True,
-                        )
-                    
-                    hoofdcategorieën_mogelijk = self.zoeken(zoekterm)
-                    if len(hoofdcategorieën_mogelijk) == 0:
-                        print(f"\n>>> zoekterm \"{zoekterm}\" levert geen hoofdcategorieën op")
-                        continue
-                    
-                    print(f"\n>>> {len(hoofdcategorieën_mogelijk)} hoofdcategorie{"ën" if len(hoofdcategorieën_mogelijk) > 1 else ""} gevonden")
-                    hoofdcategorie_uuid = invoer_kiezen(
-                        "hoofdcategorie",
-                        {self[hoofdcategorie_uuid]: hoofdcategorie_uuid for hoofdcategorie_uuid in hoofdcategorieën_mogelijk},
-                        stoppen = True,
-                        terug_naar = terug_naar,
-                        )
-                    
-                    if hoofdcategorie_uuid is STOP:
-                        continue
-                    
-                    print(f"\n>>> {self[hoofdcategorie_uuid]} gekozen")
-                    
-                    return hoofdcategorie_uuid
-                
-                if kies_optie == "nieuwe hoofdcategorie":
-                    return self.nieuw()
+                return hoofdcategorie_uuid
     
     def zoeken(
         self,
