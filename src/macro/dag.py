@@ -321,8 +321,8 @@ class Dag(MacroType):
             
             elif opdracht == "weergeef producten":
                 
-                if len(self.producten) == 0:
-                    print(f"\n>>> geen producten aanwezig om te weergeven")
+                if len(self.producten) == 0 and len(self.gerechten) == 0:
+                    print(f"\n>>> geen producten of gerechten aanwezig om te weergeven")
                     continue
                 
                 producten = Producten.openen()
@@ -332,14 +332,18 @@ class Dag(MacroType):
                     print("\n     los toegevoegde producten")
                     print(f"\n     {"HOEVEELHEID":<17} CALORIEËN EIWITTEN PRODUCT")
                 
+                calorieën_totaal    =   Hoeveelheid(0, Eenheid("kcal"))
+                eiwitten_totaal     =   Hoeveelheid(0, Eenheid("g"))
+                
                 for product_uuid, hoeveelheden in self.producten.items():
                     
                     for hoeveelheid in hoeveelheden:
                         
                         print(f"     {f"{hoeveelheid}":<17} {f"{producten[product_uuid].voedingswaarde.calorieën * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid.BASIS_EENHEDEN else hoeveelheid.waarde * producten[product_uuid].eenheden[hoeveelheid.eenheid]) / 100}":>9} {f"{producten[product_uuid].voedingswaarde.eiwitten * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid.BASIS_EENHEDEN else hoeveelheid.waarde * producten[product_uuid].eenheden[hoeveelheid.eenheid]) / 100}":>8} {producten[product_uuid]}")
+                        calorieën_totaal += producten[product_uuid].voedingswaarde.calorieën * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid.BASIS_EENHEDEN else hoeveelheid.waarde * producten[product_uuid].eenheden[hoeveelheid.eenheid]) / 100
+                        eiwitten_totaal += producten[product_uuid].voedingswaarde.eiwitten * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid.BASIS_EENHEDEN else hoeveelheid.waarde * producten[product_uuid].eenheden[hoeveelheid.eenheid]) / 100
                 
-                if len(self.gerechten) > 0:
-                    print("\n     los toegevoegde gerechten")
+                print(f"\n     {"SUBTOTAAL":<17} {f"{calorieën_totaal}":>9} {f"{eiwitten_totaal}":>8} ")
                 
                 for gerecht_uuid, versie_dict in self.gerechten.items():
                     
@@ -355,8 +359,10 @@ class Dag(MacroType):
                             for hoeveelheid in hoeveelheden:
                                 
                                 print(f"     {f"{hoeveelheid * versie_hoeveelheid.waarde/aantal_porties}":<17} {f"{producten[product_uuid].voedingswaarde.calorieën * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid.BASIS_EENHEDEN else hoeveelheid.waarde * producten[product_uuid].eenheden[hoeveelheid.eenheid]) / 100 * versie_hoeveelheid.waarde/aantal_porties}":>9} {f"{producten[product_uuid].voedingswaarde.eiwitten * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid.BASIS_EENHEDEN else hoeveelheid.waarde * producten[product_uuid].eenheden[hoeveelheid.eenheid]) / 100 * versie_hoeveelheid.waarde/aantal_porties}":>8} {producten[product_uuid]}")
-                
-                print(f"\n     {"TOTAAL":<17} {f"{self.voedingswaarde.calorieën}":>9} {f"{self.voedingswaarde.eiwitten}":>8}")
+                        
+                        print(f"\n     {"SUBTOTAAL":<17} {f"{gerechten[gerecht_uuid].voedingswaarde(versie_uuid).calorieën}":>9} {f"{gerechten[gerecht_uuid].voedingswaarde(versie_uuid).eiwitten}":>8} ")
+                        
+                print(f"\n\n     {"TOTAAL":<17} {f"{self.voedingswaarde.calorieën}":>9} {f"{self.voedingswaarde.eiwitten}":>8}")
             
             elif opdracht == "weergeef gerechten":
                 
