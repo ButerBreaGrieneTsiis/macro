@@ -111,6 +111,7 @@ class Gerecht(MacroType):
         porties = invoer_validatie(
             f"hoeveel porties",
             int,
+            bereik = (1, 100),
             )
         
         return cls(
