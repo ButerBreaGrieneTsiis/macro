@@ -140,10 +140,10 @@ class Voedingswaarde:
         dict_naar_json = {}
         
         for veld_sleutel, veld_waarde in self.__dict__.items():
-            if veld_waarde == 0.0:
-                continue
-            elif veld_sleutel == "calorieën":
+            if veld_sleutel == "calorieën":
                 dict_naar_json[veld_sleutel] = veld_waarde.waarde
+            elif veld_waarde == 0.0:
+                continue
             else:
                 dict_naar_json[veld_sleutel] = int(round(10 * veld_waarde.waarde))
         
@@ -202,7 +202,7 @@ class Voedingswaarde:
             
             calorieën_berekend = vetten * cls.CALORIE_PER_GRAM_VET + koolhydraten * cls.CALORIE_PER_GRAM_KOOLHYDRAAT + eiwitten * cls.CALORIE_PER_GRAM_EIWIT
             
-            if abs(calorieën - calorieën_berekend) / ((calorieën + calorieën_berekend)/2) > 0.1:
+            if (calorieën + calorieën_berekend) > 0 and abs(calorieën - calorieën_berekend) / ((calorieën + calorieën_berekend)/2) > 0.1:
                 print(f"calorieën ingevuld ({Hoeveelheid(calorieën, Eenheid("kcal"))}) en berekend ({Hoeveelheid(calorieën_berekend, Eenheid("kcal"))}) verschillen meer dan 10%")
                 if invoer_kiezen(
                     "doorgaan",
