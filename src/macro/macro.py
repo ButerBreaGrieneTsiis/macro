@@ -163,6 +163,6 @@ def uitvoeren():
                     gerechten = Gerechten.openen()
                     gerechten.kopie_opslaan()
                     
-                    print(f"\nkopie van gegevens gemaakt")
+                    print(f"\n>>> kopie van gegevens gemaakt")
     
     print("tot ziens")
