@@ -18,6 +18,7 @@ class Gerecht(MacroType):
         "producten_standaard",
         "porties",
         "versies",
+        "recept",
         ))
     
     def __init__(
@@ -27,6 +28,7 @@ class Gerecht(MacroType):
         producten_standaard: Dict[str, Hoeveelheid],
         porties: int,
         versies: Dict[str, Dict[str, Any]] = None,
+        recept: Dict[str, str] = None,
         ) -> "Gerecht":
         
         self.gerecht_naam = gerecht_naam
@@ -34,6 +36,7 @@ class Gerecht(MacroType):
         self.producten_standaard = producten_standaard
         self.porties = porties
         self.versies = dict() if versies is None else versies
+        self.recept = dict() if recept is None else recept
     
     def __repr__(self):
         return f"gerecht \"{self.gerecht_naam}\""
@@ -113,6 +116,8 @@ class Gerecht(MacroType):
             int,
             bereik = (1, 100),
             )
+        
+        
         
         return cls(
             gerecht_naam = gerecht_naam,
@@ -735,7 +740,22 @@ class Gerecht(MacroType):
                             for hoeveelheid in hoeveelheden:
                                 hoeveelheid_oud = next(hoeveelheid_oud for hoeveelheid_oud in self.producten_standaard[product_uuid] if hoeveelheid_oud == hoeveelheid)
                                 print(f"         {f"{hoeveelheid_oud}":<17} --> {f"{hoeveelheid}":<17} {producten[product_uuid]}")
-    
+            
+            elif kies_optie == "weergeef recept":
+                
+                if not bool(self.recept):
+                    print(f"\n>>> er is geen recept gedefinieerd voor {self}")
+                    continue
+                
+                if len(self.recept["benodigdheden"]) > 0:
+                    print("\n     benodigdheden")
+                    aantal_tekens = len(f"{len(self.recept["benodigdheden"])}") + 1
+                    [print(f"       {f"{ibenodigdheid}.":>{aantal_tekens}} {benodigdheid}") for ibenodigdheid, benodigdheid in enumerate(self.recept["benodigdheden"], 1)]
+                
+                print("\n     stappen")
+                aantal_tekens = len(f"{len(self.recept["stappen"])}") + 1
+                [print(f"       {f"{istap}.":>{aantal_tekens}} {stap}") for istap, stap in enumerate(self.recept["stappen"], 1)]
+            
     def kiezen_versie(
         self,
         terug_naar: str,
@@ -942,6 +962,69 @@ class Gerecht(MacroType):
         self.versies[versie_uuid] = versie
         
         return versie_uuid
+    
+    def nieuw_recept(
+        self,
+        ) -> str | Stop:
+        
+        benodigdheden = []
+        stappen = []
+        
+        if invoer_kiezen(
+            "toevoegen benodigdheden",
+            {
+                "ja": True,
+                "nee": False,
+                },
+            kies_een = False,
+            ):
+            
+            while True:
+                
+                if len(benodigdheden) > 0:
+                    print("\ntoegevoegde benodigdheden")
+                    aantal_tekens = len(f"{len(benodigdheden)}") + 2
+                    [print(f"     {f"[{ibenodigdheid}]":>{aantal_tekens}} {benodigdheid}") for ibenodigdheid, benodigdheid in enumerate(benodigdheden, 1)]
+                    print("\nvoer \"klaar\" in om af te ronden")
+                
+                benodigdheid = invoer_validatie(
+                    "benodigdheid",
+                    str,
+                    kleine_letters = True,
+                    uitsluiten_leeg = True,
+                    )
+                
+                if benodigdheid == "klaar":
+                    break
+                
+                benodigdheden.append(benodigdheid)
+        
+        print("\ntoevoegen stappen van het recept")
+        
+        while True:
+            
+            if len(stappen) > 0:
+                print("\ntoegevoegde stappen")
+                aantal_tekens = len(f"{len(stappen)}") + 2
+                [print(f"     {f"[{istap}]":>{aantal_tekens}} {stap}") for istap, stap in enumerate(stappen, 1)]
+                print("\nvoer \"klaar\" in om af te ronden")
+            
+            stap = invoer_validatie(
+                f"stap {len(stappen)+1}",
+                str,
+                kleine_letters = True,
+                uitsluiten_leeg = True,
+                )
+            
+            if stap == "klaar":
+                    break
+            
+            stappen.append(stap)
+        
+        self.recept = {
+            "benodigdheden": benodigdheden,
+            "stappen": stappen,
+            }
     
     def producten(
         self,
@@ -1156,6 +1239,17 @@ class Gerechten(MacroTypeDatabank):
             ):
             
             gerecht.nieuwe_versie()
+        
+        if invoer_kiezen(
+            "toevoegen recept",
+            {
+                "ja": True,
+                "nee": False,
+                },
+            kies_een = False,
+            ):
+            
+            gerecht.nieuw_recept()
         
         self[gerecht_uuid] = gerecht
         
