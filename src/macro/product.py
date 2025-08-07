@@ -139,89 +139,50 @@ class Merken(MacroTypeDatabank):
         
         while True:
             
-            if len(self) == 0:
+            zoekterm = invoer_validatie(
+                "merknaam",
+                str,
+                kleine_letters = True,
+                )
+            
+            merken_mogelijk = self.zoeken(zoekterm)
+            
+            if len(merken_mogelijk) == 0 and uitsluiten_nieuw:
+                print("\n>>> geen merken aanwezig om te selecteren")
+                return STOP
+            
+            optie_dict = {
+                "nieuw merk": "nieuw merk",
+            } | {
+                self[merk_uuid].merk_naam: merk_uuid for merk_uuid in merken_mogelijk
+                }
+            
+            kies_optie = invoer_kiezen(
+                "bestaand merk of nieuwe",
+                optie_dict,
+                stoppen = True,
+                terug_naar = terug_naar,
+                )
+            
+            if kies_optie is STOP:
+                return STOP
+            
+            elif kies_optie == "nieuw merk":
                 
-                if uitsluiten_nieuw:
-                    print("\n>>> geen merken aanwezig om te selecteren")
-                    return STOP
-                
-                kies_optie = invoer_kiezen(
-                    "geen merken aanwezig, maak een nieuw merk",
-                    [
-                        "nieuw merk",
-                        ],
-                    stoppen = True,
-                    kies_een = False,
-                    terug_naar = terug_naar,
+                return self.nieuw(
+                    terug_naar,
                     )
-                
-                if kies_optie is STOP:
-                    return STOP
-                
-                else:
-                    return self.nieuw(
-                        terug_naar,
-                        )
             
             else:
                 
-                if uitsluiten_nieuw:
-                    kies_optie = invoer_kiezen(
-                        "merk op naam of maak een nieuwe",
-                        [
-                            "merknaam",
-                            ],
-                        stoppen = True,
-                        terug_naar = terug_naar,
-                        )
-                
-                else:
-                    kies_optie = invoer_kiezen(
-                        "merk op naam of maak een nieuwe",
-                        [
-                            "merknaam",
-                            "nieuw merk",
-                            ],
-                        stoppen = True,
-                        terug_naar = terug_naar,
-                        )
-                
-                if kies_optie is STOP:
-                    return STOP
-                
-                if kies_optie == "merknaam":
-                    
-                    print("\ngeef een zoekterm op voor een merk")
-                    zoekterm = invoer_validatie(
-                        "zoekterm",
-                        str,
-                        kleine_letters = True,
-                        )
-                    
-                    merken_mogelijk = [merk_uuid for merk_uuid, merk in self.items() if zoekterm in merk.merk_naam]
-                    
-                    if len(merken_mogelijk) == 0:
-                        print(f"\n>>> geen merken gevonden")
-                        continue
-                    
-                    merk_uuid = invoer_kiezen(
-                        "merk",
-                        {self[merk_uuid].merk_naam: merk_uuid for merk_uuid in merken_mogelijk},
-                        stoppen = True,
-                        terug_naar = terug_naar,
-                        )
-                    
-                    if merk_uuid is STOP:
-                        continue
-                    
-                    print(f"\n>>> {self[merk_uuid]} gekozen")
-                    
-                    return merk_uuid
-                
-                elif kies_optie == "nieuw merk":
-                    return self.nieuw(
-                        terug_naar,
-                        )
+                return kies_optie
+    
+    def zoeken(
+        self,
+        zoekterm: str,
+        ) -> List[str]:
+        
+        return [merk_uuid for merk_uuid, merk in self.items() if zoekterm in merk.merk_naam]
 
 class Product(MacroType):
     
