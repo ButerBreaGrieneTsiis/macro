@@ -264,6 +264,16 @@ class Gerecht(MacroType):
                         print(f"\n>>> hoeveelheid {self.producten_standaard[product_uuid][ihoeveelheid]} aangepast naar {hoeveelheid}")
                         
                         self.producten_standaard[product_uuid][ihoeveelheid] = hoeveelheid
+                        
+                        print(f"\n     {"HOEVEELHEID":<17} CALORIEËN EIWITTEN PRODUCT")
+                
+                        for product_uuid, hoeveelheden in self.producten().items():
+                            for hoeveelheid in hoeveelheden:
+                                print(f"     {f"{hoeveelheid}":<17} {f"{producten[product_uuid].voedingswaarde.calorieën * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid.BASIS_EENHEDEN else hoeveelheid.waarde * producten[product_uuid].eenheden[hoeveelheid.eenheid]) / 100}":>9} {f"{producten[product_uuid].voedingswaarde.eiwitten * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid.BASIS_EENHEDEN else hoeveelheid.waarde * producten[product_uuid].eenheden[hoeveelheid.eenheid]) / 100}":>8} {producten[product_uuid]}")
+                        
+                        aantal_porties = self.porties
+                        print(f"\n     {"TOTAAL":<17} {f"{self.voedingswaarde().calorieën*aantal_porties}":>9} {f"{self.voedingswaarde().eiwitten*aantal_porties}":>8} (voor {aantal_porties} porties)")
+                        print(f"     {"PER PORTIE":<17} {f"{self.voedingswaarde().calorieën}":>9} {f"{self.voedingswaarde().eiwitten}":>8}")
             
             elif kies_optie == "bewerk categorie":
                 
