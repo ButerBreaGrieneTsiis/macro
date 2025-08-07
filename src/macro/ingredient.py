@@ -398,7 +398,7 @@ class Ingrediënten(MacroTypeDatabank):
                 
                 elif kies_optie == "zoek op ingrediëntnaam":
                         
-                    print("\ngeef een zoekterm op")
+                    print("\ngeef een ingrediëntnaam op")
                     
                     zoekterm = invoer_validatie(
                         "ingrediëntnaam",

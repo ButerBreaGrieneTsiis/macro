@@ -1279,7 +1279,7 @@ class Gerechten(MacroTypeDatabank):
                 
                 elif kies_optie == "zoek op gerechtnaam":
                         
-                    print("\ngeef een zoekterm op")
+                    print("\ngeef een gerechtnaam op")
                     
                     zoekterm = invoer_validatie(
                         "gerechtnaam",

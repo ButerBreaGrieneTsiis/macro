@@ -781,10 +781,10 @@ class Producten(MacroTypeDatabank):
                 
                 if kies_optie == "zoek op productnaam":
                     
-                    print("\ngeef een zoekterm op")
+                    print("\ngeef een ingrediëntnaam of productnaam op")
                     
                     zoekterm = invoer_validatie(
-                        "productnaam",
+                        "ingrediëntnaam of productnaam",
                         str,
                         kleine_letters = True,
                         )

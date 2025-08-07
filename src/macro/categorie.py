@@ -449,7 +449,7 @@ class Categorieën(MacroTypeDatabank):
                 
                 elif kies_optie == "zoek op categorienaam":
                     
-                    print("\ngeef een zoekterm op")
+                    print("\ngeef een categorienaam op")
                     
                     zoekterm = invoer_validatie(
                         "categorienaam",
