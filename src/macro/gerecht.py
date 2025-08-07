@@ -1144,9 +1144,8 @@ class Gerechten(MacroTypeDatabank):
                 },
             kies_een = False,
             ):
-            gerecht.nieuwe_versie(
-                gerecht_uuid = gerecht_uuid,
-                )
+            
+            gerecht.nieuwe_versie()
         
         self[gerecht_uuid] = gerecht
         
