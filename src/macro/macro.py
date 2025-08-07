@@ -78,14 +78,15 @@ def uitvoeren():
                 opdracht_gegevens = invoer_kiezen(
                     "MENU GEGEVENS",
                     [
-                        "hoofdcategorieën",
-                        "categorieën",
-                        "ingrediënten",
                         "producten",
+                        "ingrediënten",
+                        "gerechten",
                         "merken",
+                        "hoofdcategorieën producten",
+                        "categorieën producten",
                         "hoofdcategorieën gerechten",
                         "categorieën gerechten",
-                        "gerechten",
+                        "kopie gegevens",
                         ],
                     stoppen = True,
                     kies_een = False,
@@ -95,13 +96,13 @@ def uitvoeren():
                 if opdracht_gegevens is STOP:
                     break
                 
-                elif opdracht_gegevens == "hoofdcategorieën":
+                elif opdracht_gegevens == "hoofdcategorieën producten":
                     
                     hoofdcategorieën = Hoofdcategorieën.openen()
                     hoofdcategorieën.opdracht(terug_naar)
                     hoofdcategorieën.opslaan()
                 
-                elif opdracht_gegevens == "categorieën":
+                elif opdracht_gegevens == "categorieën producten":
                     
                     categorieën = Categorieën.openen()
                     categorieën.opdracht(terug_naar)
@@ -142,5 +143,26 @@ def uitvoeren():
                     gerechten = Gerechten.openen()
                     gerechten.opdracht(terug_naar)
                     gerechten.opslaan()
+                
+                elif opdracht_gegevens == "kopie gegevens":
+                    
+                    hoofdcategorieën = Hoofdcategorieën.openen()
+                    hoofdcategorieën.kopie_opslaan()
+                    categorieën = Categorieën.openen()
+                    categorieën.kopie_opslaan()
+                    ingrediënten = Ingrediënten.openen()
+                    ingrediënten.kopie_opslaan()
+                    producten = Producten.openen()
+                    producten.kopie_opslaan()
+                    merken = Merken.openen()
+                    merken.kopie_opslaan()
+                    hoofdcategorieën_gerecht = HoofdcategorieënGerecht.openen()
+                    hoofdcategorieën_gerecht.kopie_opslaan()
+                    categorieën_gerecht = CategorieënGerecht.openen()
+                    categorieën_gerecht.kopie_opslaan()
+                    gerechten = Gerechten.openen()
+                    gerechten.kopie_opslaan()
+                    
+                    print(f"\nkopie van gegevens gemaakt")
     
     print("tot ziens")

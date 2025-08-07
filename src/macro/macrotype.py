@@ -122,6 +122,20 @@ class MacroTypeDatabank(dict):
         
         opslaan_json(self, bestandspad, encoder_dict = self.ENCODER_DICT)
     
+    def kopie_opslaan(self) -> None:
+        
+        if not (self.BESTANDSMAP / "kopie").is_dir():
+            (self.BESTANDSMAP / "kopie").mkdir()
+        
+        vandaag = dt.date.today().strftime("%Y-%m-%d")
+        
+        if not (self.BESTANDSMAP / "kopie" / vandaag).is_dir():
+            (self.BESTANDSMAP / "kopie" / vandaag).mkdir()
+        
+        bestandspad = self.BESTANDSMAP / "kopie" / vandaag / f"{self.BESTANDSNAAM}.{self.EXTENSIE}"
+        
+        opslaan_json(self, bestandspad, encoder_dict = self.ENCODER_DICT)
+    
     @property
     def lijst(self) -> List[MacroType]:
         return list(self.values())
