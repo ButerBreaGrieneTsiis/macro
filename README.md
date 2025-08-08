@@ -16,5 +16,4 @@ uv run python -m macro
 ## toekomstige functionaliteiten
 
  - [ ] toevoegen, bewerken en weergeven van recepten bij een `Gerecht`
- - [ ] kopiëren van producten van vorige dagen naar de huidige dag om invoer te versnellen
  - [ ] dashboard met grafieken over ingenomen voedingswaardes per dag
