@@ -274,7 +274,7 @@ class Product(MacroType):
             print(f"selecteren wat te bewerken")
             
             kies_optie = invoer_kiezen(
-                f"MENU {f"{self}".upper()}",
+                f"MENU {f"{self}".upper()}/BEWERK",
                 [
                     "bewerk productnaam",
                     "bewerk merk",
@@ -351,7 +351,7 @@ class Product(MacroType):
         while True:
         
             kies_optie = invoer_kiezen(
-                "veld",
+                f"MENU {f"{self}".upper()}/WEERGEEF",
                 [
                     "weergeef merk",
                     "weergeef voedingswaarde",
@@ -360,6 +360,7 @@ class Product(MacroType):
                     "weergeef categorie",
                     "weergeef ingrediënt",
                     ],
+                kies_een = False,
                 stoppen = True,
                 terug_naar = terug_naar,
                 )

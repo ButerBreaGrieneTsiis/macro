@@ -117,8 +117,6 @@ class Gerecht(MacroType):
             bereik = (1, 100),
             )
         
-        
-        
         return cls(
             gerecht_naam = gerecht_naam,
             categorie_uuid = categorie_uuid,
@@ -136,13 +134,14 @@ class Gerecht(MacroType):
             print(f"selecteren wat te bewerken")
             
             kies_optie = invoer_kiezen(
-                f"MENU {f"{self}".upper()}",
+                f"MENU {f"{self}".upper()} BEWERK",
                 [
                     "bewerk gerechtnaam",
                     "bewerk producten",
                     "bewerk porties",
                     "bewerk versies",
                     "bewerk categorie",
+                    "bewerk recept",
                     ],
                 kies_een = False,
                 stoppen = True,
@@ -170,7 +169,7 @@ class Gerecht(MacroType):
                 while True:
                     
                     kies_optie_bewerken = invoer_kiezen(
-                        f"MENU BEWERKEN {f"{self}".upper()}",
+                        f"MENU {f"{self}".upper()} BEWERK PRODUCTEN",
                         [
                             "toevoegen producten",
                             "verwijderen producten",
@@ -189,7 +188,7 @@ class Gerecht(MacroType):
                         producten = Producten.openen()
                         
                         product_uuid, eenheid = producten.kiezen_product_eenheid(
-                            terug_naar = f"MENU BEWERKEN {f"{self}".upper()}",
+                            terug_naar = f"MENU {f"{self}".upper()} BEWERK PRODUCTEN",
                             )
                         
                         if product_uuid is STOP:
@@ -223,7 +222,7 @@ class Gerecht(MacroType):
                             "een product en hoeveelheid om te verwijderen",
                             {f"{f"{hoeveelheid}":<17} {producten[product_uuid]}": (product_uuid, ihoeveelheid) for product_uuid, hoeveelheden in self.producten_standaard.items() for ihoeveelheid, hoeveelheid in enumerate(hoeveelheden)},
                             stoppen = True,
-                            terug_naar = f"MENU BEWERKEN {f"{self}".upper()}",
+                            terug_naar = f"MENU {f"{self}".upper()} BEWERK",
                             )
                         
                         if kies_optie_verwijderen is STOP:
@@ -243,7 +242,7 @@ class Gerecht(MacroType):
                             "een product en hoeveelheid om aan te passen",
                             {f"{f"{hoeveelheid}":<17} {producten[product_uuid]}": (product_uuid, ihoeveelheid) for product_uuid, hoeveelheden in self.producten_standaard.items() for ihoeveelheid, hoeveelheid in enumerate(hoeveelheden)},
                             stoppen = True,
-                            terug_naar = f"MENU BEWERKEN {f"{self}".upper()}",
+                            terug_naar = f"MENU {f"{self}".upper()} BEWERK",
                             )
                         
                         if kies_optie_aanpassen is STOP:
@@ -252,7 +251,7 @@ class Gerecht(MacroType):
                         product_uuid, ihoeveelheid = kies_optie_aanpassen
                 
                         eenheid = producten.kiezen_eenheid(
-                            terug_naar = f"MENU BEWERKEN {f"{self}".upper()}",
+                            terug_naar = f"MENU {f"{self}".upper()} BEWERK",
                             product_uuid = product_uuid,
                             )
                         
@@ -284,7 +283,7 @@ class Gerecht(MacroType):
                 
                 categorieën_gerecht = CategorieënGerecht.openen()
                 categorie_uuid = categorieën_gerecht.kiezen(
-                    terug_naar = f"MENU {f"{self}".upper()}",
+                    terug_naar = f"MENU {f"{self}".upper()} BEWERK",
                     )
                 
                 if categorie_uuid is STOP:
@@ -313,7 +312,7 @@ class Gerecht(MacroType):
                     "versie",
                     optie_dict,
                     stoppen = True,
-                    terug_naar = f"MENU {f"{self}".upper()}",
+                    terug_naar = f"MENU {f"{self}".upper()} BEWERK",
                     )
                 
                 if kies_optie is STOP:
@@ -330,7 +329,7 @@ class Gerecht(MacroType):
                     while True:
                         
                         kies_optie_bewerken = invoer_kiezen(
-                            f"MENU BEWERKEN VERSIE {f"{self.versies[versie_uuid]["versie_naam"]}".upper()}",
+                            f"MENU VERSIE {f"{self.versies[versie_uuid]["versie_naam"]}".upper()} BEWERK",
                             [
                                 "toevoegen toevoeging product",
                                 "verwijderen toevoeging product",
@@ -356,7 +355,7 @@ class Gerecht(MacroType):
                         elif kies_optie_bewerken == "toevoegen toevoeging product":
                             
                             product_uuid, eenheid = producten.kiezen_product_eenheid(
-                                terug_naar = f"MENU BEWERKEN VERSIE {f"{self.versies[versie_uuid]["versie_naam"]}".upper()}",
+                                terug_naar = f"MENU VERSIE {f"{self.versies[versie_uuid]["versie_naam"]}".upper()} BEWERK",
                                 )
                             
                             if product_uuid is STOP or eenheid is STOP:
@@ -400,7 +399,7 @@ class Gerecht(MacroType):
                                 "product en hoeveelheid om te verwijderen uit toevoegingen",
                                 {f"{producten[product_uuid]} ({hoeveelheid})": (product_uuid, hoeveelheid) for product_uuid, hoeveelheden in self.versies[versie_uuid]["toegevoegd"].items() for hoeveelheid in hoeveelheden},
                                 stoppen = True,
-                                terug_naar = f"MENU BEWERKEN VERSIE {f"{self.versies[versie_uuid]["versie_naam"]}".upper()}",
+                                terug_naar = f"MENU VERSIE {f"{self.versies[versie_uuid]["versie_naam"]}".upper()} BEWERK",
                                 )
                             
                             if kies_optie is STOP:
@@ -428,7 +427,7 @@ class Gerecht(MacroType):
                                 "product en hoeveelheid om aan te passen uit toevoegingen",
                                 {f"{producten[product_uuid]} ({hoeveelheid})": (product_uuid, ihoeveelheid) for product_uuid, hoeveelheden in self.versies[versie_uuid]["toegevoegd"].items() for ihoeveelheid, hoeveelheid in enumerate(hoeveelheden)},
                                 stoppen = True,
-                                terug_naar = f"MENU BEWERKEN VERSIE {f"{self.versies[versie_uuid]["versie_naam"]}".upper()}",
+                                terug_naar = f"MENU VERSIE {f"{self.versies[versie_uuid]["versie_naam"]}".upper()} BEWERK",
                                 )
                             
                             if kies_optie is STOP:
@@ -455,7 +454,7 @@ class Gerecht(MacroType):
                                 "product en hoeveelheid om te toe te voegen aan verwijderingen",
                                 {f"{f"{hoeveelheid}":<17} {producten[product_uuid]}": (product_uuid, hoeveelheid) for product_uuid, hoeveelheden in self.producten_standaard.items() for  hoeveelheid in hoeveelheden},
                                 stoppen = True,
-                                terug_naar = f"MENU BEWERKEN VERSIE {f"{self.versies[versie_uuid]["versie_naam"]}".upper()}",
+                                terug_naar = f"MENU VERSIE {f"{self.versies[versie_uuid]["versie_naam"]}".upper()} BEWERK",
                                 )
                             
                             if kies_optie is STOP:
@@ -488,7 +487,7 @@ class Gerecht(MacroType):
                                 "product en hoeveelheid om te verwijderen uit verwijderingen",
                                 {f"{f"{hoeveelheid}":<17} {producten[product_uuid]}": (product_uuid, hoeveelheid) for product_uuid, hoeveelheden in self.versies[versie_uuid]["verwijderd"].items() for hoeveelheid in hoeveelheden},
                                 stoppen = True,
-                                terug_naar = f"MENU BEWERKEN VERSIE {f"{self.versies[versie_uuid]["versie_naam"]}".upper()}",
+                                terug_naar = f"MENU VERSIE {f"{self.versies[versie_uuid]["versie_naam"]}".upper()} BEWERK",
                                 )
                             
                             if kies_optie is STOP:
@@ -512,7 +511,7 @@ class Gerecht(MacroType):
                                 "een product en hoeveelheid om toe te voegen aan aanpassen hoeveelheid",
                                 {f"{f"{hoeveelheid}":<17} {producten[product_uuid]}": (product_uuid, hoeveelheid) for product_uuid, hoeveelheden in self.producten_standaard.items() for hoeveelheid in hoeveelheden},
                                 stoppen = True,
-                                terug_naar = f"MENU BEWERKEN VERSIE {f"{self.versies[versie_uuid]["versie_naam"]}".upper()}",
+                                terug_naar = f"MENU VERSIE {f"{self.versies[versie_uuid]["versie_naam"]}".upper()} BEWERK",
                                 )
                             
                             if kies_optie is STOP:
@@ -551,7 +550,7 @@ class Gerecht(MacroType):
                                 "product en hoeveelheid om te verwijderen uit aanpassingen",
                                 {f"{producten[product_uuid]} ({hoeveelheid})": (product_uuid, hoeveelheid) for product_uuid, hoeveelheden in self.versies[versie_uuid]["hoeveelheid"].items() for hoeveelheid in hoeveelheden},
                                 stoppen = True,
-                                terug_naar = f"MENU BEWERKEN VERSIE {f"{self.versies[versie_uuid]["versie_naam"]}".upper()}",
+                                terug_naar = f"MENU VERSIE {f"{self.versies[versie_uuid]["versie_naam"]}".upper()} BEWERK",
                                 )
                             
                             if kies_optie is STOP:
@@ -581,7 +580,7 @@ class Gerecht(MacroType):
                                 "product en hoeveelheid om te verwijderen uit aanpassingen",
                                 {f"{producten[product_uuid]} ({hoeveelheid})": (product_uuid, ihoeveelheid) for product_uuid, hoeveelheden in self.versies[versie_uuid]["hoeveelheid"].items() for ihoeveelheid, hoeveelheid in enumerate(hoeveelheden)},
                                 stoppen = True,
-                                terug_naar = f"MENU BEWERKEN VERSIE {f"{self.versies[versie_uuid]["versie_naam"]}".upper()}",
+                                terug_naar = f"MENU VERSIE {f"{self.versies[versie_uuid]["versie_naam"]}".upper()} BEWERK",
                                 )
                             
                             if kies_optie is STOP:
@@ -642,6 +641,218 @@ class Gerecht(MacroType):
                             
                             del self.versies[versie_uuid]
                             break
+            
+            elif kies_optie == "bewerk recept":
+                
+                if not bool(self.recept):
+                    print(f"\n>>> er is geen recept gedefinieerd voor {self}")
+                    
+                    if self.nieuw_recept() is STOP:
+                        continue
+                    
+                    continue
+                
+                while True:
+                    
+                    if len(self.recept["benodigdheden"]) > 0:
+                        print("\n     benodigdheden")
+                        aantal_tekens = len(f"{len(self.recept["benodigdheden"])}") + 1
+                        [print(f"       {f"{ibenodigdheid}.":>{aantal_tekens}} {benodigdheid}") for ibenodigdheid, benodigdheid in enumerate(self.recept["benodigdheden"], 1)]
+                
+                    print("\n     stappen")
+                    aantal_tekens = len(f"{len(self.recept["stappen"])}") + 1
+                    [print(f"       {f"{istap}.":>{aantal_tekens}} {stap}") for istap, stap in enumerate(self.recept["stappen"], 1)]
+                
+                    kies_optie = invoer_kiezen(
+                        f"MENU {f"{self}".upper()} BEWERK RECEPT",
+                        [
+                            "bewerk benodigdheden",
+                            "bewerk stappen",
+                            ],
+                        kies_een = False,
+                        stoppen = True,
+                        terug_naar = "BEWERK RECEPT KLAAR",
+                        )
+                    
+                    if kies_optie is STOP:
+                        break
+                    
+                    elif kies_optie == "bewerk benodigdheden":
+                        
+                        while True:
+                            
+                            if len(self.recept["benodigdheden"]) > 0:
+                                print("\n     benodigdheden")
+                                aantal_tekens = len(f"{len(self.recept["benodigdheden"])}") + 1
+                                [print(f"       {f"{ibenodigdheid}.":>{aantal_tekens}} {benodigdheid}") for ibenodigdheid, benodigdheid in enumerate(self.recept["benodigdheden"], 1)]
+                            
+                            kies_optie_benodigdheden = invoer_kiezen(
+                                f"MENU {f"{self}".upper()} BEWERK RECEPT BENODIGDHEDEN",
+                                [
+                                    "toevoegen benodigdheid",
+                                    "verwijderen benodigdheid",
+                                    "aanpassen benodigdheid",
+                                    ],
+                                kies_een = False,
+                                stoppen = True,
+                                terug_naar = "BEWERK RECEPT BENODIGHEDEN KLAAR",
+                                )
+                            
+                            if kies_optie_benodigdheden is STOP:
+                                break
+                            
+                            elif kies_optie_benodigdheden == "toevoegen benodigdheid":
+                                
+                                benodigdheid = invoer_validatie(
+                                    "benodigdheid",
+                                    str,
+                                    kleine_letters = True,
+                                    uitsluiten_leeg = True,
+                                    )
+                                
+                                if benodigdheid == "klaar":
+                                    continue
+                                
+                                self.recept["benodigdheden"].append(benodigdheid)
+                                
+                                print(f"\n>>> benodigdheid \"{benodigdheid}\" toegevoegd van benodigdheden")
+                            
+                            elif kies_optie_benodigdheden == "verwijderen benodigdheid":
+                                
+                                ibenodigdheid = invoer_kiezen(
+                                    "benodigdheid om te verwijderen",
+                                    {f"{benodigdheid}": ibenodigdheid for ibenodigdheid, benodigdheid in enumerate(self.recept["benodigdheden"])},
+                                    stoppen = True,
+                                    terug_naar = "VERWIJDEREN BENODIGHEDEN KLAAR",
+                                    )
+                                
+                                if ibenodigdheid is STOP:
+                                    continue
+                                
+                                print(f"\n>>> benodigdheid \"{self.recept["benodigdheden"][ibenodigdheid]}\" verwijderd van benodigdheden")
+                                
+                                del self.recept["benodigdheden"][ibenodigdheid]
+                            
+                            elif kies_optie_benodigdheden == "aanpassen benodigdheid":
+                                
+                                ibenodigdheid = invoer_kiezen(
+                                    "benodigdheid om aan te passen",
+                                    {f"{benodigdheid}": ibenodigdheid for ibenodigdheid, benodigdheid in enumerate(self.recept["benodigdheden"])},
+                                    stoppen = True,
+                                    terug_naar = "AANPASSEN BENODIGHEDEN KLAAR",
+                                    )
+                                
+                                if ibenodigdheid is STOP:
+                                    continue
+                                
+                                benodigdheid = invoer_validatie(
+                                    "benodigdheid",
+                                    str,
+                                    kleine_letters = True,
+                                    uitsluiten_leeg = True,
+                                    )
+                                
+                                if benodigdheid == "klaar":
+                                    continue
+                                
+                                print(f"\n>>> benodigdheid \"{self.recept["benodigdheden"][ibenodigdheid]}\" aangepast naar \"{benodigdheid}\"")
+                                
+                                self.recept["benodigdheden"][ibenodigdheid] = benodigdheid
+                    
+                    elif kies_optie == "bewerk stappen":
+                        
+                        while True:
+                            
+                            print("\n     stappen")
+                            aantal_tekens = len(f"{len(self.recept["stappen"])}") + 1
+                            [print(f"       {f"{istap}.":>{aantal_tekens}} {stap}") for istap, stap in enumerate(self.recept["stappen"], 1)]
+                            
+                            kies_optie_stappen = invoer_kiezen(
+                                f"MENU {f"{self}".upper()} BEWERK RECEPT STAPPEN",
+                                [
+                                    "toevoegen stap",
+                                    "verwijderen stap",
+                                    "aanpassen stap",
+                                    ],
+                                kies_een = False,
+                                stoppen = True,
+                                terug_naar = "BEWERK RECEPT STAPPEN KLAAR",
+                                )
+                            
+                            if kies_optie_stappen is STOP:
+                                break
+                            
+                            elif kies_optie_stappen == "toevoegen stap":
+                                
+                                stap = invoer_validatie(
+                                    "stap",
+                                    str,
+                                    kleine_letters = True,
+                                    uitsluiten_leeg = True,
+                                    )
+                                
+                                if stap == "klaar":
+                                    continue
+                                
+                                istap = invoer_kiezen(
+                                    "plek waar de stap toegevoegd moet worden",
+                                    {
+                                        f"voor stap \"{stap}\"": istap for istap, stap in enumerate(self.recept["stappen"])
+                                    } | {
+                                        "laatste stap": len(self.recept["stappen"])
+                                        },
+                                    stoppen = True,
+                                    terug_naar = "TOEVOEGEN STAPPEN KLAAR",
+                                    )
+                                
+                                if istap is STOP:
+                                    continue
+                                
+                                print(f"\n>>> stap \"{stap}\" toegevoegd van stappen")
+                                
+                                self.recept["stappen"].insert(istap, stap)
+                            
+                            elif kies_optie_stappen == "verwijderen stap":
+                                
+                                istap = invoer_kiezen(
+                                    "stap om te verwijderen",
+                                    {f"{stap}": istap for istap, stap in enumerate(self.recept["stappen"])},
+                                    stoppen = True,
+                                    terug_naar = "VERWIJDEREN STAPPEN KLAAR",
+                                    )
+                                
+                                if istap is STOP:
+                                    continue
+                                
+                                print(f"\n>>> stap \"{self.recept["stappen"][istap]}\" verwijderd van stappen")
+                                
+                                del self.recept["stappen"][istap]
+                            
+                            elif kies_optie_stappen == "aanpassen stap":
+                                
+                                istap = invoer_kiezen(
+                                    "stap om aan te passen",
+                                    {f"{stap}": istap for istap, stap in enumerate(self.recept["stappen"])},
+                                    stoppen = True,
+                                    terug_naar = "AANPASSEN STAPPEN KLAAR",
+                                    )
+                                
+                                if istap is STOP:
+                                    continue
+                                
+                                stap = invoer_validatie(
+                                    "stap",
+                                    str,
+                                    kleine_letters = True,
+                                    uitsluiten_leeg = True,
+                                    )
+                                
+                                if stap == "klaar":
+                                    continue
+                                
+                                print(f"\n>>> stap \"{self.recept["stappen"][istap]}\" aangepast naar \"{stap}\"")
+                                
+                                self.recept["stappen"][istap] = stap
         
         return self
     
@@ -655,13 +866,14 @@ class Gerecht(MacroType):
         while True:
             
             kies_optie = invoer_kiezen(
-                "veld",
+                f"MENU {f"{self}".upper()}/WEERGEEF",
                 [
                     "weergeef producten",
                     "weergeef voedingswaarde",
                     "weergeef versies",
                     "weergeef recept",
                     ],
+                kies_een = False,
                 stoppen = True,
                 terug_naar = terug_naar,
                 )
@@ -965,7 +1177,9 @@ class Gerecht(MacroType):
     
     def nieuw_recept(
         self,
-        ) -> str | Stop:
+        ) -> None | Stop:
+        
+        print(f"\n>>> aanmaken nieuwe recept voor {self}")
         
         benodigdheden = []
         stappen = []
@@ -982,10 +1196,10 @@ class Gerecht(MacroType):
             while True:
                 
                 if len(benodigdheden) > 0:
-                    print("\ntoegevoegde benodigdheden")
-                    aantal_tekens = len(f"{len(benodigdheden)}") + 2
-                    [print(f"     {f"[{ibenodigdheid}]":>{aantal_tekens}} {benodigdheid}") for ibenodigdheid, benodigdheid in enumerate(benodigdheden, 1)]
-                    print("\nvoer \"klaar\" in om af te ronden")
+                    print("\nbenodigdheden")
+                    aantal_tekens = len(f"{len(benodigdheden)}") + 1
+                    [print(f"     {f"{ibenodigdheid}.":>{aantal_tekens}} {benodigdheid}") for ibenodigdheid, benodigdheid in enumerate(benodigdheden, 1)]
+                    print("\nvoer \"klaar\" in om benodigdheden af te ronden")
                 
                 benodigdheid = invoer_validatie(
                     "benodigdheid",
@@ -1005,9 +1219,9 @@ class Gerecht(MacroType):
             
             if len(stappen) > 0:
                 print("\ntoegevoegde stappen")
-                aantal_tekens = len(f"{len(stappen)}") + 2
-                [print(f"     {f"[{istap}]":>{aantal_tekens}} {stap}") for istap, stap in enumerate(stappen, 1)]
-                print("\nvoer \"klaar\" in om af te ronden")
+                aantal_tekens = len(f"{len(stappen)}") + 1
+                [print(f"     {f"{istap}.":>{aantal_tekens}} {stap}") for istap, stap in enumerate(stappen, 1)]
+                print("\nvoer \"klaar\" in om stappen af te ronden")
             
             stap = invoer_validatie(
                 f"stap {len(stappen)+1}",
@@ -1017,14 +1231,17 @@ class Gerecht(MacroType):
                 )
             
             if stap == "klaar":
-                    break
+                break
             
             stappen.append(stap)
         
-        self.recept = {
-            "benodigdheden": benodigdheden,
-            "stappen": stappen,
-            }
+        if len(stappen) == 0:
+            return STOP
+        else:
+            self.recept = {
+                "benodigdheden": benodigdheden,
+                "stappen": stappen,
+                }
     
     def producten(
         self,

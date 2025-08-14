@@ -108,11 +108,12 @@ class Categorie(MacroType):
             print(f"selecteren wat te bewerken")
         
             kies_optie = invoer_kiezen(
-                "veld",
+                f"MENU {f"{self}".upper()}/BEWERK",
                 [
                     "bewerk categorienaam",
                     "bewerk hoofdcategorie",
                     ],
+                kies_een = False,
                 stoppen = True,
                 terug_naar = terug_naar,
                 )

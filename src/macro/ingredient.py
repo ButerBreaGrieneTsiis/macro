@@ -63,11 +63,12 @@ class Ingrediënt(MacroType):
             print(f"selecteren wat te bewerken")
             
             kies_optie = invoer_kiezen(
-                "veld",
+                f"MENU {f"{self}".upper()}/BEWERK",
                 [
                     "bewerk ingrediëntnaam",
                     "bewerk categorie",
                     ],
+                kies_een = False,
                 stoppen = True,
                 terug_naar = terug_naar,
                 )
@@ -111,11 +112,12 @@ class Ingrediënt(MacroType):
         while True:
         
             kies_optie = invoer_kiezen(
-                "veld",
+                f"MENU {f"{self}".upper()}/WEERGEEF",
                 [
                     "weergeef hoofdcategorie",
                     "weergeef categorie",
                     ],
+                kies_een = False,
                 stoppen = True,
                 terug_naar = terug_naar,
                 )
