@@ -383,7 +383,7 @@ class Product(MacroType):
                     print("\n>>> geen eenheden gedefinieerd")
                 else:
                     print(f"\n     EENHEID          HOEVEELHEID CALORIEËN")
-                    [print(f"     {f"{Hoeveelheid(1, eenheid)}":<17}{f"{Hoeveelheid(waarde, self.basis_eenheid)}":<11} {self.voedingswaarde.calorieën * waarde / 100.0}") for eenheid, waarde in self.eenheden.items()]
+                    [print(f"     {f"{Hoeveelheid(1, eenheid)}":<18}{f"{Hoeveelheid(waarde, self.basis_eenheid)}":<11} {self.voedingswaarde.calorieën * waarde / 100.0}") for eenheid, waarde in self.eenheden.items()]
             
             elif kies_optie == "weergeef hoofdcategorie":
                 
