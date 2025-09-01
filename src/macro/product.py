@@ -727,54 +727,54 @@ class Producten(MacroTypeDatabank):
                     
                     hoofdcategorieën = Hoofdcategorieën.openen()
                     hoofdcategorie_uuid = hoofdcategorieën.kiezen(
-                        terug_naar,
+                        terug_naar = "MENU PRODUCT KIEZEN",
                         uitsluiten_nieuw = True,
                         )
                     if hoofdcategorie_uuid is STOP:
-                        return STOP
+                        continue
                     
                     categorieën = Categorieën.openen()
                     
                     if len([categorie for categorie in categorieën.lijst if categorie.hoofdcategorie_uuid == hoofdcategorie_uuid]) == 0:
                         print(f"\n>>> geen categorieën aanwezig onder {hoofdcategorieën[hoofdcategorie_uuid]}")
-                        return STOP
+                        continue
                     
                     categorie_uuid = invoer_kiezen(
                         "categorie",
                         {f"{categorie}": categorie_uuid for categorie_uuid, categorie in categorieën.items() if categorie.hoofdcategorie_uuid == hoofdcategorie_uuid},
                         stoppen = True,
-                        terug_naar = terug_naar,
+                        terug_naar = "MENU PRODUCT KIEZEN",
                         )
                     if categorie_uuid is STOP:
-                        return STOP
+                        continue
                     
                     ingrediënten = Ingrediënten.openen()
                     
                     if len([ingrediënt for ingrediënt in ingrediënten.lijst if ingrediënt.categorie_uuid == categorie_uuid]) == 0:
                         print(f"\n>>> geen ingrediënten aanwezig onder {categorieën[categorie_uuid]}")
-                        return STOP
+                        continue
                     
                     ingrediënt_uuid = invoer_kiezen(
                         "ingrediënt",
                         {f"{ingrediënt}": ingrediënt_uuid for ingrediënt_uuid, ingrediënt in ingrediënten.items() if ingrediënt.categorie_uuid == categorie_uuid},
                         stoppen = True,
-                        terug_naar = terug_naar,
+                        terug_naar = "MENU PRODUCT KIEZEN",
                         )
                     if ingrediënt_uuid is STOP:
-                        return STOP
+                        continue
                     
                     if len([product for product in self.lijst if product.ingrediënt_uuid == ingrediënt_uuid]) == 0:
                         print(f"\n>>> geen producten aanwezig onder {ingrediënten[ingrediënt_uuid]}")
-                        return STOP
+                        continue
                     
                     product_uuid = invoer_kiezen(
                         "product",
                         {f"{product}": product_uuid for product_uuid, product in self.items() if product.ingrediënt_uuid == ingrediënt_uuid},
                         stoppen = True,
-                        terug_naar = terug_naar,
+                        terug_naar = "MENU PRODUCT KIEZEN",
                         )
                     if product_uuid is STOP:
-                        return STOP
+                        continue
                     
                     print(f"\n>>> {self[product_uuid]} gekozen")
                     
@@ -810,7 +810,7 @@ class Producten(MacroTypeDatabank):
                         "ingrediënt of product",
                         {ingrediënten[ingrediënt_uuid]: ingrediënt_uuid for ingrediënt_uuid in ingrediënten_mogelijk} | {self[product_uuid]: product_uuid for product_uuid in producten_mogelijk},
                         stoppen = True,
-                        terug_naar = terug_naar,
+                        terug_naar = "MENU PRODUCT KIEZEN",
                         )
                     
                     if uuid is STOP:
@@ -826,10 +826,10 @@ class Producten(MacroTypeDatabank):
                             "product",
                             {f"{product}": product_uuid for product_uuid, product in self.items() if product.ingrediënt_uuid == uuid},
                             stoppen = True,
-                            terug_naar = terug_naar,
+                            terug_naar = "MENU PRODUCT KIEZEN",
                             )
                         if product_uuid is STOP:
-                            return STOP
+                            continue
                     else:
                         product_uuid = uuid
                     
