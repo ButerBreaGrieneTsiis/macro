@@ -152,9 +152,9 @@ class Merken(MacroTypeDatabank):
                 return STOP
             
             optie_dict = {
-                "nieuw merk": "nieuw merk",
-            } | {
                 self[merk_uuid].merk_naam: merk_uuid for merk_uuid in merken_mogelijk
+            } | {
+                "nieuw merk": "nieuw merk",
                 }
             
             kies_optie = invoer_kiezen(
