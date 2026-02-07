@@ -5,3 +5,6 @@ from .gerecht import Gerecht, Gerechten
 from .ingredient import Ingrediënt, Ingrediënten
 from .macrotype import Eenheid
 from .product import Product, Producten
+
+
+__version__ = "1.0.0-dev"
