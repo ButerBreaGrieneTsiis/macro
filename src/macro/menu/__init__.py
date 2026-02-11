@@ -1,5 +1,6 @@
 """macro.menu"""
-from .menu import hoofdmenu
+from .hoofdmenu import hoofdmenu
+from .submenus import *
 
 
 __all__ = [
