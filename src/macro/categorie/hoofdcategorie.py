@@ -22,7 +22,7 @@ class Hoofdcategorie(GeregistreerdObject):
     # CLASS METHODS
     
     @classmethod
-    def nieuw(cls) -> Hoofdcategorie:
+    def nieuw(cls) -> Hoofdcategorie | commando.Doorgaan:
         
         print(f"\ninvullen gegevens nieuwe hoofdcategorie")
         
@@ -33,6 +33,11 @@ class Hoofdcategorie(GeregistreerdObject):
             valideren = True,
             uitvoer_kleine_letters = True,
             )
+        
+        if hoofdcategorie_naam is commando.STOP:
+            return commando.DOORGAAN
+        
+        print(f"\n>>> nieuwe hoofdcategorie \"{hoofdcategorie_naam}\" gemaakt")
         
         return cls(
             hoofdcategorie_naam = hoofdcategorie_naam,
@@ -45,27 +50,43 @@ class Hoofdcategorie(GeregistreerdObject):
         return Register()[Hoofdcategorie._SUBREGISTER_NAAM]
     
     @staticmethod
-    def selecteren() -> str:
-        return Hoofdcategorie.subregister().selecteren()
+    def selecteren(
+        toestaan_nieuw: bool = True,
+        terug_naar: str = "terug naar MENU GEGEVENS HOOFDCATEGORIE",
+        ) -> str | commando.Stop | None:
+        
+        return Hoofdcategorie.subregister().selecteren(
+            geef_id = True,
+            toestaan_nieuw = toestaan_nieuw,
+            terug_naar = terug_naar,
+            )
     
     @staticmethod
-    def weergeven():
-        return Hoofdcategorie.subregister().weergeven()
+    def weergeven() -> commando.Doorgaan:
+        Hoofdcategorie.subregister().weergeven()
+        return commando.DOORGAAN
     
     @staticmethod
-    def verwijderen():
-        return Hoofdcategorie.subregister().verwijderen()
+    def verwijderen() -> commando.Doorgaan:
+        
+        hoofdcategorie_uuid = Hoofdcategorie.selecteren(toestaan_nieuw = False)
+        if hoofdcategorie_uuid is commando.STOP or hoofdcategorie_uuid is None:
+            return commando.DOORGAAN
+        
+        print(f">>> \"{Hoofdcategorie.subregister()[hoofdcategorie_uuid]}\" verwijderd")
+        del Hoofdcategorie.subregister()[hoofdcategorie_uuid]
+        return commando.DOORGAAN
     
     @staticmethod
-    def bewerken():
-        hoofdcategorie_uuid = Hoofdcategorie.selecteren()
+    def bewerken() -> commando.Doorgaan | None:
         
-        if hoofdcategorie_uuid is commando.STOP:
-            return None
+        hoofdcategorie_uuid = Hoofdcategorie.selecteren(toestaan_nieuw = False)
+        if hoofdcategorie_uuid is commando.STOP or hoofdcategorie_uuid is None:
+            return commando.DOORGAAN
         
-        print(f"\ninvullen gegevens nieuwe hoofdcategorie")
+        print(f"\nbewerken gegevens {Hoofdcategorie.subregister()[hoofdcategorie_uuid]}\n")
         
-        hoofdcategorie_naam = invoeren(
+        waarde_nieuw = invoeren(
             tekst_beschrijving = "hoofdcategorienaam",
             invoer_type = "str",
             uitsluiten_leeg = True,
@@ -73,12 +94,19 @@ class Hoofdcategorie(GeregistreerdObject):
             uitvoer_kleine_letters = True,
             )
         
-        Hoofdcategorie.subregister()[hoofdcategorie_uuid].hoofdcategorie_naam = hoofdcategorie_naam
+        if waarde_nieuw is commando.STOP:
+            return commando.DOORGAAN
+        
+        waarde_oud = Hoofdcategorie.subregister()[hoofdcategorie_uuid].hoofdcategorie_naam
+        
+        print(f"\n>>> veld \"hoofdcategorie_naam\" veranderd van \"{waarde_oud}\" naar \"{waarde_nieuw}\"")
+        Hoofdcategorie.subregister()[hoofdcategorie_uuid].hoofdcategorie_naam = waarde_nieuw
+        return commando.DOORGAAN
     
     @staticmethod
     def toevoegen_menu(super_menu: Menu) -> Menu:
         
-        menu_hoofdcategorie = Menu("MENU GEGEVENS HOOFDCATEGORIE", super_menu, False)
+        menu_hoofdcategorie = Menu("MENU GEGEVENS HOOFDCATEGORIE", super_menu, True)
         
         super_menu.toevoegen_optie(menu_hoofdcategorie, "menu hoofdcategorie")
         
