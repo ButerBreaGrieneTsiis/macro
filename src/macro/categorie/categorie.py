@@ -84,10 +84,12 @@ class Categorie(GeregistreerdObject):
             return commando.STOP
         
         if keuze_selecteren == "selecteren via hoofdcategorie":
+            
             hoofdcategorie_uuid = Hoofdcategorie.selecteren(
                 toestaan_nieuw = toestaan_nieuw,
                 terug_naar = terug_naar,
                 )
+            
             return Categorie.subregister().filter(
                 hoofdcategorie_uuid = hoofdcategorie_uuid,
             ).selecteren(
@@ -151,7 +153,7 @@ class Categorie(GeregistreerdObject):
     @staticmethod
     def toevoegen_menu(super_menu: Menu) -> Menu:
         
-        menu_categorie = Menu("MENU GEGEVENS CATEGORIE", super_menu, False)
+        menu_categorie = Menu("MENU GEGEVENS CATEGORIE", super_menu, True)
         
         super_menu.toevoegen_optie(menu_categorie, "menu categorie")
         
