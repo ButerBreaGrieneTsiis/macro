@@ -6,7 +6,7 @@ from pathlib import Path
 from grienetsiis.register import Register
 
 from macro.categorie import Hoofdcategorie, Categorie
-from macro.product import Ingrediënt
+from macro.product import Ingrediënt, Merk
 
 
 __version__ = "1.0.0-dev"
@@ -42,4 +42,13 @@ Register.registreer_type(
     vercijfer_methode = "functie",
     vercijfer_functie_objecten = Ingrediënt.naar_json,
     ontcijfer_functie_objecten = Ingrediënt.van_json,
+    )
+Register.registreer_type(
+    geregistreerd_type = Merk,
+    subregister_naam = Merk._SUBREGISTER_NAAM,
+    bestandsmap = Path("gegevens"),
+    bestandsnaam = "merk",
+    vercijfer_methode = "functie",
+    vercijfer_functie_objecten = Merk.naar_json,
+    ontcijfer_functie_objecten = Merk.van_json,
     )
