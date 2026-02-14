@@ -25,11 +25,14 @@ class Categorie(GeregistreerdObject):
     # CLASS METHODS
     
     @classmethod
-    def nieuw(cls) -> Categorie | commando.Doorgaan:
+    def nieuw(
+        cls,
+        terug_naar: str = "terug naar MENU GEGEVENS CATEGORIE",
+        ) -> Categorie | commando.Doorgaan:
         
         print(f"\ninvullen gegevens nieuwe categorie")
         
-        hoofdcategorie_uuid = Hoofdcategorie.selecteren()
+        hoofdcategorie_uuid = Hoofdcategorie.selecteren(terug_naar = terug_naar)
         
         if hoofdcategorie_uuid is commando.STOP or hoofdcategorie_uuid is None:
             return commando.DOORGAAN
@@ -41,6 +44,9 @@ class Categorie(GeregistreerdObject):
             valideren = True,
             uitvoer_kleine_letters = True,
             )
+        
+        if categorie_naam is commando.STOP:
+            return commando.DOORGAAN
         
         print(f"\n>>> nieuwe categorie \"{categorie_naam}\" gemaakt")
         

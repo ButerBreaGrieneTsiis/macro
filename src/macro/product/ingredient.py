@@ -25,11 +25,14 @@ class Ingrediënt(GeregistreerdObject):
     # CLASS METHODS
     
     @classmethod
-    def nieuw(cls) -> Ingrediënt | commando.Doorgaan:
+    def nieuw(
+        cls,
+        terug_naar: str = "terug naar MENU GEGEVENS INGREDIËNT",
+        ) -> Ingrediënt | commando.Doorgaan:
         
         print(f"\ninvullen gegevens nieuw ingrediënt")
         
-        categorie_uuid = Categorie.selecteren()
+        categorie_uuid = Categorie.selecteren(terug_naar = terug_naar)
         
         if categorie_uuid is commando.STOP or categorie_uuid is None:
             return commando.DOORGAAN
@@ -41,6 +44,9 @@ class Ingrediënt(GeregistreerdObject):
             valideren = True,
             uitvoer_kleine_letters = True,
             )
+        
+        if ingrediënt_naam is commando.STOP:
+            return commando.DOORGAAN
         
         print(f"\n>>> nieuw ingrediënt \"{ingrediënt_naam}\" gemaakt")
         
