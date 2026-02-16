@@ -22,7 +22,10 @@ class Hoofdcategorie(GeregistreerdObject):
     # CLASS METHODS
     
     @classmethod
-    def nieuw(cls) -> Hoofdcategorie | commando.Doorgaan:
+    def nieuw(
+        cls,
+        geef_id: bool = False,
+        ) -> Hoofdcategorie | commando.Doorgaan:
         
         print(f"\ninvullen gegevens nieuwe hoofdcategorie")
         
@@ -38,9 +41,13 @@ class Hoofdcategorie(GeregistreerdObject):
         
         print(f"\n>>> nieuwe hoofdcategorie \"{hoofdcategorie_naam}\" gemaakt")
         
-        return cls(
+        hoofdcategorie = cls(
             hoofdcategorie_naam = hoofdcategorie_naam,
             )
+        
+        if geef_id:
+            return getattr(hoofdcategorie, hoofdcategorie._ID_VELD)
+        return hoofdcategorie
     
     # STATIC METHODS
     

@@ -28,6 +28,7 @@ class Ingrediënt(GeregistreerdObject):
     def nieuw(
         cls,
         terug_naar: str = "terug naar MENU GEGEVENS INGREDIËNT",
+        geef_id: bool = False,
         ) -> Ingrediënt | commando.Doorgaan:
         
         print(f"\ninvullen gegevens nieuw ingrediënt")
@@ -48,10 +49,14 @@ class Ingrediënt(GeregistreerdObject):
         
         print(f"\n>>> nieuw ingrediënt \"{ingrediënt_naam}\" gemaakt")
         
-        return cls(
+        ingrediënt = cls(
             ingrediënt_naam = ingrediënt_naam,
             categorie_uuid = categorie_uuid,
             )
+        
+        if geef_id:
+            return getattr(ingrediënt, ingrediënt._ID_VELD)
+        return ingrediënt
     
     # PROPERTIES
     
@@ -106,7 +111,10 @@ class Ingrediënt(GeregistreerdObject):
                 return commando.STOP
         
         if selectiemethode == "nieuw":
-            return Ingrediënt.nieuw(terug_naar = terug_naar)
+            return Ingrediënt.nieuw(
+                terug_naar = terug_naar,
+                geef_id = True,
+                )
         
         if aantal_ingrediënten == 0:
             return None
@@ -131,8 +139,20 @@ class Ingrediënt(GeregistreerdObject):
         return Ingrediënt.subregister().zoeken(veld = "ingrediënt_naam")
     
     @staticmethod
-    def weergeven() -> commando.Doorgaan:
-        Ingrediënt.subregister().weergeven()
+    def weergeven(
+        terug_naar: str = "terug naar MENU GEGEVENS INGREDIËNT",
+        ) -> commando.Doorgaan:
+        
+        categorie_uuid = Categorie.selecteren(
+            toestaan_nieuw = False,
+            terug_naar = terug_naar,
+            )
+        if categorie_uuid is commando.STOP or categorie_uuid is None:
+            return commando.DOORGAAN
+        
+        Ingrediënt.subregister().filter(
+            categorie_uuid = categorie_uuid,
+            ).weergeven()
         return commando.DOORGAAN
     
     @staticmethod

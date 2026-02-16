@@ -28,6 +28,7 @@ class Categorie(GeregistreerdObject):
     def nieuw(
         cls,
         terug_naar: str = "terug naar MENU GEGEVENS CATEGORIE",
+        geef_id: bool = False,
         ) -> Categorie | commando.Doorgaan:
         
         print(f"\ninvullen gegevens nieuwe categorie")
@@ -48,10 +49,14 @@ class Categorie(GeregistreerdObject):
         
         print(f"\n>>> nieuwe categorie \"{categorie_naam}\" gemaakt")
         
-        return cls(
+        categorie = cls(
             categorie_naam = categorie_naam,
             hoofdcategorie_uuid = hoofdcategorie_uuid,
             )
+        
+        if geef_id:
+            return getattr(categorie, categorie._ID_VELD)
+        return categorie
     
     # PROPERTIES
     
@@ -102,7 +107,10 @@ class Categorie(GeregistreerdObject):
                 return commando.STOP
         
         if selectiemethode == "nieuw":
-            return Categorie.nieuw(terug_naar = terug_naar)
+            return Categorie.nieuw(
+                terug_naar = terug_naar,
+                geef_id = True,
+                )
         
         if aantal_categorieën == 0:
             return None
@@ -126,8 +134,20 @@ class Categorie(GeregistreerdObject):
         return Categorie.subregister().zoeken(veld = "categorie_naam")
     
     @staticmethod
-    def weergeven() -> commando.Doorgaan:
-        Categorie.subregister().weergeven()
+    def weergeven(
+        terug_naar: str = "terug naar MENU GEGEVENS CATEGORIE",
+        ) -> commando.Doorgaan:
+        
+        hoofdcategorie_uuid = Hoofdcategorie.selecteren(
+            toestaan_nieuw = False,
+            terug_naar = terug_naar,
+            )
+        if hoofdcategorie_uuid is commando.STOP or hoofdcategorie_uuid is None:
+            return commando.DOORGAAN
+        
+        Categorie.subregister().filter(
+            hoofdcategorie_uuid = hoofdcategorie_uuid,
+            ).weergeven()
         return commando.DOORGAAN
     
     @staticmethod
