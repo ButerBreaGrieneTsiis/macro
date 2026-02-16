@@ -3,13 +3,19 @@ macro
 """
 from pathlib import Path
 
+from grienetsiis.json import Ontcijferaar, Vercijferaar
 from grienetsiis.register import Register
 
 from macro.categorie import Hoofdcategorie, Categorie
-from macro.product import Ingrediënt, Merk
+from macro.product import Ingrediënt, Merk, Product
+from macro.voedingswaarde import Eenheid, Voedingswaarde
 
 
 __version__ = "1.0.0-dev"
+
+ENUMS = {
+    "Eenheid": Eenheid,
+    }
 
 Register.instellen(
     registratie_methode = "uuid",
@@ -51,4 +57,35 @@ Register.registreer_type(
     vercijfer_methode = "functie",
     vercijfer_functie_objecten = Merk.naar_json,
     ontcijfer_functie_objecten = Merk.van_json,
+    )
+Register.registreer_type(
+    geregistreerd_type = Product,
+    subregister_naam = Product._SUBREGISTER_NAAM,
+    bestandsmap = Path("gegevens"),
+    bestandsnaam = "product",
+    vercijfer_methode = "functie",
+    vercijfer_functie_objecten = Product.naar_json,
+    ontcijfer_functie_objecten = Product.van_json,
+    vercijfer_functie_subobjecten = [
+        Vercijferaar(
+            class_naam = "Voedingswaarde",
+            vercijfer_functie_naam = "naar_json",
+            ),
+        ],
+    ontcijfer_functie_subobjecten = [
+        Ontcijferaar(
+            velden = frozenset((
+                "_calorieën",
+                "_vetten",
+                "_verzadigd",
+                "_koolhydraten",
+                "_suikers",
+                "_eiwitten",
+                "_vezels",
+                "_zout",
+                )),
+            ontcijfer_functie = Voedingswaarde.van_json,
+            ),
+        ],
+    enums = ENUMS,
     )
