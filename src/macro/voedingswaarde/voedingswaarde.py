@@ -20,7 +20,7 @@ class Voedingswaarde(BasisType):
     _eiwitten: int
     _vezels: int
     _zout: int
-
+    
     _CALORIE_PER_GRAM_VET: ClassVar[float] = 9.0
     _CALORIE_PER_GRAM_KOOLHYDRAAT: ClassVar[float] = 4.0
     _CALORIE_PER_GRAM_EIWIT: ClassVar[float] = 4.0
@@ -204,13 +204,13 @@ class Voedingswaarde(BasisType):
         
         return cls(
             _calorieën = calorieën,
-            _vetten = vetten,
-            _verzadigd = verzadigd,
-            _koolhydraten = koolhydraten,
-            _suikers = suikers,
-            _eiwitten = eiwitten,
-            _vezels = vezels,
-            _zout = zout,
+            _vetten = int(10 * vetten),
+            _verzadigd = int(10 * verzadigd),
+            _koolhydraten = int(10 * koolhydraten),
+            _suikers = int(10 * suikers),
+            _eiwitten = int(10 * eiwitten),
+            _vezels = int(10 * vezels),
+            _zout = int(10 * zout),
             )
     
     # PROPERTIES

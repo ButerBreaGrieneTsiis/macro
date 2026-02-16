@@ -1,12 +1,12 @@
 """macro.categorie.categorie"""
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import ClassVar, List
+from typing import ClassVar, Dict, Literal
 
 from grienetsiis.opdrachtprompt import invoeren, kiezen, Menu, commando
 from grienetsiis.register import Subregister, Register, GeregistreerdObject
 
-from .hoofdcategorie import Hoofdcategorie
+from macro.categorie import Hoofdcategorie
 
 
 @dataclass
@@ -33,7 +33,6 @@ class Categorie(GeregistreerdObject):
         print(f"\ninvullen gegevens nieuwe categorie")
         
         hoofdcategorie_uuid = Hoofdcategorie.selecteren(terug_naar = terug_naar)
-        
         if hoofdcategorie_uuid is commando.STOP or hoofdcategorie_uuid is None:
             return commando.DOORGAAN
         
@@ -44,7 +43,6 @@ class Categorie(GeregistreerdObject):
             valideren = True,
             uitvoer_kleine_letters = True,
             )
-        
         if categorie_naam is commando.STOP:
             return commando.DOORGAAN
         
@@ -70,31 +68,53 @@ class Categorie(GeregistreerdObject):
     @staticmethod
     def selecteren(
         toestaan_nieuw: bool = True,
+        selectiemethode: Literal["nieuwe", "selecteren", "zoeken"] | None = None,
         terug_naar: str = "terug naar MENU GEGEVENS CATEGORIE",
-        ) -> str | commando.Stop | None:
+        ) -> str | commando.Stop | commando.Doorgaan | None:
         
-        if len(Categorie.subregister()) == 0:
-            print(f"\n>>> geen categorie aanwezig")
+        aantal_categorieën = len(Categorie.subregister())
+        
+        if aantal_categorieën == 0:
+            print(f"\n>>> geen categorieën aanwezig")
+            
+            if not toestaan_nieuw:
+                return None
+            
+            selectiemethode = "nieuw"
+        
+        if not selectiemethode:
+            
+            opties = {}
+            
+            if toestaan_nieuw:
+                opties["nieuw"] = "nieuw categorie"
+            
+            if aantal_categorieën > 0:
+                opties["selecteren"] = "selecteren via hoofdcategorie"
+                opties["zoeken"] = "zoeken op categorienaam"
+            
+            selectiemethode = kiezen(
+                opties = opties,
+                tekst_beschrijving = "selectiemethode voor categorie",
+                tekst_annuleren = terug_naar,
+                )
+            if selectiemethode is commando.STOP:
+                return commando.STOP
+        
+        if selectiemethode == "nieuw":
+            return Categorie.nieuw(terug_naar = terug_naar)
+        
+        if aantal_categorieën == 0:
             return None
         
-        keuze_selecteren = kiezen(
-            opties = [
-                "selecteren via hoofdcategorie",
-                "selecteren op categorienaam",
-                ],
-            tekst_beschrijving = "selectiemethode",
-            tekst_annuleren = terug_naar,
-            )
-        
-        if keuze_selecteren is commando.STOP:
-            return commando.STOP
-        
-        if keuze_selecteren == "selecteren via hoofdcategorie":
+        if selectiemethode == "selecteren":
             
             hoofdcategorie_uuid = Hoofdcategorie.selecteren(
                 toestaan_nieuw = toestaan_nieuw,
                 terug_naar = terug_naar,
                 )
+            if hoofdcategorie_uuid is commando.STOP:
+                return commando.STOP
             
             return Categorie.subregister().filter(
                 hoofdcategorie_uuid = hoofdcategorie_uuid,
@@ -139,7 +159,6 @@ class Categorie(GeregistreerdObject):
             valideren = True,
             uitvoer_kleine_letters = True,
             )
-        
         if waarde_nieuw is commando.STOP:
             return commando.DOORGAAN 
         
@@ -152,7 +171,7 @@ class Categorie(GeregistreerdObject):
     @staticmethod
     def kiezen_veld() -> str | commando.Stop:
         return kiezen(
-            opties = Categorie.velden(),
+            opties = list(Categorie.velden().keys()),
             tekst_beschrijving = "veld om te bewerken",
             )
     
@@ -171,5 +190,5 @@ class Categorie(GeregistreerdObject):
         return menu_categorie
     
     @staticmethod
-    def velden() -> List[str]:
-        return [veld for veld in Categorie.__annotations__ if not veld.startswith("_")]
+    def velden() -> Dict[str, str]:
+        return {veld: veld_type for veld, veld_type in Categorie.__annotations__.items() if not veld.startswith("_")}

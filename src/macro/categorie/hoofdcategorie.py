@@ -1,7 +1,7 @@
 """macro.categorie.hoofdcategorie"""
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import ClassVar
+from typing import ClassVar, Literal
 
 from grienetsiis.opdrachtprompt import invoeren, Menu, commando
 from grienetsiis.register import Subregister, Register, GeregistreerdObject
@@ -33,7 +33,6 @@ class Hoofdcategorie(GeregistreerdObject):
             valideren = True,
             uitvoer_kleine_letters = True,
             )
-        
         if hoofdcategorie_naam is commando.STOP:
             return commando.DOORGAAN
         
@@ -93,7 +92,6 @@ class Hoofdcategorie(GeregistreerdObject):
             valideren = True,
             uitvoer_kleine_letters = True,
             )
-        
         if waarde_nieuw is commando.STOP:
             return commando.DOORGAAN
         

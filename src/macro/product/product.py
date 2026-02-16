@@ -1,7 +1,7 @@
 """macro.product.product"""
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import ClassVar, Dict, List
+from typing import ClassVar, Dict, Literal
 
 from grienetsiis.opdrachtprompt import invoeren, kiezen, Menu, commando
 from grienetsiis.register import Subregister, Register, GeregistreerdObject
@@ -40,7 +40,7 @@ class Product(GeregistreerdObject):
         print(f"\ninvullen gegevens nieuw product")
         
         ingrediënt_uuid = Ingrediënt.selecteren(terug_naar = terug_naar)
-        if ingrediënt_uuid is commando.STOP or ingrediënt_uuid is None:
+        if ingrediënt_uuid is commando.STOP or ingrediënt_uuid is commando.DOORGAAN or ingrediënt_uuid is None:
             return commando.DOORGAAN
         
         product_naam = invoeren(
@@ -112,94 +112,116 @@ class Product(GeregistreerdObject):
     def subregister() -> Subregister:
         return Register()[Product._SUBREGISTER_NAAM]
     
-    # @staticmethod
-    # def selecteren(
-    #     toestaan_nieuw: bool = True,
-    #     terug_naar: str = "terug naar MENU GEGEVENS PRODUCT",
-    #     ) -> str | commando.Stop | None:
+    @staticmethod
+    def selecteren(
+        toestaan_nieuw: bool = True,
+        selectiemethode: Literal["nieuw", "selecteren", "zoeken"] | None = None,
+        terug_naar: str = "terug naar MENU GEGEVENS PRODUCT",
+        ) -> str | commando.Stop | None:
         
-    #     if len(Ingrediënt.subregister()) == 0:
-    #         print(f"\n>>> geen product aanwezig")
-    #         return None
+        aantal_producten = len(Product.subregister())
         
-    #     keuze_selecteren = kiezen(
-    #         opties = [
-    #             "selecteren via categorie",
-    #             "selecteren op productnaam",
-    #             ],
-    #         tekst_beschrijving = "selectiemethode",
-    #         tekst_annuleren = terug_naar,
-    #         )
-        
-    #     if keuze_selecteren is commando.STOP:
-    #         return commando.STOP
-        
-    #     if keuze_selecteren == "selecteren via categorie":
+        if aantal_producten == 0:
+            print(f"\n>>> geen producten aanwezig")
             
-    #         categorie_uuid = Categorie.selecteren(
-    #             toestaan_nieuw = toestaan_nieuw,
-    #             terug_naar = terug_naar,
-    #             )
+            if not toestaan_nieuw:
+                return None
             
-    #         return Ingrediënt.subregister().filter(
-    #             categorie_uuid = categorie_uuid,
-    #         ).selecteren(
-    #             toestaan_nieuw = toestaan_nieuw,
-    #             terug_naar = terug_naar,
-    #             )
+            selectiemethode = "nieuw"
+            
+        if not selectiemethode:
+            
+            opties = {}
+            
+            if toestaan_nieuw:
+                opties["nieuw"] = "nieuw product"
+            
+            if aantal_producten > 0:
+                opties["selecteren"] = "selecteren via hoofdcategorie, categorie en ingrediënt"
+                opties["zoeken"] = "zoeken op productnaam"
+            
+            selectiemethode = kiezen(
+                opties = opties,
+                tekst_beschrijving = "selectiemethode voor product",
+                tekst_annuleren = terug_naar,
+                )
+            if selectiemethode is commando.STOP:
+                return commando.STOP
         
-    #     return Ingrediënt.subregister().zoeken(veld = "ingrediënt_naam")
+        if selectiemethode == "nieuw":
+            return Product.nieuw(terug_naar = terug_naar)
+        
+        if aantal_producten == 0:
+            return None
+        
+        if selectiemethode == "selecteren":
+            
+            ingrediënt_uuid = Ingrediënt.selecteren(
+                toestaan_nieuw = toestaan_nieuw,
+                selectiemethode = "selecteren",
+                terug_naar = terug_naar,
+                )
+            if ingrediënt_uuid is commando.STOP:
+                return commando.STOP
+            
+            return Product.subregister().filter(
+                ingrediënt_uuid = ingrediënt_uuid,
+            ).selecteren(
+                toestaan_nieuw = toestaan_nieuw,
+                terug_naar = terug_naar,
+                )
+        
+        return Product.subregister().zoeken(veld = "product_naam")
     
     @staticmethod
     def weergeven() -> commando.Doorgaan:
         Product.subregister().weergeven()
         return commando.DOORGAAN
     
-    # @staticmethod
-    # def verwijderen() -> commando.Doorgaan:
+    @staticmethod
+    def verwijderen() -> commando.Doorgaan:
         
-    #     ingrediënt_uuid = Ingrediënt.selecteren(toestaan_nieuw = False)
-    #     if ingrediënt_uuid is commando.STOP or ingrediënt_uuid is None:
-    #         return commando.DOORGAAN
+        product_uuid = Product.selecteren(toestaan_nieuw = False)
+        if product_uuid is commando.STOP or product_uuid is None:
+            return commando.DOORGAAN
         
-    #     print(f">>> \"{Ingrediënt.subregister()[ingrediënt_uuid]}\" verwijderd")
-    #     del Ingrediënt.subregister()[ingrediënt_uuid]
-    #     return commando.DOORGAAN
+        print(f">>> \"{Product.subregister()[product_uuid]}\" verwijderd")
+        del Ingrediënt.subregister()[product_uuid]
+        return commando.DOORGAAN
     
-    # @staticmethod
-    # def bewerken() -> commando.Doorgaan | None:
+    @staticmethod
+    def bewerken() -> commando.Doorgaan | None:
         
-    #     ingrediënt_uuid = Ingrediënt.selecteren(toestaan_nieuw = False)
-    #     if ingrediënt_uuid is commando.STOP or ingrediënt_uuid is None:
-    #         return commando.DOORGAAN
+        product_uuid = Product.selecteren(toestaan_nieuw = False)
+        if product_uuid is commando.STOP or product_uuid is None:
+            return commando.DOORGAAN
         
-    #     veld = Ingrediënt.kiezen_veld()
-    #     if veld is commando.STOP:
-    #         return commando.DOORGAAN
+        veld = Product.kiezen_veld()
+        if veld is commando.STOP:
+            return commando.DOORGAAN
         
-    #     waarde_nieuw = invoeren(
-    #         tekst_beschrijving = veld,
-    #         invoer_type = Ingrediënt.velden()[veld],
-    #         uitsluiten_leeg = True,
-    #         valideren = True,
-    #         uitvoer_kleine_letters = True,
-    #         )
+        waarde_nieuw = invoeren(
+            tekst_beschrijving = veld,
+            invoer_type = Product.velden()[veld],
+            uitsluiten_leeg = True,
+            valideren = True,
+            uitvoer_kleine_letters = True,
+            )
+        if waarde_nieuw is commando.STOP:
+            return commando.DOORGAAN 
         
-    #     if waarde_nieuw is commando.STOP:
-    #         return commando.DOORGAAN 
+        waarde_oud = getattr(Product.subregister()[product_uuid], veld)
         
-    #     waarde_oud = getattr(Ingrediënt.subregister()[ingrediënt_uuid], veld)
-        
-    #     print(f"\n>>> veld \"{veld}\" veranderd van \"{waarde_oud}\" naar \"{waarde_nieuw}\"")
-    #     setattr(Ingrediënt.subregister()[ingrediënt_uuid], veld, waarde_nieuw)
-    #     return commando.DOORGAAN
+        print(f"\n>>> veld \"{veld}\" veranderd van \"{waarde_oud}\" naar \"{waarde_nieuw}\"")
+        setattr(Product.subregister()[product_uuid], veld, waarde_nieuw)
+        return commando.DOORGAAN
     
-    # @staticmethod
-    # def kiezen_veld() -> str | commando.Stop:
-    #     return kiezen(
-    #         opties = Ingrediënt.velden(),
-    #         tekst_beschrijving = "veld om te bewerken",
-    #         )
+    @staticmethod
+    def kiezen_veld() -> str | commando.Stop:
+        return kiezen(
+            opties = list(Product.velden().keys()),
+            tekst_beschrijving = "veld om te bewerken",
+            )
     
     @staticmethod
     def toevoegen_menu(super_menu: Menu) -> Menu:
@@ -208,13 +230,13 @@ class Product(GeregistreerdObject):
         
         super_menu.toevoegen_optie(menu_product, "menu product")
         
-        menu_product.toevoegen_optie(Product.nieuw, "nieuwe product")
-        # menu_product.toevoegen_optie(Product.bewerken, "bewerken product")
-        # menu_product.toevoegen_optie(Product.verwijderen, "verwijderen product")
+        menu_product.toevoegen_optie(Product.nieuw, "nieuw product")
+        menu_product.toevoegen_optie(Product.bewerken, "bewerken product")
+        menu_product.toevoegen_optie(Product.verwijderen, "verwijderen product")
         menu_product.toevoegen_optie(Product.weergeven, "weergeven product")
         
         return menu_product
     
     @staticmethod
-    def velden() -> List[str]:
-        return [veld for veld in Product.__annotations__ if not veld.startswith("_")]
+    def velden() -> Dict[str, str]:
+        return {veld: veld_type for veld, veld_type in Product.__annotations__.items() if not veld.startswith("_")}
