@@ -1,4 +1,4 @@
-"""macro.categorie.hoofdcategorie"""
+"""macro.categorie.hoofdcategorie_gerecht"""
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import ClassVar
@@ -8,16 +8,16 @@ from grienetsiis.register import Subregister, Register, GeregistreerdObject
 
 
 @dataclass
-class Hoofdcategorie(GeregistreerdObject):
+class HoofdcategorieGerecht(GeregistreerdObject):
     
     hoofdcategorie_naam: str
     
-    _SUBREGISTER_NAAM: ClassVar[str] = "hoofdcategorie"
+    _SUBREGISTER_NAAM: ClassVar[str] = "hoofdcategorie_gerecht"
     
     # DUNDER METHODS
     
     def __repr__(self) -> str:
-        return f"hoofdcategorie \"{self.hoofdcategorie_naam}\""
+        return f"hoofdcategorie gerecht \"{self.hoofdcategorie_naam}\""
     
     # CLASS METHODS
     
@@ -25,9 +25,9 @@ class Hoofdcategorie(GeregistreerdObject):
     def nieuw(
         cls,
         geef_id: bool = False,
-        ) -> Hoofdcategorie | commando.Doorgaan:
+        ) -> HoofdcategorieGerecht | commando.Doorgaan:
         
-        print(f"\ninvullen gegevens nieuwe hoofdcategorie")
+        print(f"\ninvullen gegevens nieuwe hoofdcategorie gerecht")
         
         hoofdcategorie_naam = invoeren(
             tekst_beschrijving = "hoofdcategorienaam",
@@ -39,7 +39,7 @@ class Hoofdcategorie(GeregistreerdObject):
         if hoofdcategorie_naam is commando.STOP:
             return commando.DOORGAAN
         
-        print(f"\n>>> nieuwe hoofdcategorie \"{hoofdcategorie_naam}\" gemaakt")
+        print(f"\n>>> nieuwe hoofdcategorie gerecht \"{hoofdcategorie_naam}\" gemaakt")
         
         hoofdcategorie = cls(
             hoofdcategorie_naam = hoofdcategorie_naam,
@@ -53,15 +53,15 @@ class Hoofdcategorie(GeregistreerdObject):
     
     @staticmethod
     def subregister() -> Subregister:
-        return Register()[Hoofdcategorie._SUBREGISTER_NAAM]
+        return Register()[HoofdcategorieGerecht._SUBREGISTER_NAAM]
     
     @staticmethod
     def selecteren(
         toestaan_nieuw: bool = True,
-        terug_naar: str = "terug naar MENU GEGEVENS HOOFDCATEGORIE",
+        terug_naar: str = "terug naar MENU GEGEVENS HOOFDCATEGORIE GERECHT",
         ) -> str | commando.Stop | None:
         
-        return Hoofdcategorie.subregister().selecteren(
+        return HoofdcategorieGerecht.subregister().selecteren(
             geef_id = True,
             toestaan_nieuw = toestaan_nieuw,
             terug_naar = terug_naar,
@@ -69,28 +69,28 @@ class Hoofdcategorie(GeregistreerdObject):
     
     @staticmethod
     def weergeven() -> commando.Doorgaan:
-        Hoofdcategorie.subregister().weergeven()
+        HoofdcategorieGerecht.subregister().weergeven()
         return commando.DOORGAAN
     
     @staticmethod
     def verwijderen() -> commando.Doorgaan:
         
-        hoofdcategorie_uuid = Hoofdcategorie.selecteren(toestaan_nieuw = False)
+        hoofdcategorie_uuid = HoofdcategorieGerecht.selecteren(toestaan_nieuw = False)
         if hoofdcategorie_uuid is commando.STOP or hoofdcategorie_uuid is None:
             return commando.DOORGAAN
         
-        print(f">>> \"{Hoofdcategorie.subregister()[hoofdcategorie_uuid]}\" verwijderd")
-        del Hoofdcategorie.subregister()[hoofdcategorie_uuid]
+        print(f">>> \"{HoofdcategorieGerecht.subregister()[hoofdcategorie_uuid]}\" verwijderd")
+        del HoofdcategorieGerecht.subregister()[hoofdcategorie_uuid]
         return commando.DOORGAAN
     
     @staticmethod
     def bewerken() -> commando.Doorgaan | None:
         
-        hoofdcategorie_uuid = Hoofdcategorie.selecteren(toestaan_nieuw = False)
+        hoofdcategorie_uuid = HoofdcategorieGerecht.selecteren(toestaan_nieuw = False)
         if hoofdcategorie_uuid is commando.STOP or hoofdcategorie_uuid is None:
             return commando.DOORGAAN
         
-        print(f"\nbewerken gegevens {Hoofdcategorie.subregister()[hoofdcategorie_uuid]}\n")
+        print(f"\nbewerken gegevens {HoofdcategorieGerecht.subregister()[hoofdcategorie_uuid]}\n")
         
         waarde_nieuw = invoeren(
             tekst_beschrijving = "hoofdcategorienaam",
@@ -102,22 +102,22 @@ class Hoofdcategorie(GeregistreerdObject):
         if waarde_nieuw is commando.STOP:
             return commando.DOORGAAN
         
-        waarde_oud = Hoofdcategorie.subregister()[hoofdcategorie_uuid].hoofdcategorie_naam
+        waarde_oud = HoofdcategorieGerecht.subregister()[hoofdcategorie_uuid].hoofdcategorie_naam
         
         print(f"\n>>> veld \"hoofdcategorie_naam\" veranderd van \"{waarde_oud}\" naar \"{waarde_nieuw}\"")
-        Hoofdcategorie.subregister()[hoofdcategorie_uuid].hoofdcategorie_naam = waarde_nieuw
+        HoofdcategorieGerecht.subregister()[hoofdcategorie_uuid].hoofdcategorie_naam = waarde_nieuw
         return commando.DOORGAAN
     
     @staticmethod
     def toevoegen_menu(super_menu: Menu) -> Menu:
         
-        menu_hoofdcategorie = Menu("MENU GEGEVENS HOOFDCATEGORIE", super_menu, True)
+        menu_hoofdcategorie_gerecht = Menu("MENU GEGEVENS HOOFDCATEGORIE GERECHT", super_menu, True)
         
-        super_menu.toevoegen_optie(menu_hoofdcategorie, "menu hoofdcategorie")
+        super_menu.toevoegen_optie(menu_hoofdcategorie_gerecht, "menu hoofdcategorie gerecht")
         
-        menu_hoofdcategorie.toevoegen_optie(Hoofdcategorie.nieuw, "nieuwe hoofdcategorie")
-        menu_hoofdcategorie.toevoegen_optie(Hoofdcategorie.bewerken, "bewerken hoofdcategorie")
-        menu_hoofdcategorie.toevoegen_optie(Hoofdcategorie.verwijderen, "verwijderen hoofdcategorie")
-        menu_hoofdcategorie.toevoegen_optie(Hoofdcategorie.weergeven, "weergeven hoofdcategorie")
+        menu_hoofdcategorie_gerecht.toevoegen_optie(HoofdcategorieGerecht.nieuw, "nieuwe hoofdcategorie gerecht")
+        menu_hoofdcategorie_gerecht.toevoegen_optie(HoofdcategorieGerecht.bewerken, "bewerken hoofdcategorie gerecht")
+        menu_hoofdcategorie_gerecht.toevoegen_optie(HoofdcategorieGerecht.verwijderen, "verwijderen hoofdcategorie gerecht")
+        menu_hoofdcategorie_gerecht.toevoegen_optie(HoofdcategorieGerecht.weergeven, "weergeven hoofdcategorie gerecht")
         
-        return menu_hoofdcategorie
+        return menu_hoofdcategorie_gerecht

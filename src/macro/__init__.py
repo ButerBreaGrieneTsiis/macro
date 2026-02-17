@@ -6,7 +6,7 @@ from pathlib import Path
 from grienetsiis.json import Ontcijferaar, Vercijferaar
 from grienetsiis.register import Register
 
-from macro.categorie import Hoofdcategorie, Categorie
+from macro.categorie import Hoofdcategorie, HoofdcategorieGerecht, Categorie, CategorieGerecht
 from macro.product import Ingrediënt, Merk, Product
 from macro.voedingswaarde import Eenheid, Voedingswaarde
 
@@ -32,6 +32,15 @@ Register.registreer_type(
     ontcijfer_functie_objecten = Hoofdcategorie.van_json,
     )
 Register.registreer_type(
+    geregistreerd_type = HoofdcategorieGerecht,
+    subregister_naam = HoofdcategorieGerecht._SUBREGISTER_NAAM,
+    bestandsmap = Path("gegevens"),
+    bestandsnaam = "hoofdcategorie_gerecht",
+    vercijfer_methode = "functie",
+    vercijfer_functie_objecten = HoofdcategorieGerecht.naar_json,
+    ontcijfer_functie_objecten = HoofdcategorieGerecht.van_json,
+    )
+Register.registreer_type(
     geregistreerd_type = Categorie,
     subregister_naam = Categorie._SUBREGISTER_NAAM,
     bestandsmap = Path("gegevens"),
@@ -39,6 +48,15 @@ Register.registreer_type(
     vercijfer_methode = "functie",
     vercijfer_functie_objecten = Categorie.naar_json,
     ontcijfer_functie_objecten = Categorie.van_json,
+    )
+Register.registreer_type(
+    geregistreerd_type = CategorieGerecht,
+    subregister_naam = CategorieGerecht._SUBREGISTER_NAAM,
+    bestandsmap = Path("gegevens"),
+    bestandsnaam = "categorie_gerecht",
+    vercijfer_methode = "functie",
+    vercijfer_functie_objecten = CategorieGerecht.naar_json,
+    ontcijfer_functie_objecten = CategorieGerecht.van_json,
     )
 Register.registreer_type(
     geregistreerd_type = Ingrediënt,
