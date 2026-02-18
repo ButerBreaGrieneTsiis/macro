@@ -1,9 +1,8 @@
 """macro.product.merk"""
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import ClassVar
 
-from grienetsiis.opdrachtprompt import invoeren, Menu, commando
+from grienetsiis.opdrachtprompt import invoeren, commando
 from grienetsiis.register import Subregister, Register, GeregistreerdObject
 
 
@@ -11,8 +10,6 @@ from grienetsiis.register import Subregister, Register, GeregistreerdObject
 class Merk(GeregistreerdObject):
     
     merk_naam: str
-    
-    _SUBREGISTER_NAAM: ClassVar[str] = "merk"
     
     # DUNDER METHODS
     
@@ -102,17 +99,3 @@ class Merk(GeregistreerdObject):
         print(f"\n>>> veld \"merk_naam\" veranderd van \"{waarde_oud}\" naar \"{waarde_nieuw}\"")
         Merk.subregister()[merk_uuid].merk_naam = waarde_nieuw
         return commando.DOORGAAN
-    
-    @staticmethod
-    def toevoegen_menu(super_menu: Menu) -> Menu:
-        
-        menu_merk = Menu("MENU GEGEVENS MERK", super_menu, True)
-        
-        super_menu.toevoegen_optie(menu_merk, "menu merk")
-        
-        menu_merk.toevoegen_optie(Merk.nieuw, "nieuwe merk")
-        menu_merk.toevoegen_optie(Merk.bewerken, "bewerken merk")
-        menu_merk.toevoegen_optie(Merk.verwijderen, "verwijderen merk")
-        menu_merk.toevoegen_optie(Merk.weergeven, "weergeven merk")
-        
-        return menu_merk

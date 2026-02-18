@@ -12,14 +12,14 @@ from macro.voedingswaarde import Eenheid, Hoeveelheid
 @dataclass
 class Voedingswaarde(BasisType):
     
-    _calorieën: int
-    _vetten: int
-    _verzadigd: int
-    _koolhydraten: int
-    _suikers: int
-    _eiwitten: int
-    _vezels: int
-    _zout: int
+    _calorieën: int = 0
+    _vetten: int = 0
+    _verzadigd: int = 0
+    _koolhydraten: int = 0
+    _suikers: int = 0
+    _eiwitten: int = 0
+    _vezels: int = 0
+    _zout: int = 0
     
     _CALORIE_PER_GRAM_VET: ClassVar[float] = 9.0
     _CALORIE_PER_GRAM_KOOLHYDRAAT: ClassVar[float] = 4.0

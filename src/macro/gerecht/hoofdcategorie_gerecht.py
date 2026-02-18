@@ -1,9 +1,8 @@
 """macro.categorie.hoofdcategorie_gerecht"""
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import ClassVar
 
-from grienetsiis.opdrachtprompt import invoeren, Menu, commando
+from grienetsiis.opdrachtprompt import invoeren, commando
 from grienetsiis.register import Subregister, Register, GeregistreerdObject
 
 
@@ -11,8 +10,6 @@ from grienetsiis.register import Subregister, Register, GeregistreerdObject
 class HoofdcategorieGerecht(GeregistreerdObject):
     
     hoofdcategorie_naam: str
-    
-    _SUBREGISTER_NAAM: ClassVar[str] = "hoofdcategorie_gerecht"
     
     # DUNDER METHODS
     
@@ -107,17 +104,3 @@ class HoofdcategorieGerecht(GeregistreerdObject):
         print(f"\n>>> veld \"hoofdcategorie_naam\" veranderd van \"{waarde_oud}\" naar \"{waarde_nieuw}\"")
         HoofdcategorieGerecht.subregister()[hoofdcategorie_uuid].hoofdcategorie_naam = waarde_nieuw
         return commando.DOORGAAN
-    
-    @staticmethod
-    def toevoegen_menu(super_menu: Menu) -> Menu:
-        
-        menu_hoofdcategorie_gerecht = Menu("MENU GEGEVENS HOOFDCATEGORIE GERECHT", super_menu, True)
-        
-        super_menu.toevoegen_optie(menu_hoofdcategorie_gerecht, "menu hoofdcategorie gerecht")
-        
-        menu_hoofdcategorie_gerecht.toevoegen_optie(HoofdcategorieGerecht.nieuw, "nieuwe hoofdcategorie gerecht")
-        menu_hoofdcategorie_gerecht.toevoegen_optie(HoofdcategorieGerecht.bewerken, "bewerken hoofdcategorie gerecht")
-        menu_hoofdcategorie_gerecht.toevoegen_optie(HoofdcategorieGerecht.verwijderen, "verwijderen hoofdcategorie gerecht")
-        menu_hoofdcategorie_gerecht.toevoegen_optie(HoofdcategorieGerecht.weergeven, "weergeven hoofdcategorie gerecht")
-        
-        return menu_hoofdcategorie_gerecht

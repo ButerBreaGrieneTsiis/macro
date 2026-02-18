@@ -1,12 +1,12 @@
 """macro.product.ingredient"""
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import ClassVar, Dict, Literal
+from typing import Dict, Literal
 
-from grienetsiis.opdrachtprompt import invoeren, kiezen, Menu, commando
+from grienetsiis.opdrachtprompt import invoeren, kiezen, commando
 from grienetsiis.register import Subregister, Register, GeregistreerdObject
 
-from macro.categorie import Hoofdcategorie, Categorie
+from macro.product import Hoofdcategorie, Categorie
 
 
 @dataclass
@@ -14,8 +14,6 @@ class Ingrediënt(GeregistreerdObject):
     
     ingrediënt_naam: str
     categorie_uuid: str
-    
-    _SUBREGISTER_NAAM: ClassVar[str] = "ingrediënt"
     
     # DUNDER METHODS
     
@@ -199,20 +197,6 @@ class Ingrediënt(GeregistreerdObject):
             opties = list(Ingrediënt.velden().keys()),
             tekst_beschrijving = "veld om te bewerken",
             )
-    
-    @staticmethod
-    def toevoegen_menu(super_menu: Menu) -> Menu:
-        
-        menu_ingrediënt = Menu("MENU GEGEVENS INGREDIËNT", super_menu, True)
-        
-        super_menu.toevoegen_optie(menu_ingrediënt, "menu ingrediënt")
-        
-        menu_ingrediënt.toevoegen_optie(Ingrediënt.nieuw, "nieuwe ingrediënt")
-        menu_ingrediënt.toevoegen_optie(Ingrediënt.bewerken, "bewerken ingrediënt")
-        menu_ingrediënt.toevoegen_optie(Ingrediënt.verwijderen, "verwijderen ingrediënt")
-        menu_ingrediënt.toevoegen_optie(Ingrediënt.weergeven, "weergeven ingrediënt")
-        
-        return menu_ingrediënt
     
     @staticmethod
     def velden() -> Dict[str, str]:

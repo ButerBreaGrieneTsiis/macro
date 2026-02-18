@@ -6,9 +6,10 @@ from pathlib import Path
 from grienetsiis.json import Ontcijferaar, Vercijferaar
 from grienetsiis.register import Register
 
-from macro.categorie import Hoofdcategorie, HoofdcategorieGerecht, Categorie, CategorieGerecht
-from macro.product import Ingrediënt, Merk, Product
+from macro.gerecht import HoofdcategorieGerecht, CategorieGerecht
+from macro.product import Hoofdcategorie, Categorie, Ingrediënt, Merk, Product
 from macro.voedingswaarde import Eenheid, Voedingswaarde
+from macro.dag import Dag
 
 
 __version__ = "1.0.0-dev"
@@ -18,13 +19,12 @@ ENUMS = {
     }
 
 Register.instellen(
-    registratie_methode = "uuid",
     bestandsmap = Path("gegevens"),
     )
 
 Register.registreer_type(
     geregistreerd_type = Hoofdcategorie,
-    subregister_naam = Hoofdcategorie._SUBREGISTER_NAAM,
+    subregister_naam = "hoofdcategorie",
     bestandsmap = Path("gegevens"),
     bestandsnaam = "hoofdcategorie",
     vercijfer_methode = "functie",
@@ -33,7 +33,7 @@ Register.registreer_type(
     )
 Register.registreer_type(
     geregistreerd_type = HoofdcategorieGerecht,
-    subregister_naam = HoofdcategorieGerecht._SUBREGISTER_NAAM,
+    subregister_naam = "hoofdcategorie_gerecht",
     bestandsmap = Path("gegevens"),
     bestandsnaam = "hoofdcategorie_gerecht",
     vercijfer_methode = "functie",
@@ -42,7 +42,7 @@ Register.registreer_type(
     )
 Register.registreer_type(
     geregistreerd_type = Categorie,
-    subregister_naam = Categorie._SUBREGISTER_NAAM,
+    subregister_naam = "categorie",
     bestandsmap = Path("gegevens"),
     bestandsnaam = "categorie",
     vercijfer_methode = "functie",
@@ -51,7 +51,7 @@ Register.registreer_type(
     )
 Register.registreer_type(
     geregistreerd_type = CategorieGerecht,
-    subregister_naam = CategorieGerecht._SUBREGISTER_NAAM,
+    subregister_naam = "categorie_gerecht",
     bestandsmap = Path("gegevens"),
     bestandsnaam = "categorie_gerecht",
     vercijfer_methode = "functie",
@@ -60,7 +60,7 @@ Register.registreer_type(
     )
 Register.registreer_type(
     geregistreerd_type = Ingrediënt,
-    subregister_naam = Ingrediënt._SUBREGISTER_NAAM,
+    subregister_naam = "ingrediënt",
     bestandsmap = Path("gegevens"),
     bestandsnaam = "ingrediënt",
     vercijfer_methode = "functie",
@@ -69,7 +69,7 @@ Register.registreer_type(
     )
 Register.registreer_type(
     geregistreerd_type = Merk,
-    subregister_naam = Merk._SUBREGISTER_NAAM,
+    subregister_naam = "merk",
     bestandsmap = Path("gegevens"),
     bestandsnaam = "merk",
     vercijfer_methode = "functie",
@@ -78,7 +78,7 @@ Register.registreer_type(
     )
 Register.registreer_type(
     geregistreerd_type = Product,
-    subregister_naam = Product._SUBREGISTER_NAAM,
+    subregister_naam = "product",
     bestandsmap = Path("gegevens"),
     bestandsnaam = "product",
     vercijfer_methode = "functie",
@@ -106,4 +106,14 @@ Register.registreer_type(
             ),
         ],
     enums = ENUMS,
+    )
+Register.registreer_type(
+    geregistreerd_type = Dag,
+    subregister_naam = "dag",
+    registratie_methode = "property",
+    bestandsmap = Path("gegevens"),
+    bestandsnaam = "dag",
+    vercijfer_methode = "functie",
+    vercijfer_functie_objecten = Dag.naar_json,
+    ontcijfer_functie_objecten = Dag.van_json,
     )

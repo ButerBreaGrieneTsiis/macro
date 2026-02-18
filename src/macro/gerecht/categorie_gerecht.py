@@ -1,39 +1,37 @@
-"""macro.categorie.categorie"""
+"""macro.categorie.categorie_gerecht"""
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import ClassVar, Dict, Literal
+from typing import Dict, Literal
 
-from grienetsiis.opdrachtprompt import invoeren, kiezen, Menu, commando
+from grienetsiis.opdrachtprompt import invoeren, kiezen, commando
 from grienetsiis.register import Subregister, Register, GeregistreerdObject
 
-from macro.categorie import Hoofdcategorie
+from macro.gerecht import HoofdcategorieGerecht
 
 
 @dataclass
-class Categorie(GeregistreerdObject):
+class CategorieGerecht(GeregistreerdObject):
     
     categorie_naam: str
     hoofdcategorie_uuid: str
     
-    _SUBREGISTER_NAAM: ClassVar[str] = "categorie"
-    
     # DUNDER METHODS
     
     def __repr__(self) -> str:
-        return f"categorie \"{self.categorie_naam}\""
+        return f"categorie gerecht\"{self.categorie_naam}\""
     
     # CLASS METHODS
     
     @classmethod
     def nieuw(
         cls,
-        terug_naar: str = "terug naar MENU GEGEVENS CATEGORIE",
+        terug_naar: str = "terug naar MENU GEGEVENS CATEGORIE GERECHT",
         geef_id: bool = False,
-        ) -> Categorie | commando.Doorgaan:
+        ) -> CategorieGerecht | commando.Doorgaan:
         
-        print(f"\ninvullen gegevens nieuwe categorie")
+        print(f"\ninvullen gegevens nieuwe categorie gerecht")
         
-        hoofdcategorie_uuid = Hoofdcategorie.selecteren(terug_naar = terug_naar)
+        hoofdcategorie_uuid = HoofdcategorieGerecht.selecteren(terug_naar = terug_naar)
         if hoofdcategorie_uuid is commando.STOP or hoofdcategorie_uuid is None:
             return commando.DOORGAAN
         
@@ -47,7 +45,7 @@ class Categorie(GeregistreerdObject):
         if categorie_naam is commando.STOP:
             return commando.DOORGAAN
         
-        print(f"\n>>> nieuwe categorie \"{categorie_naam}\" gemaakt")
+        print(f"\n>>> nieuwe categorie gerecht \"{categorie_naam}\" gemaakt")
         
         categorie = cls(
             categorie_naam = categorie_naam,
@@ -61,26 +59,26 @@ class Categorie(GeregistreerdObject):
     # PROPERTIES
     
     @property
-    def hoofdcategorie(self) -> Hoofdcategorie:
-        return Hoofdcategorie.subregister()[self.hoofdcategorie_uuid]
+    def hoofdcategorie_gerecht(self) -> HoofdcategorieGerecht:
+        return HoofdcategorieGerecht.subregister()[self.hoofdcategorie_uuid]
     
     # STATIC METHODS
     
     @staticmethod
     def subregister() -> Subregister:
-        return Register()[Categorie._SUBREGISTER_NAAM]
+        return Register()[CategorieGerecht._SUBREGISTER_NAAM]
     
     @staticmethod
     def selecteren(
         toestaan_nieuw: bool = True,
         selectiemethode: Literal["nieuwe", "selecteren", "zoeken"] | None = None,
-        terug_naar: str = "terug naar MENU GEGEVENS CATEGORIE",
+        terug_naar: str = "terug naar MENU GEGEVENS CATEGORIE GERECHT",
         ) -> str | commando.Stop | commando.Doorgaan | None:
         
-        aantal_categorieën = len(Categorie.subregister())
+        aantal_categorieën = len(CategorieGerecht.subregister())
         
         if aantal_categorieën == 0:
-            print(f"\n>>> geen categorieën aanwezig")
+            print(f"\n>>> geen categorieën gerecht aanwezig")
             
             if not toestaan_nieuw:
                 return None
@@ -92,22 +90,22 @@ class Categorie(GeregistreerdObject):
             opties = {}
             
             if toestaan_nieuw:
-                opties["nieuw"] = "nieuw categorie"
+                opties["nieuw"] = "nieuw categorie gerecht"
             
             if aantal_categorieën > 0:
-                opties["selecteren"] = "selecteren via hoofdcategorie"
+                opties["selecteren"] = "selecteren via hoofdcategorie gerecht"
                 opties["zoeken"] = "zoeken op categorienaam"
             
             selectiemethode = kiezen(
                 opties = opties,
-                tekst_beschrijving = "selectiemethode voor categorie",
+                tekst_beschrijving = "selectiemethode voor categorie gerecht",
                 tekst_annuleren = terug_naar,
                 )
             if selectiemethode is commando.STOP:
                 return commando.STOP
         
         if selectiemethode == "nieuw":
-            return Categorie.nieuw(
+            return CategorieGerecht.nieuw(
                 terug_naar = terug_naar,
                 geef_id = True,
                 )
@@ -117,35 +115,35 @@ class Categorie(GeregistreerdObject):
         
         if selectiemethode == "selecteren":
             
-            hoofdcategorie_uuid = Hoofdcategorie.selecteren(
+            hoofdcategorie_uuid = HoofdcategorieGerecht.selecteren(
                 toestaan_nieuw = toestaan_nieuw,
                 terug_naar = terug_naar,
                 )
             if hoofdcategorie_uuid is commando.STOP:
                 return commando.STOP
             
-            return Categorie.subregister().filter(
+            return CategorieGerecht.subregister().filter(
                 hoofdcategorie_uuid = hoofdcategorie_uuid,
             ).selecteren(
                 toestaan_nieuw = toestaan_nieuw,
                 terug_naar = terug_naar,
                 )
         
-        return Categorie.subregister().zoeken(veld = "categorie_naam")
+        return CategorieGerecht.subregister().zoeken(veld = "categorie_naam")
     
     @staticmethod
     def weergeven(
-        terug_naar: str = "terug naar MENU GEGEVENS CATEGORIE",
+        terug_naar: str = "terug naar MENU GEGEVENS CATEGORIE GERECHT",
         ) -> commando.Doorgaan:
         
-        hoofdcategorie_uuid = Hoofdcategorie.selecteren(
+        hoofdcategorie_uuid = HoofdcategorieGerecht.selecteren(
             toestaan_nieuw = False,
             terug_naar = terug_naar,
             )
         if hoofdcategorie_uuid is commando.STOP or hoofdcategorie_uuid is None:
             return commando.DOORGAAN
         
-        Categorie.subregister().filter(
+        CategorieGerecht.subregister().filter(
             hoofdcategorie_uuid = hoofdcategorie_uuid,
             ).weergeven()
         return commando.DOORGAAN
@@ -153,28 +151,28 @@ class Categorie(GeregistreerdObject):
     @staticmethod
     def verwijderen() -> commando.Doorgaan:
         
-        categorie_uuid = Categorie.selecteren(toestaan_nieuw = False)
+        categorie_uuid = CategorieGerecht.selecteren(toestaan_nieuw = False)
         if categorie_uuid is commando.STOP or categorie_uuid is None:
             return commando.DOORGAAN
         
-        print(f">>> \"{Categorie.subregister()[categorie_uuid]}\" verwijderd")
-        del Categorie.subregister()[categorie_uuid]
+        print(f">>> \"{CategorieGerecht.subregister()[categorie_uuid]}\" verwijderd")
+        del CategorieGerecht.subregister()[categorie_uuid]
         return commando.DOORGAAN
     
     @staticmethod
     def bewerken() -> commando.Doorgaan | None:
         
-        categorie_uuid = Categorie.selecteren(toestaan_nieuw = False)
+        categorie_uuid = CategorieGerecht.selecteren(toestaan_nieuw = False)
         if categorie_uuid is commando.STOP or categorie_uuid is None:
             return commando.DOORGAAN
         
-        veld = Categorie.kiezen_veld()
+        veld = CategorieGerecht.kiezen_veld()
         if veld is commando.STOP:
             return commando.DOORGAAN
         
         waarde_nieuw = invoeren(
             tekst_beschrijving = veld,
-            invoer_type = Categorie.velden()[veld],
+            invoer_type = CategorieGerecht.velden()[veld],
             uitsluiten_leeg = True,
             valideren = True,
             uitvoer_kleine_letters = True,
@@ -182,33 +180,19 @@ class Categorie(GeregistreerdObject):
         if waarde_nieuw is commando.STOP:
             return commando.DOORGAAN 
         
-        waarde_oud = getattr(Categorie.subregister()[categorie_uuid], veld)
+        waarde_oud = getattr(CategorieGerecht.subregister()[categorie_uuid], veld)
         
         print(f"\n>>> veld \"{veld}\" veranderd van \"{waarde_oud}\" naar \"{waarde_nieuw}\"")
-        setattr(Categorie.subregister()[categorie_uuid], veld, waarde_nieuw)
+        setattr(CategorieGerecht.subregister()[categorie_uuid], veld, waarde_nieuw)
         return commando.DOORGAAN
     
     @staticmethod
     def kiezen_veld() -> str | commando.Stop:
         return kiezen(
-            opties = list(Categorie.velden().keys()),
+            opties = list(CategorieGerecht.velden().keys()),
             tekst_beschrijving = "veld om te bewerken",
             )
     
     @staticmethod
-    def toevoegen_menu(super_menu: Menu) -> Menu:
-        
-        menu_categorie = Menu("MENU GEGEVENS CATEGORIE", super_menu, True)
-        
-        super_menu.toevoegen_optie(menu_categorie, "menu categorie")
-        
-        menu_categorie.toevoegen_optie(Categorie.nieuw, "nieuwe categorie")
-        menu_categorie.toevoegen_optie(Categorie.bewerken, "bewerken categorie")
-        menu_categorie.toevoegen_optie(Categorie.verwijderen, "verwijderen categorie")
-        menu_categorie.toevoegen_optie(Categorie.weergeven, "weergeven categorie")
-        
-        return menu_categorie
-    
-    @staticmethod
     def velden() -> Dict[str, str]:
-        return {veld: veld_type for veld, veld_type in Categorie.__annotations__.items() if not veld.startswith("_")}
+        return {veld: veld_type for veld, veld_type in CategorieGerecht.__annotations__.items() if not veld.startswith("_")}
