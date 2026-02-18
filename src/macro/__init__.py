@@ -8,7 +8,7 @@ from grienetsiis.register import Register
 
 from macro.gerecht import HoofdcategorieGerecht, CategorieGerecht
 from macro.product import Hoofdcategorie, Categorie, Ingrediënt, Merk, Product
-from macro.voedingswaarde import Eenheid, Voedingswaarde
+from macro.voedingswaarde import Eenheid, Hoeveelheid, Voedingswaarde
 from macro.dag import Dag
 
 
@@ -111,9 +111,26 @@ Register.registreer_type(
     geregistreerd_type = Dag,
     subregister_naam = "dag",
     registratie_methode = "property",
-    bestandsmap = Path("gegevens"),
+    opslaan = "instantie",
+    bestandsmap = Path("gegevens\\dagen"),
     bestandsnaam = "dag",
     vercijfer_methode = "functie",
     vercijfer_functie_objecten = Dag.naar_json,
     ontcijfer_functie_objecten = Dag.van_json,
+    vercijfer_functie_subobjecten = [
+        Vercijferaar(
+            class_naam = "Hoeveelheid",
+            vercijfer_functie_naam = "naar_json",
+            ),
+        ],
+    ontcijfer_functie_subobjecten = [
+        Ontcijferaar(
+            velden = frozenset((
+                "waarde",
+                "eenheid",
+                )),
+            ontcijfer_functie = Hoeveelheid.van_json,
+            ),
+        ],
+    enums = ENUMS,
     )

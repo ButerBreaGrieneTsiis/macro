@@ -101,6 +101,35 @@ class Product(GeregistreerdObject):
     
     # INSTANCE METHODS
     
+    def selecteren_eenheid(
+        self,
+        terug_naar: str,
+        toestaan_nieuw: bool = True,
+        ) -> Eenheid | commando.Stop:
+        
+        opties_eenheden = {self.basis_eenheid.enkelvoud: f"per \"{self.basis_eenheid.meervoud}\""}
+        opties_eenheden |= {eenheid: f"per \"{eenheid}\"" for eenheid in self.eenheden.keys()}
+        
+        if toestaan_nieuw:
+            opties_eenheden |= {"nieuwe eenheid": "nieuwe eenheid"}
+        
+        keuze_eenheid = kiezen(
+            opties = opties_eenheden,
+            tekst_beschrijving = "eenheid",
+            tekst_annuleren = terug_naar,
+            )
+        if keuze_eenheid is commando.STOP:
+            return commando.STOP
+        
+        if keuze_eenheid == "nieuwe eenheid":
+            eenheid = self.bewerken_eenheden(terug_naar = terug_naar)
+            if eenheid is commando.DOORGAAN:
+                return commando.STOP
+        else:
+            eenheid = Eenheid.van_tekst(keuze_eenheid)
+        
+        return eenheid
+    
     def bewerken_naam(self) -> commando.Doorgaan:
         
         waarde_oud = self.product_naam
@@ -151,7 +180,7 @@ class Product(GeregistreerdObject):
     def bewerken_eenheden(
         self,
         terug_naar: str | None = None,
-        ) -> commando.Doorgaan:
+        ) -> Eenheid | commando.Doorgaan:
         
         if terug_naar is None:
             terug_naar = f"MENU BEWERKEN ({f"{self}".upper()})"
@@ -201,6 +230,8 @@ class Product(GeregistreerdObject):
             print(f"\n>>> eenheid \"{eenheid.meervoud}\" toegevoegd van {Hoeveelheid(waarde, self.basis_eenheid)}")
             
             self.eenheden[eenheid.enkelvoud] = waarde
+        
+        return eenheid
     
     def bewerken_voedingswaarde(self) -> commando.Doorgaan:
         
@@ -241,7 +272,6 @@ class Product(GeregistreerdObject):
         else:
             print(f"EENHEID          HOEVEELHEID CALORIEËN")
             [print(f"{f"{Hoeveelheid(1, Eenheid(eenheid))}":<18}{f"{Hoeveelheid(waarde, self.basis_eenheid)}":<11} {self.voedingswaarde.calorieën * waarde / 100.0}") for eenheid, waarde in self.eenheden.items()]
-    
     
     # PROPERTIES
     
