@@ -97,7 +97,7 @@ class Merk(GeregistreerdObject):
     def selecteren(
         geef_id: bool = True,
         toestaan_nieuw: bool = True,
-        terug_naar: str = "terug naar MENU GEGEVENS MERK",
+        terug_naar: str = "terug naar MENU MERK",
         ) -> str | commando.Stop | None:
         
         return Merk.subregister().selecteren(
@@ -128,25 +128,33 @@ class Merk(GeregistreerdObject):
     @staticmethod
     def selecteren_en_bewerken() -> commando.Doorgaan:
         
-        merk = Merk.selecteren(
-            geef_id = False,
-            toestaan_nieuw = False,
-            )
-        if merk is commando.STOP or merk is None:
+        while True:
+            
+            merk = Merk.selecteren(
+                geef_id = False,
+                toestaan_nieuw = False,
+                )
+            if merk is commando.STOP:
+                return commando.DOORGAAN
+            if merk is None:
+                continue
+            
+            merk.bewerken()
             return commando.DOORGAAN
-        
-        merk.bewerken()
-        return commando.DOORGAAN
     
     @staticmethod
     def selecteren_en_inspecteren() -> commando.Doorgaan:
         
-        merk = Merk.selecteren(
-            geef_id = False,
-            toestaan_nieuw = False,
-            )
-        if merk is commando.STOP or merk is None:
+        while True:
+            
+            merk = Merk.selecteren(
+                geef_id = False,
+                toestaan_nieuw = False,
+                )
+            if merk is commando.STOP:
+                return commando.DOORGAAN
+            if merk is None:
+                continue
+            
+            merk.inspecteren()
             return commando.DOORGAAN
-        
-        merk.inspecteren()
-        return commando.DOORGAAN

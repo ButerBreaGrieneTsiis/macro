@@ -96,7 +96,7 @@ class Hoofdcategorie(GeregistreerdObject):
     def selecteren(
         geef_id: bool = True,
         toestaan_nieuw: bool = True,
-        terug_naar: str = "terug naar MENU GEGEVENS HOOFDCATEGORIE",
+        terug_naar: str = "terug naar MENU HOOFDCATEGORIE",
         ) -> str | commando.Stop | None:
         
         return Hoofdcategorie.subregister().selecteren(
@@ -127,25 +127,29 @@ class Hoofdcategorie(GeregistreerdObject):
     @staticmethod
     def selecteren_en_bewerken() -> commando.Doorgaan:
         
-        hoofdcategorie = Hoofdcategorie.selecteren(
-            geef_id = False,
-            toestaan_nieuw = False,
-            )
-        if hoofdcategorie is commando.STOP or hoofdcategorie is None:
-            return commando.DOORGAAN
+        while True:
         
-        hoofdcategorie.bewerken()
-        return commando.DOORGAAN
+            hoofdcategorie = Hoofdcategorie.selecteren(
+                geef_id = False,
+                toestaan_nieuw = False,
+                )
+            if hoofdcategorie is commando.STOP or hoofdcategorie is None:
+                return commando.DOORGAAN
+            
+            hoofdcategorie.bewerken()
+            return commando.DOORGAAN
     
     @staticmethod
     def selecteren_en_inspecteren() -> commando.Doorgaan:
         
-        hoofdcategorie = Hoofdcategorie.selecteren(
-            geef_id = False,
-            toestaan_nieuw = False,
-            )
-        if hoofdcategorie is commando.STOP or hoofdcategorie is None:
+        while True:
+            
+            hoofdcategorie = Hoofdcategorie.selecteren(
+                geef_id = False,
+                toestaan_nieuw = False,
+                )
+            if hoofdcategorie is commando.STOP or hoofdcategorie is None:
+                return commando.DOORGAAN
+            
+            hoofdcategorie.inspecteren()
             return commando.DOORGAAN
-        
-        hoofdcategorie.inspecteren()
-        return commando.DOORGAAN

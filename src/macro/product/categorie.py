@@ -140,7 +140,7 @@ class Categorie(GeregistreerdObject):
             print(f"\n>>> geen categorieën aanwezig")
             
             if not toestaan_nieuw:
-                return None
+                return commando.STOP
             
             selectiemethode = "nieuw"
         
@@ -231,25 +231,33 @@ class Categorie(GeregistreerdObject):
     @staticmethod
     def selecteren_en_bewerken() -> commando.Doorgaan:
         
-        categorie = Categorie.selecteren(
-            geef_id = False,
-            toestaan_nieuw = False,
-            )
-        if categorie is commando.STOP or categorie is None:
+        while True:
+            
+            categorie = Categorie.selecteren(
+                geef_id = False,
+                toestaan_nieuw = False,
+                )
+            if categorie is commando.STOP:
+                return commando.DOORGAAN
+            if categorie is None:
+                continue
+            
+            categorie.bewerken()
             return commando.DOORGAAN
-        
-        categorie.bewerken()
-        return commando.DOORGAAN
     
     @staticmethod
     def selecteren_en_inspecteren() -> commando.Doorgaan:
         
-        categorie = Categorie.selecteren(
-            geef_id = False,
-            toestaan_nieuw = False,
-            )
-        if categorie is commando.STOP or categorie is None:
+        while True:
+            
+            categorie = Categorie.selecteren(
+                geef_id = False,
+                toestaan_nieuw = False,
+                )
+            if categorie is commando.STOP:
+                return commando.DOORGAAN
+            if categorie is None:
+                continue
+            
+            categorie.inspecteren()
             return commando.DOORGAAN
-        
-        categorie.inspecteren()
-        return commando.DOORGAAN

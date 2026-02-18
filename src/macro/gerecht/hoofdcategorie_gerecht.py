@@ -96,7 +96,7 @@ class HoofdcategorieGerecht(GeregistreerdObject):
     def selecteren(
         geef_id: bool = True,
         toestaan_nieuw: bool = True,
-        terug_naar: str = "terug naar MENU GEGEVENS HOOFDCATEGORIE GERECHT",
+        terug_naar: str = "terug naar MENU HOOFDCATEGORIE GERECHT",
         ) -> str | commando.Stop | None:
         
         return HoofdcategorieGerecht.subregister().selecteren(
@@ -127,25 +127,29 @@ class HoofdcategorieGerecht(GeregistreerdObject):
     @staticmethod
     def selecteren_en_bewerken() -> commando.Doorgaan:
         
-        hoofdcategorie_gerecht = HoofdcategorieGerecht.selecteren(
-            geef_id = False,
-            toestaan_nieuw = False,
-            )
-        if hoofdcategorie_gerecht is commando.STOP or hoofdcategorie_gerecht is None:
+        while True:
+            
+            hoofdcategorie_gerecht = HoofdcategorieGerecht.selecteren(
+                geef_id = False,
+                toestaan_nieuw = False,
+                )
+            if hoofdcategorie_gerecht is commando.STOP or hoofdcategorie_gerecht is None:
+                return commando.DOORGAAN
+            
+            hoofdcategorie_gerecht.bewerken()
             return commando.DOORGAAN
-        
-        hoofdcategorie_gerecht.bewerken()
-        return commando.DOORGAAN
     
     @staticmethod
     def selecteren_en_inspecteren() -> commando.Doorgaan:
         
-        hoofdcategorie_gerecht = HoofdcategorieGerecht.selecteren(
-            geef_id = False,
-            toestaan_nieuw = False,
-            )
-        if hoofdcategorie_gerecht is commando.STOP or hoofdcategorie_gerecht is None:
-            return commando.DOORGAAN
+        while True:
         
-        hoofdcategorie_gerecht.inspecteren()
-        return commando.DOORGAAN
+            hoofdcategorie_gerecht = HoofdcategorieGerecht.selecteren(
+                geef_id = False,
+                toestaan_nieuw = False,
+                )
+            if hoofdcategorie_gerecht is commando.STOP or hoofdcategorie_gerecht is None:
+                return commando.DOORGAAN
+            
+            hoofdcategorie_gerecht.inspecteren()
+            return commando.DOORGAAN

@@ -28,7 +28,8 @@ menu_gegevens.toevoegen_optie(menu_hoofdcategorie_gerecht, "menu hoofdcategorie 
 menu_gegevens.toevoegen_optie(menu_categorie_gerecht, "menu categorie gerecht")
 
 menu_product.toevoegen_optie(Product.nieuw, "nieuw product")
-menu_product.toevoegen_optie(Product.bewerken, "bewerken product")
+menu_product.toevoegen_optie(Product.selecteren_en_bewerken, "bewerken product")
+menu_product.toevoegen_optie(Product.selecteren_en_inspecteren, "inspecteren product")
 menu_product.toevoegen_optie(Product.verwijderen, "verwijderen product")
 menu_product.toevoegen_optie(Product.weergeven, "weergeven product")
 

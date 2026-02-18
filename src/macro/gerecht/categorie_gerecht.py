@@ -25,7 +25,7 @@ class CategorieGerecht(GeregistreerdObject):
     @classmethod
     def nieuw(
         cls,
-        terug_naar: str = "terug naar MENU GEGEVENS CATEGORIE GERECHT",
+        terug_naar: str = "terug naar MENU CATEGORIE GERECHT",
         geef_id: bool = False,
         ) -> CategorieGerecht | commando.Doorgaan:
         
@@ -131,7 +131,7 @@ class CategorieGerecht(GeregistreerdObject):
         geef_id: bool = True,
         toestaan_nieuw: bool = True,
         selectiemethode: Literal["nieuwe", "selecteren", "zoeken"] | None = None,
-        terug_naar: str = "terug naar MENU GEGEVENS CATEGORIE GERECHT",
+        terug_naar: str = "terug naar MENU CATEGORIE GERECHT",
         ) -> str | commando.Stop | commando.Doorgaan | None:
         
         aantal_categorieën = len(CategorieGerecht.subregister())
@@ -140,7 +140,7 @@ class CategorieGerecht(GeregistreerdObject):
             print(f"\n>>> geen categorieën gerecht aanwezig")
             
             if not toestaan_nieuw:
-                return None
+                return commando.STOP
             
             selectiemethode = "nieuw"
         
@@ -198,7 +198,7 @@ class CategorieGerecht(GeregistreerdObject):
     
     @staticmethod
     def weergeven(
-        terug_naar: str = "terug naar MENU GEGEVENS CATEGORIE GERECHT",
+        terug_naar: str = "terug naar MENU CATEGORIE GERECHT",
         ) -> commando.Doorgaan:
         
         hoofdcategorie_uuid = HoofdcategorieGerecht.selecteren(
@@ -231,25 +231,33 @@ class CategorieGerecht(GeregistreerdObject):
     @staticmethod
     def selecteren_en_bewerken() -> commando.Doorgaan:
         
-        categorie_gerecht = CategorieGerecht.selecteren(
-            geef_id = False,
-            toestaan_nieuw = False,
-            )
-        if categorie_gerecht is commando.STOP or categorie_gerecht is None:
+        while True:
+            
+            categorie_gerecht = CategorieGerecht.selecteren(
+                geef_id = False,
+                toestaan_nieuw = False,
+                )
+            if categorie_gerecht is commando.STOP:
+                return commando.DOORGAAN
+            if categorie_gerecht is None:
+                continue
+            
+            categorie_gerecht.bewerken()
             return commando.DOORGAAN
-        
-        categorie_gerecht.bewerken()
-        return commando.DOORGAAN
     
     @staticmethod
     def selecteren_en_inspecteren() -> commando.Doorgaan:
         
-        categorie_gerecht = CategorieGerecht.selecteren(
-            geef_id = False,
-            toestaan_nieuw = False,
-            )
-        if categorie_gerecht is commando.STOP or categorie_gerecht is None:
+        while True:
+            
+            categorie_gerecht = CategorieGerecht.selecteren(
+                geef_id = False,
+                toestaan_nieuw = False,
+                )
+            if categorie_gerecht is commando.STOP:
+                return commando.DOORGAAN
+            if categorie_gerecht is None:
+                continue
+            
+            categorie_gerecht.inspecteren()
             return commando.DOORGAAN
-        
-        categorie_gerecht.inspecteren()
-        return commando.DOORGAAN

@@ -25,7 +25,7 @@ class Ingrediënt(GeregistreerdObject):
     @classmethod
     def nieuw(
         cls,
-        terug_naar: str = "terug naar MENU GEGEVENS INGREDIËNT",
+        terug_naar: str = "terug naar MENU INGREDIËNT",
         geef_id: bool = False,
         ) -> Ingrediënt | commando.Doorgaan:
         
@@ -136,7 +136,7 @@ class Ingrediënt(GeregistreerdObject):
         geef_id: bool = True,
         toestaan_nieuw: bool = True,
         selectiemethode: Literal["nieuw", "selecteren", "zoeken"] | None = None,
-        terug_naar: str = "terug naar MENU GEGEVENS INGREDIËNT",
+        terug_naar: str = "terug naar MENU INGREDIËNT",
         ) -> str | commando.Stop | commando.Doorgaan | None:
         
         aantal_ingrediënten = len(Ingrediënt.subregister())
@@ -145,7 +145,7 @@ class Ingrediënt(GeregistreerdObject):
             print(f"\n>>> geen ingrediënten aanwezig")
             
             if not toestaan_nieuw:
-                return None
+                return commando.STOP
             
             selectiemethode = "nieuw"
         
@@ -204,7 +204,7 @@ class Ingrediënt(GeregistreerdObject):
     
     @staticmethod
     def weergeven(
-        terug_naar: str = "terug naar MENU GEGEVENS INGREDIËNT",
+        terug_naar: str = "terug naar MENU INGREDIËNT",
         ) -> commando.Doorgaan:
         
         categorie_uuid = Categorie.selecteren(
@@ -237,25 +237,33 @@ class Ingrediënt(GeregistreerdObject):
     @staticmethod
     def selecteren_en_bewerken() -> commando.Doorgaan:
         
-        ingrediënt = Ingrediënt.selecteren(
-            geef_id = False,
-            toestaan_nieuw = False,
-            )
-        if ingrediënt is commando.STOP or ingrediënt is None:
-            return commando.DOORGAAN
+        while True:
+            
+            ingrediënt = Ingrediënt.selecteren(
+                geef_id = False,
+                toestaan_nieuw = False,
+                )
+            if ingrediënt is commando.STOP:
+                return commando.DOORGAAN
+            if ingrediënt is None:
+                continue
         
-        ingrediënt.bewerken()
-        return commando.DOORGAAN
+            ingrediënt.bewerken()
+            return commando.DOORGAAN
     
     @staticmethod
     def selecteren_en_inspecteren() -> commando.Doorgaan:
         
-        ingrediënt = Ingrediënt.selecteren(
-            geef_id = False,
-            toestaan_nieuw = False,
-            )
-        if ingrediënt is commando.STOP or ingrediënt is None:
+        while True:
+            
+            ingrediënt = Ingrediënt.selecteren(
+                geef_id = False,
+                toestaan_nieuw = False,
+                )
+            if ingrediënt is commando.STOP:
+                return commando.DOORGAAN
+            if ingrediënt is None:
+                continue
+            
+            ingrediënt.inspecteren()
             return commando.DOORGAAN
-        
-        ingrediënt.inspecteren()
-        return commando.DOORGAAN
