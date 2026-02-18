@@ -100,17 +100,6 @@ class Product(GeregistreerdObject):
     
     # INSTANCE METHODS
     
-    def bewerken(self) -> None:
-        
-        menu_bewerken = Menu(f"MENU BEWERKEN ({f"{self}".upper()})", "MENU PRODUCT", blijf_in_menu = True)
-        menu_bewerken.toevoegen_optie(self.bewerken_naam, "naam")
-        menu_bewerken.toevoegen_optie(self.bewerken_ingrediënt, "ingrediënt")
-        menu_bewerken.toevoegen_optie(self.bewerken_merk, "merk")
-        # menu_bewerken.toevoegen_optie(self.bewerken_eenheden, "eenheden")
-        # menu_bewerken.toevoegen_optie(self.bewerken_voedingswaarde, "voedingswaarde")
-        
-        menu_bewerken()
-    
     def bewerken_naam(self) -> commando.Doorgaan:
         
         waarde_oud = self.product_naam
@@ -157,19 +146,23 @@ class Product(GeregistreerdObject):
         self.ingrediënt_uuid = ingrediënt_uuid
         print(f"\n>>> veld \"ingrediënt\" veranderd van \"{waarde_oud}\" naar \"{self.ingrediënt}\"")
         return commando.DOORGAAN
+    
+    def bewerken_opmerking(self) -> commando.Doorgaan:
         
-    def inspecteren(self) -> None:
+        waarde_oud = self.opmerking
+        opmerking = invoeren(
+            tekst_beschrijving = "opmerking",
+            invoer_type = "str",
+            uitsluiten_leeg = True,
+            valideren = True,
+            uitvoer_kleine_letters = True,
+            )
+        if opmerking is commando.STOP:
+            return commando.DOORGAAN
         
-        menu_inspectie = Menu(f"MENU INSPECTEREN ({f"{self}".upper()})", "MENU INGREDIËNT", blijf_in_menu = True)
-        menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {self.product_naam}"), "naam")
-        menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {self.hoofdcategorie}"), "hoofdcategorie")
-        menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {self.categorie}"), "categorie")
-        menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {self.ingrediënt}"), "ingrediënt")
-        menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {self.merk}"), "merk")
-        menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {self.eenheden}"), "eenheden")
-        menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {self.voedingswaarde}"), "voedingswaarde")
-        
-        menu_inspectie()
+        self.opmerking = opmerking
+        print(f"\n>>> veld \"opmerking\" veranderd van \"{waarde_oud}\" naar \"{self.opmerking}\"")
+        return commando.DOORGAAN
     
     # PROPERTIES
     
@@ -267,21 +260,181 @@ class Product(GeregistreerdObject):
             )
     
     @staticmethod
-    def weergeven(
-        terug_naar: str = "terug naar MENU PRODUCT",
-        ) -> commando.Doorgaan:
+    def weergeven_alle() -> commando.Stop:
+        
+        print()
+        
+        for hoofdcategorie_uuid, hoofdcategorie in Hoofdcategorie.subregister().items():
+            
+            print(hoofdcategorie)
+            
+            for categorie_uuid, categorie in Categorie.subregister().filter(
+                hoofdcategorie_uuid = hoofdcategorie_uuid,
+                ).items():
+                
+                print(f"  {categorie}")
+                
+                for ingrediënt_uuid, ingrediënt in Ingrediënt.subregister().filter(
+                    categorie_uuid = categorie_uuid,
+                    ).items():
+                    
+                    print(f"    {ingrediënt}")
+                    
+                    for product in Product.subregister().filter(
+                        ingrediënt_uuid = ingrediënt_uuid,
+                        ).lijst:
+                        
+                        print(f"      {product}")
+        
+        return commando.STOP
+    
+    @staticmethod
+    def weergeven_voor_hoofdcategorie() -> commando.Doorgaan | commando.Stop:
+        
+        hoofdcategorie_uuid = Hoofdcategorie.selecteren(
+            geef_id = True,
+            toestaan_nieuw = False,
+            terug_naar = "terug naar MENU PRODUCT",
+            )
+        if hoofdcategorie_uuid is commando.STOP or hoofdcategorie_uuid is None:
+            return commando.DOORGAAN
+        
+        print()
+        
+        for categorie_uuid, categorie in Categorie.subregister().filter(
+            hoofdcategorie_uuid = hoofdcategorie_uuid,
+            ).items():
+            
+            print(f"{categorie}")
+            
+            for ingrediënt_uuid, ingrediënt in Ingrediënt.subregister().filter(
+                categorie_uuid = categorie_uuid,
+                ).items():
+                
+                print(f"  {ingrediënt}")
+                
+                for product in Product.subregister().filter(
+                    ingrediënt_uuid = ingrediënt_uuid,
+                    ).lijst:
+                    
+                    print(f"    {product}")
+        
+        return commando.STOP
+    
+    @staticmethod
+    def weergeven_voor_categorie() -> commando.Doorgaan | commando.Stop:
+        
+        categorie_uuid = Categorie.selecteren(
+            geef_id = True,
+            toestaan_nieuw = False,
+            terug_naar = "terug naar MENU PRODUCT",
+            )
+        if categorie_uuid is commando.STOP or categorie_uuid is None:
+            return commando.DOORGAAN
+        
+        print()
+        
+        for ingrediënt_uuid, ingrediënt in Ingrediënt.subregister().filter(
+            categorie_uuid = categorie_uuid,
+            ).items():
+            
+            print(f"{ingrediënt}")
+            
+            for product in Product.subregister().filter(
+                ingrediënt_uuid = ingrediënt_uuid,
+                ).lijst:
+                
+                print(f"  {product}")
+        
+        return commando.STOP
+    
+    @staticmethod
+    def weergeven_voor_ingrediënt() -> commando.Doorgaan | commando.Stop:
         
         ingrediënt_uuid = Ingrediënt.selecteren(
             geef_id = True,
             toestaan_nieuw = False,
-            terug_naar = terug_naar,
+            terug_naar = "terug naar MENU PRODUCT",
             )
         if ingrediënt_uuid is commando.STOP or ingrediënt_uuid is None:
             return commando.DOORGAAN
         
-        Product.subregister().filter(
+        print()
+        
+        for product in Product.subregister().filter(
             ingrediënt_uuid = ingrediënt_uuid,
-            ).weergeven()
+            ).lijst:
+            
+            print(f"{product}")
+        
+        return commando.STOP
+    
+    @staticmethod
+    def bewerken() -> commando.Doorgaan:
+        
+        while True:
+            
+            product = Product.selecteren(
+                geef_id = False,
+                toestaan_nieuw = False,
+                )
+            if product is commando.STOP:
+                return commando.DOORGAAN
+            if product is None:
+                continue
+            
+            menu_bewerken = Menu(f"MENU BEWERKEN ({f"{product}".upper()})", "MENU PRODUCT", blijf_in_menu = True)
+            menu_bewerken.toevoegen_optie(product.bewerken_naam, "naam")
+            menu_bewerken.toevoegen_optie(product.bewerken_ingrediënt, "ingrediënt")
+            menu_bewerken.toevoegen_optie(product.bewerken_merk, "merk")
+            # menu_bewerken.toevoegen_optie(self.bewerken_eenheden, "eenheden")
+            # menu_bewerken.toevoegen_optie(self.bewerken_voedingswaarde, "voedingswaarde")
+            menu_bewerken.toevoegen_optie(product.bewerken_opmerking, "opmerking")
+            
+            menu_bewerken()
+        
+            return commando.DOORGAAN
+    
+    @staticmethod
+    def inspecteren() -> commando.Doorgaan:
+        
+        while True:
+            
+            product = Product.selecteren(
+                geef_id = False,
+                toestaan_nieuw = False,
+                )
+            if product is commando.STOP:
+                return commando.DOORGAAN
+            if product is None:
+                continue
+            
+            menu_inspectie = Menu(f"MENU INSPECTEREN ({f"{product}".upper()})", "MENU INGREDIËNT", blijf_in_menu = True)
+            menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {product.product_naam}"), "naam")
+            menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {product.hoofdcategorie}"), "hoofdcategorie")
+            menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {product.categorie}"), "categorie")
+            menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {product.ingrediënt}"), "ingrediënt")
+            menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {product.merk}"), "merk")
+            menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {product.eenheden}"), "eenheden")
+            menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {product.voedingswaarde}"), "voedingswaarde")
+            menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {product.basis_eenheid}"), "basiseenheid")
+            menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {product.opmerking}"), "opmerking")
+            
+            menu_inspectie()
+        
+            return commando.DOORGAAN
+    
+    @staticmethod
+    def weergeven() -> commando.Doorgaan:
+        
+        menu_weergeven = Menu(f"MENU WEERGEVEN INGREDIËNT", "MENU INGREDIËNT", blijf_in_menu = True)
+        menu_weergeven.toevoegen_optie(Product.weergeven_alle, "alle producten")
+        menu_weergeven.toevoegen_optie(Product.weergeven_voor_hoofdcategorie, "producten voor hoofdcategorie")
+        menu_weergeven.toevoegen_optie(Product.weergeven_voor_categorie, "producten voor categorie")
+        menu_weergeven.toevoegen_optie(Product.weergeven_voor_ingrediënt, "producten voor ingrediënt")
+        
+        menu_weergeven()
+        
         return commando.DOORGAAN
     
     @staticmethod
@@ -297,37 +450,3 @@ class Product(GeregistreerdObject):
         print(f">>> \"{Product.subregister()[product_uuid]}\" verwijderd")
         del Product.subregister()[product_uuid]
         return commando.DOORGAAN
-    
-    @staticmethod
-    def selecteren_en_bewerken() -> commando.Doorgaan:
-        
-        while True:
-            
-            product = Product.selecteren(
-                geef_id = False,
-                toestaan_nieuw = False,
-                )
-            if product is commando.STOP:
-                return commando.DOORGAAN
-            if product is None:
-                continue
-            
-            product.bewerken()
-            return commando.DOORGAAN
-    
-    @staticmethod
-    def selecteren_en_inspecteren() -> commando.Doorgaan:
-        
-        while True:
-            
-            product = Product.selecteren(
-                geef_id = False,
-                toestaan_nieuw = False,
-                )
-            if product is commando.STOP:
-                return commando.DOORGAAN
-            if product is None:
-                continue
-            
-            product.inspecteren()
-            return commando.DOORGAAN

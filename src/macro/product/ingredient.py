@@ -62,14 +62,6 @@ class Ingrediënt(GeregistreerdObject):
     
     # INSTANCE METHODS
     
-    def bewerken(self) -> None:
-        
-        menu_bewerken = Menu(f"MENU BEWERKEN ({f"{self}".upper()})", "MENU INGREDIËNT", blijf_in_menu = True)
-        menu_bewerken.toevoegen_optie(self.bewerken_naam, "naam")
-        menu_bewerken.toevoegen_optie(self.bewerken_categorie, "categorie")
-        
-        menu_bewerken()
-    
     def bewerken_naam(self) -> commando.Doorgaan:
         
         waarde_oud = self.ingrediënt_naam
@@ -101,15 +93,6 @@ class Ingrediënt(GeregistreerdObject):
         self.categorie_uuid = categorie_uuid
         print(f"\n>>> veld \"categorie\" veranderd van \"{waarde_oud}\" naar \"{self.categorie}\"")
         return commando.DOORGAAN
-        
-    def inspecteren(self) -> None:
-        
-        menu_inspectie = Menu(f"MENU INSPECTEREN ({f"{self}".upper()})", "MENU INGREDIËNT", blijf_in_menu = True)
-        menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {self.ingrediënt_naam}"), "naam")
-        menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {self.hoofdcategorie}"), "hoofdcategorie")
-        menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {self.categorie}"), "categorie")
-        
-        menu_inspectie()
     
     # PROPERTIES
     
@@ -203,21 +186,131 @@ class Ingrediënt(GeregistreerdObject):
             )
     
     @staticmethod
-    def weergeven(
-        terug_naar: str = "terug naar MENU INGREDIËNT",
-        ) -> commando.Doorgaan:
+    def weergeven_alle() -> commando.Stop:
+        
+        print()
+        
+        for hoofdcategorie_uuid, hoofdcategorie in Hoofdcategorie.subregister().items():
+            
+            print(hoofdcategorie)
+            
+            for categorie_uuid, categorie in Categorie.subregister().filter(
+                hoofdcategorie_uuid = hoofdcategorie_uuid,
+                ).items():
+                
+                print(f"  {categorie}")
+                
+                for ingrediënt in Ingrediënt.subregister().filter(
+                    categorie_uuid = categorie_uuid,
+                    ).lijst:
+                    
+                    print(f"    {ingrediënt}")
+        
+        return commando.STOP
+    
+    @staticmethod
+    def weergeven_voor_hoofdcategorie() -> commando.Doorgaan | commando.Stop:
+        
+        hoofdcategorie_uuid = Hoofdcategorie.selecteren(
+            geef_id = True,
+            toestaan_nieuw = False,
+            terug_naar = "terug naar MENU INGREDIËNT",
+            )
+        if hoofdcategorie_uuid is commando.STOP or hoofdcategorie_uuid is None:
+            return commando.DOORGAAN
+        
+        print()
+        
+        for categorie_uuid, categorie in Categorie.subregister().filter(
+            hoofdcategorie_uuid = hoofdcategorie_uuid,
+            ).items():
+            
+            print(f"{categorie}")
+            
+            for ingrediënt in Ingrediënt.subregister().filter(
+                categorie_uuid = categorie_uuid,
+                ).lijst:
+                
+                print(f"  {ingrediënt}")
+        
+        return commando.STOP
+    
+    @staticmethod
+    def weergeven_voor_categorie() -> commando.Doorgaan | commando.Stop:
         
         categorie_uuid = Categorie.selecteren(
             geef_id = True,
             toestaan_nieuw = False,
-            terug_naar = terug_naar,
+            terug_naar = "terug naar MENU INGREDIËNT",
             )
         if categorie_uuid is commando.STOP or categorie_uuid is None:
             return commando.DOORGAAN
         
-        Ingrediënt.subregister().filter(
+        print()
+        
+        for ingrediënt in Ingrediënt.subregister().filter(
             categorie_uuid = categorie_uuid,
-            ).weergeven()
+            ).lijst:
+            
+            print(f"{ingrediënt}")
+        
+        return commando.STOP
+    
+    @staticmethod
+    def bewerken() -> commando.Doorgaan:
+        
+        while True:
+            
+            ingrediënt = Ingrediënt.selecteren(
+                geef_id = False,
+                toestaan_nieuw = False,
+                )
+            if ingrediënt is commando.STOP:
+                return commando.DOORGAAN
+            if ingrediënt is None:
+                continue
+            
+            menu_bewerken = Menu(f"MENU BEWERKEN ({f"{ingrediënt}".upper()})", "MENU INGREDIËNT", blijf_in_menu = True)
+            menu_bewerken.toevoegen_optie(ingrediënt.bewerken_naam, "naam")
+            menu_bewerken.toevoegen_optie(ingrediënt.bewerken_categorie, "categorie")
+            
+            menu_bewerken()
+            
+            return commando.DOORGAAN
+    
+    @staticmethod
+    def inspecteren() -> commando.Doorgaan:
+        
+        while True:
+            
+            ingrediënt = Ingrediënt.selecteren(
+                geef_id = False,
+                toestaan_nieuw = False,
+                )
+            if ingrediënt is commando.STOP:
+                return commando.DOORGAAN
+            if ingrediënt is None:
+                continue
+            
+            menu_inspectie = Menu(f"MENU INSPECTEREN ({f"{ingrediënt}".upper()})", "MENU INGREDIËNT", blijf_in_menu = True)
+            menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {ingrediënt.ingrediënt_naam}"), "naam")
+            menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {ingrediënt.hoofdcategorie}"), "hoofdcategorie")
+            menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {ingrediënt.categorie}"), "categorie")
+            
+            menu_inspectie()
+            
+            return commando.DOORGAAN
+    
+    @staticmethod
+    def weergeven() -> commando.Doorgaan:
+        
+        menu_weergeven = Menu(f"MENU WEERGEVEN INGREDIËNT", "MENU INGREDIËNT", blijf_in_menu = True)
+        menu_weergeven.toevoegen_optie(Ingrediënt.weergeven_alle, "alle ingrediënten")
+        menu_weergeven.toevoegen_optie(Ingrediënt.weergeven_voor_hoofdcategorie, "ingrediënten voor hoofdcategorie")
+        menu_weergeven.toevoegen_optie(Ingrediënt.weergeven_voor_categorie, "ingrediënten voor categorie")
+        
+        menu_weergeven()
+        
         return commando.DOORGAAN
     
     @staticmethod
@@ -233,37 +326,3 @@ class Ingrediënt(GeregistreerdObject):
         print(f">>> \"{Ingrediënt.subregister()[ingrediënt_uuid]}\" verwijderd")
         del Ingrediënt.subregister()[ingrediënt_uuid]
         return commando.DOORGAAN
-    
-    @staticmethod
-    def selecteren_en_bewerken() -> commando.Doorgaan:
-        
-        while True:
-            
-            ingrediënt = Ingrediënt.selecteren(
-                geef_id = False,
-                toestaan_nieuw = False,
-                )
-            if ingrediënt is commando.STOP:
-                return commando.DOORGAAN
-            if ingrediënt is None:
-                continue
-        
-            ingrediënt.bewerken()
-            return commando.DOORGAAN
-    
-    @staticmethod
-    def selecteren_en_inspecteren() -> commando.Doorgaan:
-        
-        while True:
-            
-            ingrediënt = Ingrediënt.selecteren(
-                geef_id = False,
-                toestaan_nieuw = False,
-                )
-            if ingrediënt is commando.STOP:
-                return commando.DOORGAAN
-            if ingrediënt is None:
-                continue
-            
-            ingrediënt.inspecteren()
-            return commando.DOORGAAN

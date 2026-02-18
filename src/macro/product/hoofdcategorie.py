@@ -49,13 +49,6 @@ class Hoofdcategorie(GeregistreerdObject):
     
     # INSTANCE METHODS
     
-    def bewerken(self) -> None:
-        
-        menu_bewerken = Menu(f"MENU BEWERKEN ({f"{self}".upper()})", "MENU HOOFDCATEGORIE PRODUCT", blijf_in_menu = True)
-        menu_bewerken.toevoegen_optie(self.bewerken_naam, "naam")
-        
-        menu_bewerken()
-    
     def bewerken_naam(self) -> commando.Doorgaan:
         
         waarde_oud = self.hoofdcategorie_naam
@@ -72,13 +65,6 @@ class Hoofdcategorie(GeregistreerdObject):
         self.hoofdcategorie_naam = hoofdcategorie_naam
         print(f"\n>>> veld \"hoofdcategorienaam\" veranderd van \"{waarde_oud}\" naar \"{self.hoofdcategorie_naam}\"")
         return commando.DOORGAAN
-    
-    def inspecteren(self) -> None:
-        
-        menu_inspectie = Menu(f"MENU INSPECTEREN ({f"{self}".upper()})", "MENU HOOFDCATEGORIE PRODUCT", blijf_in_menu = True)
-        menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {self.hoofdcategorie_naam}"), "naam")
-        
-        menu_inspectie()
     
     # PROPERTIES
     
@@ -106,8 +92,51 @@ class Hoofdcategorie(GeregistreerdObject):
             )
     
     @staticmethod
-    def weergeven() -> commando.Doorgaan:
+    def weergeven_alle() -> commando.Stop:
         Hoofdcategorie.subregister().weergeven()
+        return commando.STOP
+    
+    @staticmethod
+    def bewerken() -> commando.Doorgaan:
+        
+        while True:
+            
+            hoofdcategorie = Hoofdcategorie.selecteren(
+                geef_id = False,
+                toestaan_nieuw = False,
+                )
+            if hoofdcategorie is commando.STOP or hoofdcategorie is None:
+                return commando.DOORGAAN
+            
+            menu_bewerken = Menu(f"MENU BEWERKEN ({f"{hoofdcategorie}".upper()})", "MENU HOOFDCATEGORIE PRODUCT", blijf_in_menu = True)
+            menu_bewerken.toevoegen_optie(hoofdcategorie.bewerken_naam, "naam")
+            
+            menu_bewerken()
+        
+            return commando.DOORGAAN
+    
+    @staticmethod
+    def inspecteren() -> commando.Doorgaan:
+        
+        while True:
+            
+            hoofdcategorie = Hoofdcategorie.selecteren(
+                geef_id = False,
+                toestaan_nieuw = False,
+                )
+            if hoofdcategorie is commando.STOP or hoofdcategorie is None:
+                return commando.DOORGAAN
+            
+            menu_inspectie = Menu(f"MENU INSPECTEREN ({f"{hoofdcategorie}".upper()})", "MENU HOOFDCATEGORIE PRODUCT", blijf_in_menu = True)
+            menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {hoofdcategorie.hoofdcategorie_naam}"), "naam")
+            
+            menu_inspectie()
+            
+            return commando.DOORGAAN
+    
+    @staticmethod
+    def weergeven() -> commando.Doorgaan:
+        Hoofdcategorie.weergeven_alle()
         return commando.DOORGAAN
     
     @staticmethod
@@ -123,33 +152,3 @@ class Hoofdcategorie(GeregistreerdObject):
         print(f">>> \"{Hoofdcategorie.subregister()[hoofdcategorie_uuid]}\" verwijderd")
         del Hoofdcategorie.subregister()[hoofdcategorie_uuid]
         return commando.DOORGAAN
-    
-    @staticmethod
-    def selecteren_en_bewerken() -> commando.Doorgaan:
-        
-        while True:
-        
-            hoofdcategorie = Hoofdcategorie.selecteren(
-                geef_id = False,
-                toestaan_nieuw = False,
-                )
-            if hoofdcategorie is commando.STOP or hoofdcategorie is None:
-                return commando.DOORGAAN
-            
-            hoofdcategorie.bewerken()
-            return commando.DOORGAAN
-    
-    @staticmethod
-    def selecteren_en_inspecteren() -> commando.Doorgaan:
-        
-        while True:
-            
-            hoofdcategorie = Hoofdcategorie.selecteren(
-                geef_id = False,
-                toestaan_nieuw = False,
-                )
-            if hoofdcategorie is commando.STOP or hoofdcategorie is None:
-                return commando.DOORGAAN
-            
-            hoofdcategorie.inspecteren()
-            return commando.DOORGAAN

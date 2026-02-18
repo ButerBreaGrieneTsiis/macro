@@ -62,14 +62,6 @@ class CategorieGerecht(GeregistreerdObject):
     
     # INSTANCE METHODS
     
-    def bewerken(self) -> None:
-        
-        menu_bewerken = Menu(f"MENU BEWERKEN ({f"{self}".upper()})", "MENU CATEGORIE GERECHT", blijf_in_menu = True)
-        menu_bewerken.toevoegen_optie(self.bewerken_naam, "naam")
-        menu_bewerken.toevoegen_optie(self.bewerken_hoofdcategorie, "hoofdcategorie")
-        
-        menu_bewerken()
-    
     def bewerken_naam(self) -> commando.Doorgaan:
         
         waarde_oud = self.categorie_naam
@@ -101,14 +93,6 @@ class CategorieGerecht(GeregistreerdObject):
         self.hoofdcategorie_uuid = hoofdcategorie_uuid
         print(f"\n>>> veld \"hoofdcategorie\" veranderd van \"{waarde_oud}\" naar \"{self.hoofdcategorie_gerecht}\"")
         return commando.DOORGAAN
-        
-    def inspecteren(self) -> None:
-        
-        menu_inspectie = Menu(f"MENU INSPECTEREN ({f"{self}".upper()})", "MENU CATEGORIE GERECHT", blijf_in_menu = True)
-        menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {self.categorie_naam}"), "naam")
-        menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {self.hoofdcategorie}"), "hoofdcategorie")
-        
-        menu_inspectie()
     
     # PROPERTIES
     
@@ -197,21 +181,92 @@ class CategorieGerecht(GeregistreerdObject):
             )
     
     @staticmethod
-    def weergeven(
-        terug_naar: str = "terug naar MENU CATEGORIE GERECHT",
-        ) -> commando.Doorgaan:
+    def weergeven_alle() -> commando.Stop:
         
-        hoofdcategorie_uuid = HoofdcategorieGerecht.selecteren(
+        print()
+        
+        for hoofdcategorie_gerecht_uuid, hoofdcategorie_gerecht in HoofdcategorieGerecht.subregister().items():
+            
+            print(hoofdcategorie_gerecht)
+            
+            for categorie_gerecht in CategorieGerecht.subregister().filter(
+                hoofdcategorie_uuid = hoofdcategorie_gerecht_uuid,
+                ).lijst:
+                
+                print(f"  {categorie_gerecht}")
+        
+        return commando.STOP
+    
+    @staticmethod
+    def weergeven_voor_hoofdcategorie() -> commando.Doorgaan | commando.Stop:
+        
+        hoofdcategorie_gerecht_uuid = HoofdcategorieGerecht.selecteren(
             geef_id = True,
             toestaan_nieuw = False,
-            terug_naar = terug_naar,
+            terug_naar = "terug naar MENU CATEGORIE GERECHT",
             )
-        if hoofdcategorie_uuid is commando.STOP or hoofdcategorie_uuid is None:
+        if hoofdcategorie_gerecht_uuid is commando.STOP or hoofdcategorie_gerecht_uuid is None:
             return commando.DOORGAAN
         
         CategorieGerecht.subregister().filter(
-            hoofdcategorie_uuid = hoofdcategorie_uuid,
+            hoofdcategorie_uuid = hoofdcategorie_gerecht_uuid,
             ).weergeven()
+        
+        return commando.STOP
+    
+    @staticmethod
+    def bewerken() -> commando.Doorgaan:
+        
+        while True:
+            
+            categorie_gerecht = CategorieGerecht.selecteren(
+                geef_id = False,
+                toestaan_nieuw = False,
+                )
+            if categorie_gerecht is commando.STOP:
+                return commando.DOORGAAN
+            if categorie_gerecht is None:
+                continue
+            
+            menu_bewerken = Menu(f"MENU BEWERKEN ({f"{categorie_gerecht}".upper()})", "MENU CATEGORIE GERECHT", blijf_in_menu = True)
+            menu_bewerken.toevoegen_optie(categorie_gerecht.bewerken_naam, "naam")
+            menu_bewerken.toevoegen_optie(categorie_gerecht.bewerken_hoofdcategorie, "hoofdcategorie")
+            
+            menu_bewerken()
+            
+            return commando.DOORGAAN
+    
+    @staticmethod
+    def inspecteren() -> commando.Doorgaan:
+        
+        while True:
+            
+            categorie_gerecht = CategorieGerecht.selecteren(
+                geef_id = False,
+                toestaan_nieuw = False,
+                )
+            if categorie_gerecht is commando.STOP:
+                return commando.DOORGAAN
+            if categorie_gerecht is None:
+                continue
+            
+            menu_inspectie = Menu(f"MENU INSPECTEREN ({f"{categorie_gerecht}".upper()})", "MENU CATEGORIE GERECHT", blijf_in_menu = True)
+            menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {categorie_gerecht.categorie_naam}"), "naam")
+            menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {categorie_gerecht.hoofdcategorie}"), "hoofdcategorie")
+            
+            menu_inspectie()
+            
+            return commando.DOORGAAN
+    
+    @staticmethod
+    def weergeven() -> commando.Doorgaan:
+        
+        menu_weergeven = Menu(f"MENU WEERGEVEN CATEGORIE GERECHT", "MENU CATEGORIE GERECHT", blijf_in_menu = True)
+        menu_weergeven.toevoegen_optie(CategorieGerecht.weergeven_alle, "alle categorieën")
+        menu_weergeven.toevoegen_optie(CategorieGerecht.weergeven_voor_hoofdcategorie, "categorieën voor hoofdcategorie")
+        
+        menu_weergeven()
+        
         return commando.DOORGAAN
     
     @staticmethod
@@ -227,37 +282,3 @@ class CategorieGerecht(GeregistreerdObject):
         print(f">>> \"{CategorieGerecht.subregister()[categorie_uuid]}\" verwijderd")
         del CategorieGerecht.subregister()[categorie_uuid]
         return commando.DOORGAAN
-    
-    @staticmethod
-    def selecteren_en_bewerken() -> commando.Doorgaan:
-        
-        while True:
-            
-            categorie_gerecht = CategorieGerecht.selecteren(
-                geef_id = False,
-                toestaan_nieuw = False,
-                )
-            if categorie_gerecht is commando.STOP:
-                return commando.DOORGAAN
-            if categorie_gerecht is None:
-                continue
-            
-            categorie_gerecht.bewerken()
-            return commando.DOORGAAN
-    
-    @staticmethod
-    def selecteren_en_inspecteren() -> commando.Doorgaan:
-        
-        while True:
-            
-            categorie_gerecht = CategorieGerecht.selecteren(
-                geef_id = False,
-                toestaan_nieuw = False,
-                )
-            if categorie_gerecht is commando.STOP:
-                return commando.DOORGAAN
-            if categorie_gerecht is None:
-                continue
-            
-            categorie_gerecht.inspecteren()
-            return commando.DOORGAAN

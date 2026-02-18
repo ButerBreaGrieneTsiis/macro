@@ -50,13 +50,6 @@ class Merk(GeregistreerdObject):
     
     # INSTANCE METHODS
     
-    def bewerken(self) -> None:
-        
-        menu_bewerken = Menu(f"MENU BEWERKEN ({f"{self}".upper()})", "MENU MERK", blijf_in_menu = True)
-        menu_bewerken.toevoegen_optie(self.bewerken_naam, "naam")
-        
-        menu_bewerken()
-    
     def bewerken_naam(self) -> commando.Doorgaan:
         
         waarde_oud = self.hoofdcategorie_naam
@@ -73,13 +66,6 @@ class Merk(GeregistreerdObject):
         self.merk_naam = merk_naam
         print(f"\n>>> veld \"merknaam\" veranderd van \"{waarde_oud}\" naar \"{self.merk_naam}\"")
         return commando.DOORGAAN
-    
-    def inspecteren(self) -> None:
-        
-        menu_inspectie = Menu(f"MENU INSPECTEREN ({f"{self}".upper()})", "MENU MERK", blijf_in_menu = True)
-        menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {self.merk_naam}"), "naam")
-        
-        menu_inspectie()
     
     # PROPERTIES
     
@@ -107,8 +93,55 @@ class Merk(GeregistreerdObject):
             )
     
     @staticmethod
-    def weergeven() -> commando.Doorgaan:
+    def weergeven_alle() -> commando.Doorgaan:
         Merk.subregister().weergeven()
+        return commando.DOORGAAN
+    
+    @staticmethod
+    def bewerken() -> commando.Doorgaan:
+        
+        while True:
+            
+            merk = Merk.selecteren(
+                geef_id = False,
+                toestaan_nieuw = False,
+                )
+            if merk is commando.STOP:
+                return commando.DOORGAAN
+            if merk is None:
+                continue
+            
+            menu_bewerken = Menu(f"MENU BEWERKEN ({f"{merk}".upper()})", "MENU MERK", blijf_in_menu = True)
+            menu_bewerken.toevoegen_optie(merk.bewerken_naam, "naam")
+            
+            menu_bewerken()
+            
+            return commando.DOORGAAN
+    
+    @staticmethod
+    def inspecteren() -> commando.Doorgaan:
+        
+        while True:
+            
+            merk = Merk.selecteren(
+                geef_id = False,
+                toestaan_nieuw = False,
+                )
+            if merk is commando.STOP:
+                return commando.DOORGAAN
+            if merk is None:
+                continue
+            
+            menu_inspectie = Menu(f"MENU INSPECTEREN ({f"{merk}".upper()})", "MENU MERK", blijf_in_menu = True)
+            menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {merk.merk_naam}"), "naam")
+            
+            menu_inspectie()
+            
+            return commando.DOORGAAN
+    
+    @staticmethod
+    def weergeven() -> commando.Doorgaan:
+        Merk.weergeven_alle()
         return commando.DOORGAAN
     
     @staticmethod
@@ -124,37 +157,3 @@ class Merk(GeregistreerdObject):
         print(f">>> \"{Merk.subregister()[merk_uuid]}\" verwijderd")
         del Merk.subregister()[merk_uuid]
         return commando.DOORGAAN
-    
-    @staticmethod
-    def selecteren_en_bewerken() -> commando.Doorgaan:
-        
-        while True:
-            
-            merk = Merk.selecteren(
-                geef_id = False,
-                toestaan_nieuw = False,
-                )
-            if merk is commando.STOP:
-                return commando.DOORGAAN
-            if merk is None:
-                continue
-            
-            merk.bewerken()
-            return commando.DOORGAAN
-    
-    @staticmethod
-    def selecteren_en_inspecteren() -> commando.Doorgaan:
-        
-        while True:
-            
-            merk = Merk.selecteren(
-                geef_id = False,
-                toestaan_nieuw = False,
-                )
-            if merk is commando.STOP:
-                return commando.DOORGAAN
-            if merk is None:
-                continue
-            
-            merk.inspecteren()
-            return commando.DOORGAAN

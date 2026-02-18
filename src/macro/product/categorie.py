@@ -62,14 +62,6 @@ class Categorie(GeregistreerdObject):
     
     # INSTANCE METHODS
     
-    def bewerken(self) -> None:
-        
-        menu_bewerken = Menu(f"MENU BEWERKEN ({f"{self}".upper()})", "MENU CATEGORIE PRODUCT", blijf_in_menu = True)
-        menu_bewerken.toevoegen_optie(self.bewerken_naam, "naam")
-        menu_bewerken.toevoegen_optie(self.bewerken_hoofdcategorie, "hoofdcategorie")
-        
-        menu_bewerken()
-    
     def bewerken_naam(self) -> commando.Doorgaan:
         
         waarde_oud = self.categorie_naam
@@ -101,14 +93,6 @@ class Categorie(GeregistreerdObject):
         self.hoofdcategorie_uuid = hoofdcategorie_uuid
         print(f"\n>>> veld \"hoofdcategorie\" veranderd van \"{waarde_oud}\" naar \"{self.hoofdcategorie}\"")
         return commando.DOORGAAN
-        
-    def inspecteren(self) -> None:
-        
-        menu_inspectie = Menu(f"MENU INSPECTEREN ({f"{self}".upper()})", "MENU CATEGORIE PRODUCT", blijf_in_menu = True)
-        menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {self.categorie_naam}"), "naam")
-        menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {self.hoofdcategorie}"), "hoofdcategorie")
-        
-        menu_inspectie()
     
     # PROPERTIES
     
@@ -197,14 +181,29 @@ class Categorie(GeregistreerdObject):
             )
     
     @staticmethod
-    def weergeven(
-        terug_naar: str = "terug naar MENU CATEGORIE PRODUCT",
-        ) -> commando.Doorgaan:
+    def weergeven_alle() -> commando.Stop:
+        
+        print()
+        
+        for hoofdcategorie_uuid, hoofdcategorie in Hoofdcategorie.subregister().items():
+            
+            print(hoofdcategorie)
+            
+            for categorie in Categorie.subregister().filter(
+                hoofdcategorie_uuid = hoofdcategorie_uuid,
+                ).lijst:
+                
+                print(f"  {categorie}")
+        
+        return commando.STOP
+    
+    @staticmethod
+    def weergeven_voor_hoofdcategorie() -> commando.Doorgaan | commando.Stop:
         
         hoofdcategorie_uuid = Hoofdcategorie.selecteren(
             geef_id = True,
             toestaan_nieuw = False,
-            terug_naar = terug_naar,
+            terug_naar = "terug naar MENU CATEGORIE PRODUCT",
             )
         if hoofdcategorie_uuid is commando.STOP or hoofdcategorie_uuid is None:
             return commando.DOORGAAN
@@ -212,6 +211,62 @@ class Categorie(GeregistreerdObject):
         Categorie.subregister().filter(
             hoofdcategorie_uuid = hoofdcategorie_uuid,
             ).weergeven()
+        
+        return commando.STOP
+    
+    @staticmethod
+    def bewerken() -> commando.Doorgaan:
+        
+        while True:
+            
+            categorie = Categorie.selecteren(
+                geef_id = False,
+                toestaan_nieuw = False,
+                )
+            if categorie is commando.STOP:
+                return commando.DOORGAAN
+            if categorie is None:
+                continue
+            
+            menu_bewerken = Menu(f"MENU BEWERKEN ({f"{categorie}".upper()})", "MENU CATEGORIE PRODUCT", blijf_in_menu = True)
+            menu_bewerken.toevoegen_optie(categorie.bewerken_naam, "naam")
+            menu_bewerken.toevoegen_optie(categorie.bewerken_hoofdcategorie, "hoofdcategorie")
+            
+            menu_bewerken()
+            
+            return commando.DOORGAAN
+    
+    @staticmethod
+    def inspecteren() -> commando.Doorgaan:
+        
+        while True:
+            
+            categorie = Categorie.selecteren(
+                geef_id = False,
+                toestaan_nieuw = False,
+                )
+            if categorie is commando.STOP:
+                return commando.DOORGAAN
+            if categorie is None:
+                continue
+            
+            menu_inspectie = Menu(f"MENU INSPECTEREN ({f"{categorie}".upper()})", "MENU CATEGORIE PRODUCT", blijf_in_menu = True)
+            menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {categorie.categorie_naam}"), "naam")
+            menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {categorie.hoofdcategorie}"), "hoofdcategorie")
+            
+            menu_inspectie()
+            
+            return commando.DOORGAAN
+    
+    @staticmethod
+    def weergeven() -> commando.Doorgaan:
+        
+        menu_weergeven = Menu(f"MENU WEERGEVEN CATEGORIE PRODUCT", "MENU CATEGORIE PRODUCT", blijf_in_menu = True)
+        menu_weergeven.toevoegen_optie(Categorie.weergeven_alle, "alle categorieën")
+        menu_weergeven.toevoegen_optie(Categorie.weergeven_voor_hoofdcategorie, "categorieën voor hoofdcategorie")
+        
+        menu_weergeven()
+        
         return commando.DOORGAAN
     
     @staticmethod
@@ -227,37 +282,3 @@ class Categorie(GeregistreerdObject):
         print(f">>> \"{Categorie.subregister()[categorie_uuid]}\" verwijderd")
         del Categorie.subregister()[categorie_uuid]
         return commando.DOORGAAN
-    
-    @staticmethod
-    def selecteren_en_bewerken() -> commando.Doorgaan:
-        
-        while True:
-            
-            categorie = Categorie.selecteren(
-                geef_id = False,
-                toestaan_nieuw = False,
-                )
-            if categorie is commando.STOP:
-                return commando.DOORGAAN
-            if categorie is None:
-                continue
-            
-            categorie.bewerken()
-            return commando.DOORGAAN
-    
-    @staticmethod
-    def selecteren_en_inspecteren() -> commando.Doorgaan:
-        
-        while True:
-            
-            categorie = Categorie.selecteren(
-                geef_id = False,
-                toestaan_nieuw = False,
-                )
-            if categorie is commando.STOP:
-                return commando.DOORGAAN
-            if categorie is None:
-                continue
-            
-            categorie.inspecteren()
-            return commando.DOORGAAN
