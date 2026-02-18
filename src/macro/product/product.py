@@ -18,7 +18,7 @@ class Product(GeregistreerdObject):
     merk_uuid: str
     voedingswaarde: Voedingswaarde
     basis_eenheid: Eenheid
-    eenheden: Dict[Eenheid, str] | None = None
+    eenheden: Dict[str, str] | None = None
     opmerking: str | None = None
     
     # DUNDER METHODS
@@ -92,6 +92,7 @@ class Product(GeregistreerdObject):
             merk_uuid = merk_uuid,
             voedingswaarde = voedingswaarde,
             basis_eenheid = basis_eenheid,
+            opmerking = opmerking,
             )
     
         if geef_id:
@@ -147,8 +148,59 @@ class Product(GeregistreerdObject):
         print(f"\n>>> veld \"merk\" veranderd van \"{waarde_oud}\" naar \"{self.merk}\"")
         return commando.DOORGAAN
     
-    def bewerken_eenheden(self) -> commando.Doorgaan:
-        ...
+    def bewerken_eenheden(
+        self,
+        terug_naar: str | None = None,
+        ) -> commando.Doorgaan:
+        
+        if terug_naar is None:
+            terug_naar = f"MENU BEWERKEN ({f"{self}".upper()})"
+        
+        opties_eenheden = {eenheid: eenheid.enkelvoud for eenheid in Eenheid if eenheid not in Hoeveelheid._BASIS_EENHEDEN and eenheid not in Hoeveelheid._ENERGIE_EENHEDEN}
+        
+        eenheid = kiezen(
+            opties = opties_eenheden,
+            tekst_beschrijving = "eenheid",
+            tekst_annuleren = terug_naar,
+            )
+        if eenheid is commando.STOP:
+            return commando.DOORGAAN
+        
+        print(f"\nhoeveel {self.basis_eenheid.meervoud} is \"{Hoeveelheid(1, eenheid)}\"?")
+        waarde = invoeren(
+            tekst_beschrijving = f"hoeveel {self.basis_eenheid.meervoud}",
+            invoer_type = "int",
+            )
+        if waarde is commando.STOP:
+            return commando.DOORGAAN
+        
+        if self.eenheden is None:
+            self.eenheden = {}
+        
+        if eenheid.enkelvoud in self.eenheden:
+            if waarde == self.eenheden[eenheid.enkelvoud]:
+                print(f"\n>>> geen wijziging")
+            else: 
+                
+                overschrijven = kiezen(
+                    opties = {
+                        False: "niet overschrijven",
+                        True: "overschrijven",
+                        },
+                    tekst_beschrijving = f"eenheid \"{eenheid.meervoud}\" van {Hoeveelheid(waarde, self.basis_eenheid)} bestaat al, overschrijven?",
+                    tekst_kies_een = False,
+                    tekst_annuleren = "stop",
+                    )
+                
+                if overschrijven is commando.STOP:
+                    return commando.STOP
+                if overschrijven:
+                    self.eenheden[eenheid.enkelvoud] = waarde
+        
+        else:
+            print(f"\n>>> eenheid \"{eenheid.meervoud}\" toegevoegd van {Hoeveelheid(waarde, self.basis_eenheid)}")
+            
+            self.eenheden[eenheid.enkelvoud] = waarde
     
     def bewerken_voedingswaarde(self) -> commando.Doorgaan:
         
@@ -180,6 +232,16 @@ class Product(GeregistreerdObject):
         self.opmerking = opmerking
         print(f"\n>>> veld \"opmerking\" veranderd van \"{waarde_oud}\" naar \"{self.opmerking}\"")
         return commando.DOORGAAN
+    
+    def inspecteren_eenheden(self) -> None:
+        
+        print(f"\neenheden voor {self}:\n")
+        if len(self.eenheden) == 0:
+            print(">>> geen eenheden gedefinieerd")
+        else:
+            print(f"EENHEID          HOEVEELHEID CALORIEËN")
+            [print(f"{f"{Hoeveelheid(1, Eenheid(eenheid))}":<18}{f"{Hoeveelheid(waarde, self.basis_eenheid)}":<11} {self.voedingswaarde.calorieën * waarde / 100.0}") for eenheid, waarde in self.eenheden.items()]
+    
     
     # PROPERTIES
     
@@ -432,8 +494,8 @@ class Product(GeregistreerdObject):
             menu_inspectie.toevoegen_optie(lambda: print(f"\ncategorie voor {product}:\n>>> {product.categorie}"), "categorie")
             menu_inspectie.toevoegen_optie(lambda: print(f"\ningrediënt voor {product}:\n>>> {product.ingrediënt}"), "ingrediënt")
             menu_inspectie.toevoegen_optie(lambda: print(f"\nmerk voor {product}:\n>>> {product.merk}"), "merk")
-            menu_inspectie.toevoegen_optie(lambda: print(f"\neenheden voor {product}:\n>>> {product.eenheden}"), "eenheden")
-            menu_inspectie.toevoegen_optie(lambda: print(f"\nvoedingswaarde voor {product}:\n{product.voedingswaarde}"), "voedingswaarde")
+            menu_inspectie.toevoegen_optie(product.inspecteren_eenheden, "eenheden")
+            menu_inspectie.toevoegen_optie(lambda: print(f"\nvoedingswaarde voor {product} per {Hoeveelheid(100.0, product.basis_eenheid)}:\n\n{product.voedingswaarde}"), "voedingswaarde")
             menu_inspectie.toevoegen_optie(lambda: print(f"\nbasiseenheid voor {product}:\n>>> {Hoeveelheid(100.0, product.basis_eenheid)}"), "basiseenheid")
             menu_inspectie.toevoegen_optie(lambda: print(f"\nopmerking voor {product}:\n>>> {product.opmerking}"), "opmerking")
             
