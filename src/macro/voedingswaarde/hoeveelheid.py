@@ -34,14 +34,17 @@ class Hoeveelheid:
         
         if self.eenheid in Hoeveelheid._ENERGIE_EENHEDEN:
             aantal_decimalen = 0
+            decimalen_automatisch = False
         elif self.eenheid in Hoeveelheid._BASIS_EENHEDEN:
             aantal_decimalen = 1
+            decimalen_automatisch = False
         else:
             aantal_decimalen = 3
+            decimalen_automatisch = True
         
         return formatteer_getal(
             getal = self.waarde,
-            decimalen_automatisch = False,
+            decimalen_automatisch = decimalen_automatisch,
             decimalen = aantal_decimalen,
             suffix = eenheid
             )
