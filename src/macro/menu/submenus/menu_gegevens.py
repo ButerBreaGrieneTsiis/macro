@@ -62,6 +62,7 @@ menu_hoofdcategorie_gerecht.toevoegen_optie(HoofdcategorieGerecht.verwijderen, "
 menu_hoofdcategorie_gerecht.toevoegen_optie(HoofdcategorieGerecht.weergeven, "weergeven hoofdcategorie gerecht")
 
 menu_categorie_gerecht.toevoegen_optie(CategorieGerecht.nieuw, "nieuwe categorie gerecht")
-menu_categorie_gerecht.toevoegen_optie(CategorieGerecht.bewerken, "bewerken categorie gerecht")
+menu_categorie_gerecht.toevoegen_optie(CategorieGerecht.selecteren_en_bewerken, "bewerken categorie gerecht")
+menu_categorie_gerecht.toevoegen_optie(CategorieGerecht.selecteren_en_inspecteren, "inspecteren categorie gerecht")
 menu_categorie_gerecht.toevoegen_optie(CategorieGerecht.verwijderen, "verwijderen categorie gerecht")
 menu_categorie_gerecht.toevoegen_optie(CategorieGerecht.weergeven, "weergeven categorie gerecht")

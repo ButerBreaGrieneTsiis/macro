@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, Literal
 
-from grienetsiis.opdrachtprompt import invoeren, kiezen, commando
+from grienetsiis.opdrachtprompt import invoeren, kiezen, commando, Menu
 from grienetsiis.register import Subregister, Register, GeregistreerdObject
 
 from macro.gerecht import HoofdcategorieGerecht
@@ -51,16 +51,70 @@ class CategorieGerecht(GeregistreerdObject):
         
         print(f"\n>>> nieuwe categorie gerecht \"{categorie_naam}\" gemaakt")
         
-        categorie = cls(
+        categorie_gerecht = cls(
             categorie_naam = categorie_naam,
             hoofdcategorie_uuid = hoofdcategorie_uuid,
             )
         
         if geef_id:
-            return getattr(categorie, categorie._ID_VELD)
-        return categorie
+            return categorie_gerecht._id
+        return categorie_gerecht
+    
+    # INSTANCE METHODS
+    
+    def bewerken(self) -> None:
+        
+        menu_bewerken = Menu(f"MENU BEWERKEN ({f"{self}".upper()})", "MENU CATEGORIE GERECHT", blijf_in_menu = True)
+        menu_bewerken.toevoegen_optie(self.bewerken_naam, "naam")
+        menu_bewerken.toevoegen_optie(self.bewerken_hoofdcategorie, "hoofdcategorie")
+        
+        menu_bewerken()
+    
+    def bewerken_naam(self) -> commando.Doorgaan:
+        
+        waarde_oud = self.categorie_naam
+        categorie_naam = invoeren(
+            tekst_beschrijving = "categorienaam",
+            invoer_type = "str",
+            uitsluiten_leeg = True,
+            valideren = True,
+            uitvoer_kleine_letters = True,
+            )
+        if categorie_naam is commando.STOP:
+            return commando.DOORGAAN
+        
+        self.categorie_naam = categorie_naam
+        print(f"\n>>> veld \"categorienaam\" veranderd van \"{waarde_oud}\" naar \"{self.categorie_naam}\"")
+        return commando.DOORGAAN
+    
+    def bewerken_hoofdcategorie(self) -> commando.Doorgaan:
+        
+        waarde_oud = self.hoofdcategorie_gerecht
+        hoofdcategorie_uuid = HoofdcategorieGerecht.selecteren(
+            geef_id = True,
+            toestaan_nieuw = True,
+            terug_naar = f"MENU BEWERKEN ({f"{self}".upper()})",
+            )
+        if hoofdcategorie_uuid is commando.STOP or hoofdcategorie_uuid is None:
+            return commando.DOORGAAN
+        
+        self.hoofdcategorie_uuid = hoofdcategorie_uuid
+        print(f"\n>>> veld \"hoofdcategorie\" veranderd van \"{waarde_oud}\" naar \"{self.hoofdcategorie_gerecht}\"")
+        return commando.DOORGAAN
+        
+    def inspecteren(self) -> None:
+        
+        menu_inspectie = Menu(f"MENU INSPECTEREN ({f"{self}".upper()})", "MENU CATEGORIE GERECHT", blijf_in_menu = True)
+        menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {self.categorie_naam}"), "naam")
+        menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {self.hoofdcategorie}"), "hoofdcategorie")
+        
+        menu_inspectie()
     
     # PROPERTIES
+    
+    @property
+    def velden(self) -> Dict[str, str]:
+        return {veld: veld_type for veld, veld_type in CategorieGerecht.__annotations__.items() if not veld.startswith("_")}
     
     @property
     def hoofdcategorie_gerecht(self) -> HoofdcategorieGerecht:
@@ -175,42 +229,27 @@ class CategorieGerecht(GeregistreerdObject):
         return commando.DOORGAAN
     
     @staticmethod
-    def bewerken() -> commando.Doorgaan | None:
+    def selecteren_en_bewerken() -> commando.Doorgaan:
         
-        categorie_uuid = CategorieGerecht.selecteren(
-            geef_id = True,
+        categorie_gerecht = CategorieGerecht.selecteren(
+            geef_id = False,
             toestaan_nieuw = False,
             )
-        if categorie_uuid is commando.STOP or categorie_uuid is None:
+        if categorie_gerecht is commando.STOP or categorie_gerecht is None:
             return commando.DOORGAAN
         
-        veld = CategorieGerecht.kiezen_veld()
-        if veld is commando.STOP:
-            return commando.DOORGAAN
-        
-        waarde_nieuw = invoeren(
-            tekst_beschrijving = veld,
-            invoer_type = CategorieGerecht.velden()[veld],
-            uitsluiten_leeg = True,
-            valideren = True,
-            uitvoer_kleine_letters = True,
-            )
-        if waarde_nieuw is commando.STOP:
-            return commando.DOORGAAN 
-        
-        waarde_oud = getattr(CategorieGerecht.subregister()[categorie_uuid], veld)
-        
-        print(f"\n>>> veld \"{veld}\" veranderd van \"{waarde_oud}\" naar \"{waarde_nieuw}\"")
-        setattr(CategorieGerecht.subregister()[categorie_uuid], veld, waarde_nieuw)
+        categorie_gerecht.bewerken()
         return commando.DOORGAAN
     
     @staticmethod
-    def kiezen_veld() -> str | commando.Stop:
-        return kiezen(
-            opties = list(CategorieGerecht.velden().keys()),
-            tekst_beschrijving = "veld om te bewerken",
+    def selecteren_en_inspecteren() -> commando.Doorgaan:
+        
+        categorie_gerecht = CategorieGerecht.selecteren(
+            geef_id = False,
+            toestaan_nieuw = False,
             )
-    
-    @staticmethod
-    def velden() -> Dict[str, str]:
-        return {veld: veld_type for veld, veld_type in CategorieGerecht.__annotations__.items() if not veld.startswith("_")}
+        if categorie_gerecht is commando.STOP or categorie_gerecht is None:
+            return commando.DOORGAAN
+        
+        categorie_gerecht.inspecteren()
+        return commando.DOORGAAN
