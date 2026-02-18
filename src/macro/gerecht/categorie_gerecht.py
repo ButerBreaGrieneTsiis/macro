@@ -132,12 +132,12 @@ class CategorieGerecht(GeregistreerdObject):
             
             opties = {}
             
-            if toestaan_nieuw:
-                opties["nieuw"] = "nieuw categorie gerecht"
-            
             if aantal_categorieën > 0:
                 opties["selecteren"] = "selecteren via hoofdcategorie gerecht"
                 opties["zoeken"] = "zoeken op categorienaam"
+            
+            if toestaan_nieuw:
+                opties["nieuw"] = "nieuw categorie gerecht"
             
             selectiemethode = kiezen(
                 opties = opties,

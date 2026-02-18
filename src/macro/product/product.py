@@ -289,12 +289,12 @@ class Product(GeregistreerdObject):
             
             opties = {}
             
-            if toestaan_nieuw:
-                opties["nieuw"] = "nieuw product"
-            
             if aantal_producten > 0:
                 opties["selecteren"] = "selecteren via hoofdcategorie, categorie en ingrediënt"
                 opties["zoeken"] = "zoeken op productnaam"
+            
+            if toestaan_nieuw:
+                opties["nieuw"] = "nieuw product"
             
             selectiemethode = kiezen(
                 opties = opties,

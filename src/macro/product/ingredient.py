@@ -136,12 +136,12 @@ class Ingrediënt(GeregistreerdObject):
             
             opties = {}
             
-            if toestaan_nieuw:
-                opties["nieuw"] = "nieuw ingrediënt"
-            
             if aantal_ingrediënten > 0:
                 opties["selecteren"] = "selecteren via hoofdcategorie en categorie"
                 opties["zoeken"] = "zoeken op ingrediëntnaam"
+            
+            if toestaan_nieuw:
+                opties["nieuw"] = "nieuw ingrediënt"
             
             selectiemethode = kiezen(
                 opties = opties,
