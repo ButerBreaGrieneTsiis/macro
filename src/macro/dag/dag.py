@@ -78,7 +78,7 @@ class Dag(GeregistreerdObject):
                     )
     
     @staticmethod
-    def toevoegen_product():
+    def toevoegen_product() -> commando.Doorgaan:
         
         dag = Dag.selecteren(datum = Dag._HUIDIGE_DAG)
         
@@ -126,3 +126,48 @@ class Dag(GeregistreerdObject):
                 dag.producten[product_uuid] = [hoeveelheid]
             
             print(f"\n>>> {hoeveelheid} toegevoegd van {product}")
+    
+    @staticmethod
+    def weergeven_product():
+        
+        dag = Dag.selecteren(datum = Dag._HUIDIGE_DAG)
+        
+        if len(dag.producten) == 0 and len(dag.gerechten) == 0:
+            print(f"\n>>> geen producten of gerechten aanwezig om te weergeven")
+            return commando.Doorgaan
+        
+        if len(dag.producten) > 0:
+            print("\nlos toegevoegde producten")
+            print(f"\n{"HOEVEELHEID":<18} CALORIEËN EIWITTEN PRODUCT")
+        
+        calorieën_totaal    =   Hoeveelheid(0, Eenheid.KILOCALORIE)
+        eiwitten_totaal     =   Hoeveelheid(0, Eenheid.GRAM)
+        
+        for product_uuid, hoeveelheden in dag.producten.items():
+            
+            for hoeveelheid in hoeveelheden:
+                
+                print(f"{f"{hoeveelheid}":<18} {f"{Product.subregister()[product_uuid].voedingswaarde.calorieën * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid._BASIS_EENHEDEN else hoeveelheid.waarde * Product.subregister()[product_uuid].eenheden[hoeveelheid.eenheid]) / 100}":>9} {f"{Product.subregister()[product_uuid].voedingswaarde.eiwitten * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid._BASIS_EENHEDEN else hoeveelheid.waarde * Product.subregister()[product_uuid].eenheden[hoeveelheid.eenheid]) / 100}":>8} {Product.subregister()[product_uuid]}")
+                calorieën_totaal += Product.subregister()[product_uuid].voedingswaarde.calorieën * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid._BASIS_EENHEDEN else hoeveelheid.waarde * Product.subregister()[product_uuid].eenheden[hoeveelheid.eenheid]) / 100
+                eiwitten_totaal += Product.subregister()[product_uuid].voedingswaarde.eiwitten * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid._BASIS_EENHEDEN else hoeveelheid.waarde * Product.subregister()[product_uuid].eenheden[hoeveelheid.eenheid]) / 100
+        
+        print(f"\n{"SUBTOTAAL":<18} {f"{calorieën_totaal}":>9} {f"{eiwitten_totaal}":>8} ")
+        
+        # for gerecht_uuid, versie_dict in self.gerechten.items():
+            
+        #     for versie_uuid, versie_hoeveelheid  in versie_dict.items():
+        #         versie_naam = "standaard" if versie_uuid == "standaard" else gerechten[gerecht_uuid].versies[versie_uuid]["versie_naam"]
+        #         print(f"\n     {versie_hoeveelheid} van {gerechten[gerecht_uuid]} (versie \"{versie_naam}\")")
+        #         print(f"\n     {"HOEVEELHEID":<18} CALORIEËN EIWITTEN PRODUCT")
+                
+        #         aantal_porties = gerechten[gerecht_uuid].porties if versie_uuid == "standaard" else gerechten[gerecht_uuid].versies[versie_uuid].get("porties", gerechten[gerecht_uuid].porties)
+                
+        #         for product_uuid, hoeveelheden in gerechten[gerecht_uuid].producten(versie_uuid).items():
+            
+        #             for hoeveelheid in hoeveelheden:
+                        
+        #                 print(f"     {f"{hoeveelheid * versie_hoeveelheid.waarde/aantal_porties}":<18} {f"{producten[product_uuid].voedingswaarde.calorieën * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid._BASIS_EENHEDEN else hoeveelheid.waarde * producten[product_uuid].eenheden[hoeveelheid.eenheid]) / 100 * versie_hoeveelheid.waarde/aantal_porties}":>9} {f"{producten[product_uuid].voedingswaarde.eiwitten * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid._BASIS_EENHEDEN else hoeveelheid.waarde * producten[product_uuid].eenheden[hoeveelheid.eenheid]) / 100 * versie_hoeveelheid.waarde/aantal_porties}":>8} {producten[product_uuid]}")
+                
+        #         print(f"\n     {"SUBTOTAAL":<18} {f"{gerechten[gerecht_uuid].voedingswaarde(versie_uuid).calorieën}":>9} {f"{gerechten[gerecht_uuid].voedingswaarde(versie_uuid).eiwitten}":>8} ")
+                
+        # print(f"\n\n     {"TOTAAL":<18} {f"{self.voedingswaarde.calorieën}":>9} {f"{self.voedingswaarde.eiwitten}":>8}")
