@@ -22,8 +22,8 @@ menu_gegevens.toevoegen_optie(menu_product, "menu product")
 menu_gegevens.toevoegen_optie(menu_ingrediënt, "menu ingrediënt")
 # gerecht
 menu_gegevens.toevoegen_optie(menu_merk, "menu merk")
-menu_gegevens.toevoegen_optie(menu_hoofdcategorie, "menu hoofdcategorie")
-menu_gegevens.toevoegen_optie(menu_categorie, "menu categorie")
+menu_gegevens.toevoegen_optie(menu_hoofdcategorie, "menu hoofdcategorie product")
+menu_gegevens.toevoegen_optie(menu_categorie, "menu categorie product")
 menu_gegevens.toevoegen_optie(menu_hoofdcategorie_gerecht, "menu hoofdcategorie gerecht")
 menu_gegevens.toevoegen_optie(menu_categorie_gerecht, "menu categorie gerecht")
 
@@ -43,7 +43,8 @@ menu_merk.toevoegen_optie(Merk.verwijderen, "verwijderen merk")
 menu_merk.toevoegen_optie(Merk.weergeven, "weergeven merk")
 
 menu_hoofdcategorie.toevoegen_optie(Hoofdcategorie.nieuw, "nieuwe hoofdcategorie")
-menu_hoofdcategorie.toevoegen_optie(Hoofdcategorie.bewerken, "bewerken hoofdcategorie")
+menu_hoofdcategorie.toevoegen_optie(Hoofdcategorie.selecteren_en_bewerken, "bewerken hoofdcategorie")
+menu_hoofdcategorie.toevoegen_optie(Hoofdcategorie.selecteren_en_inspecteren, "inspecteren hoofdcategorie")
 menu_hoofdcategorie.toevoegen_optie(Hoofdcategorie.verwijderen, "verwijderen hoofdcategorie")
 menu_hoofdcategorie.toevoegen_optie(Hoofdcategorie.weergeven, "weergeven hoofdcategorie")
 
