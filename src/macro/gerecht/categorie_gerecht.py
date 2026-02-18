@@ -31,7 +31,11 @@ class CategorieGerecht(GeregistreerdObject):
         
         print(f"\ninvullen gegevens nieuwe categorie gerecht")
         
-        hoofdcategorie_uuid = HoofdcategorieGerecht.selecteren(terug_naar = terug_naar)
+        hoofdcategorie_uuid = HoofdcategorieGerecht.selecteren(
+            geef_id = True,
+            toestaan_nieuw = True,
+            terug_naar = terug_naar,
+            )
         if hoofdcategorie_uuid is commando.STOP or hoofdcategorie_uuid is None:
             return commando.DOORGAAN
         
@@ -70,6 +74,7 @@ class CategorieGerecht(GeregistreerdObject):
     
     @staticmethod
     def selecteren(
+        geef_id: bool = True,
         toestaan_nieuw: bool = True,
         selectiemethode: Literal["nieuwe", "selecteren", "zoeken"] | None = None,
         terug_naar: str = "terug naar MENU GEGEVENS CATEGORIE GERECHT",
@@ -107,7 +112,7 @@ class CategorieGerecht(GeregistreerdObject):
         if selectiemethode == "nieuw":
             return CategorieGerecht.nieuw(
                 terug_naar = terug_naar,
-                geef_id = True,
+                geef_id = geef_id,
                 )
         
         if aantal_categorieën == 0:
@@ -116,6 +121,7 @@ class CategorieGerecht(GeregistreerdObject):
         if selectiemethode == "selecteren":
             
             hoofdcategorie_uuid = HoofdcategorieGerecht.selecteren(
+                geef_id = True,
                 toestaan_nieuw = toestaan_nieuw,
                 terug_naar = terug_naar,
                 )
@@ -125,11 +131,16 @@ class CategorieGerecht(GeregistreerdObject):
             return CategorieGerecht.subregister().filter(
                 hoofdcategorie_uuid = hoofdcategorie_uuid,
             ).selecteren(
+                geef_id = geef_id,
                 toestaan_nieuw = toestaan_nieuw,
                 terug_naar = terug_naar,
                 )
         
-        return CategorieGerecht.subregister().zoeken(veld = "categorie_naam")
+        return CategorieGerecht.subregister().zoeken(
+            veld = "categorie_naam",
+            veld_exact_overeenkomend = False,
+            geef_id = geef_id,
+            )
     
     @staticmethod
     def weergeven(
@@ -137,6 +148,7 @@ class CategorieGerecht(GeregistreerdObject):
         ) -> commando.Doorgaan:
         
         hoofdcategorie_uuid = HoofdcategorieGerecht.selecteren(
+            geef_id = True,
             toestaan_nieuw = False,
             terug_naar = terug_naar,
             )
@@ -151,7 +163,10 @@ class CategorieGerecht(GeregistreerdObject):
     @staticmethod
     def verwijderen() -> commando.Doorgaan:
         
-        categorie_uuid = CategorieGerecht.selecteren(toestaan_nieuw = False)
+        categorie_uuid = CategorieGerecht.selecteren(
+            geef_id = True,
+            toestaan_nieuw = False,
+            )
         if categorie_uuid is commando.STOP or categorie_uuid is None:
             return commando.DOORGAAN
         
@@ -162,7 +177,10 @@ class CategorieGerecht(GeregistreerdObject):
     @staticmethod
     def bewerken() -> commando.Doorgaan | None:
         
-        categorie_uuid = CategorieGerecht.selecteren(toestaan_nieuw = False)
+        categorie_uuid = CategorieGerecht.selecteren(
+            geef_id = True,
+            toestaan_nieuw = False,
+            )
         if categorie_uuid is commando.STOP or categorie_uuid is None:
             return commando.DOORGAAN
         

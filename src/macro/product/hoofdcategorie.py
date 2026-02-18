@@ -54,12 +54,13 @@ class Hoofdcategorie(GeregistreerdObject):
     
     @staticmethod
     def selecteren(
+        geef_id: bool = True,
         toestaan_nieuw: bool = True,
         terug_naar: str = "terug naar MENU GEGEVENS HOOFDCATEGORIE",
         ) -> str | commando.Stop | None:
         
         return Hoofdcategorie.subregister().selecteren(
-            geef_id = True,
+            geef_id = geef_id,
             toestaan_nieuw = toestaan_nieuw,
             terug_naar = terug_naar,
             )
@@ -72,7 +73,10 @@ class Hoofdcategorie(GeregistreerdObject):
     @staticmethod
     def verwijderen() -> commando.Doorgaan:
         
-        hoofdcategorie_uuid = Hoofdcategorie.selecteren(toestaan_nieuw = False)
+        hoofdcategorie_uuid = Hoofdcategorie.selecteren(
+            geef_id = True,
+            toestaan_nieuw = False,
+            )
         if hoofdcategorie_uuid is commando.STOP or hoofdcategorie_uuid is None:
             return commando.DOORGAAN
         
@@ -83,7 +87,10 @@ class Hoofdcategorie(GeregistreerdObject):
     @staticmethod
     def bewerken() -> commando.Doorgaan | None:
         
-        hoofdcategorie_uuid = Hoofdcategorie.selecteren(toestaan_nieuw = False)
+        hoofdcategorie_uuid = Hoofdcategorie.selecteren(
+            geef_id = True,
+            toestaan_nieuw = False,
+            )
         if hoofdcategorie_uuid is commando.STOP or hoofdcategorie_uuid is None:
             return commando.DOORGAAN
         

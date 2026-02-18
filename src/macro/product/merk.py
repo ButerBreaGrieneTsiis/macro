@@ -48,12 +48,13 @@ class Merk(GeregistreerdObject):
     
     @staticmethod
     def selecteren(
+        geef_id: bool = True,
         toestaan_nieuw: bool = True,
         terug_naar: str = "terug naar MENU GEGEVENS MERK",
         ) -> str | commando.Stop | None:
         
         return Merk.subregister().selecteren(
-            geef_id = True,
+            geef_id = geef_id,
             toestaan_nieuw = toestaan_nieuw,
             terug_naar = terug_naar,
             )
@@ -66,7 +67,10 @@ class Merk(GeregistreerdObject):
     @staticmethod
     def verwijderen() -> commando.Doorgaan:
         
-        merk_uuid = Merk.selecteren(toestaan_nieuw = False)
+        merk_uuid = Merk.selecteren(
+            geef_id = True,
+            toestaan_nieuw = False,
+            )
         if merk_uuid is commando.STOP or merk_uuid is None:
             return commando.DOORGAAN
         
@@ -77,7 +81,10 @@ class Merk(GeregistreerdObject):
     @staticmethod
     def bewerken() -> commando.Doorgaan | None:
         
-        merk_uuid = Merk.selecteren(toestaan_nieuw = False)
+        merk_uuid = Merk.selecteren(
+            geef_id = True,
+            toestaan_nieuw = False,
+            )
         if merk_uuid is commando.STOP or merk_uuid is None:
             return commando.DOORGAAN
         

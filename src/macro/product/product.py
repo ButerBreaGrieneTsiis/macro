@@ -37,7 +37,11 @@ class Product(GeregistreerdObject):
         
         print(f"\ninvullen gegevens nieuw product")
         
-        ingrediënt_uuid = Ingrediënt.selecteren(terug_naar = terug_naar)
+        ingrediënt_uuid = Ingrediënt.selecteren(
+            geef_id = True,
+            toestaan_nieuw = True,
+            terug_naar = terug_naar,
+            )
         if ingrediënt_uuid is commando.STOP or ingrediënt_uuid is commando.DOORGAAN or ingrediënt_uuid is None:
             return commando.DOORGAAN
         
@@ -51,7 +55,11 @@ class Product(GeregistreerdObject):
         if product_naam is commando.STOP:
             return commando.DOORGAAN
         
-        merk_uuid = Merk.selecteren(terug_naar = terug_naar)
+        merk_uuid = Merk.selecteren(
+            geef_id = True,
+            toestaan_nieuw = True,
+            terug_naar = terug_naar,
+            )
         if merk_uuid is commando.STOP or ingrediënt_uuid is None:
             return commando.DOORGAAN
         
@@ -116,6 +124,7 @@ class Product(GeregistreerdObject):
     
     @staticmethod
     def selecteren(
+        geef_id: bool = True,
         toestaan_nieuw: bool = True,
         selectiemethode: Literal["nieuw", "selecteren", "zoeken"] | None = None,
         terug_naar: str = "terug naar MENU GEGEVENS PRODUCT",
@@ -153,7 +162,7 @@ class Product(GeregistreerdObject):
         if selectiemethode == "nieuw":
             return Product.nieuw(
                 terug_naar = terug_naar,
-                geef_id = True,
+                geef_id = geef_id,
                 )
         
         if aantal_producten == 0:
@@ -162,6 +171,7 @@ class Product(GeregistreerdObject):
         if selectiemethode == "selecteren":
             
             ingrediënt_uuid = Ingrediënt.selecteren(
+                geef_id = True,
                 toestaan_nieuw = toestaan_nieuw,
                 selectiemethode = "selecteren",
                 terug_naar = terug_naar,
@@ -172,11 +182,16 @@ class Product(GeregistreerdObject):
             return Product.subregister().filter(
                 ingrediënt_uuid = ingrediënt_uuid,
             ).selecteren(
+                geef_id = geef_id,
                 toestaan_nieuw = toestaan_nieuw,
                 terug_naar = terug_naar,
                 )
         
-        return Product.subregister().zoeken(veld = "product_naam")
+        return Product.subregister().zoeken(
+            veld = "product_naam",
+            veld_exact_overeenkomend = False,
+            geef_id = geef_id,
+            )
     
     @staticmethod
     def weergeven(
@@ -184,6 +199,7 @@ class Product(GeregistreerdObject):
         ) -> commando.Doorgaan:
         
         ingrediënt_uuid = Ingrediënt.selecteren(
+            geef_id = True,
             toestaan_nieuw = False,
             terug_naar = terug_naar,
             )
@@ -198,7 +214,10 @@ class Product(GeregistreerdObject):
     @staticmethod
     def verwijderen() -> commando.Doorgaan:
         
-        product_uuid = Product.selecteren(toestaan_nieuw = False)
+        product_uuid = Product.selecteren(
+            geef_id = True,
+            toestaan_nieuw = False,
+            )
         if product_uuid is commando.STOP or product_uuid is None:
             return commando.DOORGAAN
         
@@ -209,7 +228,10 @@ class Product(GeregistreerdObject):
     @staticmethod
     def bewerken() -> commando.Doorgaan | None:
         
-        product_uuid = Product.selecteren(toestaan_nieuw = False)
+        product_uuid = Product.selecteren(
+            geef_id = True,
+            toestaan_nieuw = False,
+            )
         if product_uuid is commando.STOP or product_uuid is None:
             return commando.DOORGAAN
         

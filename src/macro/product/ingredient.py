@@ -31,7 +31,11 @@ class Ingrediënt(GeregistreerdObject):
         
         print(f"\ninvullen gegevens nieuw ingrediënt")
         
-        categorie_uuid = Categorie.selecteren(terug_naar = terug_naar)
+        categorie_uuid = Categorie.selecteren(
+            geef_id = True,
+            toestaan_nieuw = True,
+            terug_naar = terug_naar,
+            )
         if categorie_uuid is commando.STOP or categorie_uuid is commando.DOORGAAN or categorie_uuid is None:
             return commando.DOORGAAN
         
@@ -74,6 +78,7 @@ class Ingrediënt(GeregistreerdObject):
     
     @staticmethod
     def selecteren(
+        geef_id: bool = True,
         toestaan_nieuw: bool = True,
         selectiemethode: Literal["nieuw", "selecteren", "zoeken"] | None = None,
         terug_naar: str = "terug naar MENU GEGEVENS INGREDIËNT",
@@ -111,7 +116,7 @@ class Ingrediënt(GeregistreerdObject):
         if selectiemethode == "nieuw":
             return Ingrediënt.nieuw(
                 terug_naar = terug_naar,
-                geef_id = True,
+                geef_id = geef_id,
                 )
         
         if aantal_ingrediënten == 0:
@@ -120,6 +125,7 @@ class Ingrediënt(GeregistreerdObject):
         if selectiemethode == "selecteren":
             
             categorie_uuid = Categorie.selecteren(
+                geef_id = True,
                 toestaan_nieuw = toestaan_nieuw,
                 selectiemethode = "selecteren",
                 terug_naar = terug_naar,
@@ -130,11 +136,16 @@ class Ingrediënt(GeregistreerdObject):
             return Ingrediënt.subregister().filter(
                 categorie_uuid = categorie_uuid,
             ).selecteren(
+                geef_id = geef_id,
                 toestaan_nieuw = toestaan_nieuw,
                 terug_naar = terug_naar,
                 )
         
-        return Ingrediënt.subregister().zoeken(veld = "ingrediënt_naam")
+        return Ingrediënt.subregister().zoeken(
+            veld = "ingrediënt_naam",
+            veld_exact_overeenkomend = False,
+            geef_id = geef_id,
+            )
     
     @staticmethod
     def weergeven(
@@ -142,6 +153,7 @@ class Ingrediënt(GeregistreerdObject):
         ) -> commando.Doorgaan:
         
         categorie_uuid = Categorie.selecteren(
+            geef_id = True,
             toestaan_nieuw = False,
             terug_naar = terug_naar,
             )
@@ -156,7 +168,10 @@ class Ingrediënt(GeregistreerdObject):
     @staticmethod
     def verwijderen() -> commando.Doorgaan:
         
-        ingrediënt_uuid = Ingrediënt.selecteren(toestaan_nieuw = False)
+        ingrediënt_uuid = Ingrediënt.selecteren(
+            geef_id = True,
+            toestaan_nieuw = False,
+            )
         if ingrediënt_uuid is commando.STOP or ingrediënt_uuid is None:
             return commando.DOORGAAN
         
@@ -167,7 +182,10 @@ class Ingrediënt(GeregistreerdObject):
     @staticmethod
     def bewerken() -> commando.Doorgaan | None:
         
-        ingrediënt_uuid = Ingrediënt.selecteren(toestaan_nieuw = False)
+        ingrediënt_uuid = Ingrediënt.selecteren(
+            geef_id = True,
+            toestaan_nieuw = False,
+            )
         if ingrediënt_uuid is commando.STOP or ingrediënt_uuid is None:
             return commando.DOORGAAN
         
