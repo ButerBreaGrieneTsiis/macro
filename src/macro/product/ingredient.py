@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, Literal
 
-from grienetsiis.opdrachtprompt import invoeren, kiezen, commando
+from grienetsiis.opdrachtprompt import invoeren, kiezen, commando, Menu
 from grienetsiis.register import Subregister, Register, GeregistreerdObject
 
 from macro.product import Hoofdcategorie, Categorie
@@ -57,10 +57,65 @@ class Ingrediënt(GeregistreerdObject):
             )
         
         if geef_id:
-            return getattr(ingrediënt, ingrediënt._ID_VELD)
+            return ingrediënt._id
         return ingrediënt
     
+    # INSTANCE METHODS
+    
+    def bewerken(self) -> None:
+        
+        menu_bewerken = Menu(f"MENU BEWERKEN ({f"{self}".upper()})", "MENU INGREDIËNT", blijf_in_menu = True)
+        menu_bewerken.toevoegen_optie(self.bewerken_naam, "naam")
+        menu_bewerken.toevoegen_optie(self.bewerken_categorie, "categorie")
+        
+        menu_bewerken()
+    
+    def bewerken_naam(self) -> commando.Doorgaan:
+        
+        waarde_oud = self.ingrediënt_naam
+        ingrediënt_naam = invoeren(
+            tekst_beschrijving = "ingrediëntnaam",
+            invoer_type = "str",
+            uitsluiten_leeg = True,
+            valideren = True,
+            uitvoer_kleine_letters = True,
+            )
+        if ingrediënt_naam is commando.STOP:
+            return commando.DOORGAAN
+        
+        self.ingrediënt_naam = ingrediënt_naam
+        print(f"\n>>> veld \"ingrediëntnaam\" veranderd van \"{waarde_oud}\" naar \"{self.ingrediënt_naam}\"")
+        return commando.DOORGAAN
+    
+    def bewerken_categorie(self) -> commando.Doorgaan:
+        
+        waarde_oud = self.categorie
+        categorie_uuid = Categorie.selecteren(
+            geef_id = True,
+            toestaan_nieuw = True,
+            terug_naar = f"MENU BEWERKEN ({f"{self}".upper()})",
+            )
+        if categorie_uuid is commando.STOP or categorie_uuid is None:
+            return commando.DOORGAAN
+        
+        self.categorie_uuid = categorie_uuid
+        print(f"\n>>> veld \"categorie\" veranderd van \"{waarde_oud}\" naar \"{self.categorie}\"")
+        return commando.DOORGAAN
+        
+    def inspecteren(self) -> None:
+        
+        menu_inspectie = Menu(f"MENU INSPECTEREN ({f"{self}".upper()})", "MENU INGREDIËNT", blijf_in_menu = True)
+        menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {self.ingrediënt_naam}"), "naam")
+        menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {self.hoofdcategorie}"), "hoofdcategorie")
+        menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {self.categorie}"), "categorie")
+        
+        menu_inspectie()
+    
     # PROPERTIES
+    
+    @property
+    def velden(self) -> Dict[str, str]:
+        return {veld: veld_type for veld, veld_type in Ingrediënt.__annotations__.items() if not veld.startswith("_")}
     
     @property
     def hoofdcategorie(self) -> Hoofdcategorie:
@@ -180,42 +235,27 @@ class Ingrediënt(GeregistreerdObject):
         return commando.DOORGAAN
     
     @staticmethod
-    def bewerken() -> commando.Doorgaan | None:
+    def selecteren_en_bewerken() -> commando.Doorgaan:
         
-        ingrediënt_uuid = Ingrediënt.selecteren(
-            geef_id = True,
+        ingrediënt = Ingrediënt.selecteren(
+            geef_id = False,
             toestaan_nieuw = False,
             )
-        if ingrediënt_uuid is commando.STOP or ingrediënt_uuid is None:
+        if ingrediënt is commando.STOP or ingrediënt is None:
             return commando.DOORGAAN
         
-        veld = Ingrediënt.kiezen_veld()
-        if veld is commando.STOP:
-            return commando.DOORGAAN
-        
-        waarde_nieuw = invoeren(
-            tekst_beschrijving = veld,
-            invoer_type = Ingrediënt.velden()[veld],
-            uitsluiten_leeg = True,
-            valideren = True,
-            uitvoer_kleine_letters = True,
-            )
-        if waarde_nieuw is commando.STOP:
-            return commando.DOORGAAN 
-        
-        waarde_oud = getattr(Ingrediënt.subregister()[ingrediënt_uuid], veld)
-        
-        print(f"\n>>> veld \"{veld}\" veranderd van \"{waarde_oud}\" naar \"{waarde_nieuw}\"")
-        setattr(Ingrediënt.subregister()[ingrediënt_uuid], veld, waarde_nieuw)
+        ingrediënt.bewerken()
         return commando.DOORGAAN
     
     @staticmethod
-    def kiezen_veld() -> str | commando.Stop:
-        return kiezen(
-            opties = list(Ingrediënt.velden().keys()),
-            tekst_beschrijving = "veld om te bewerken",
+    def selecteren_en_inspecteren() -> commando.Doorgaan:
+        
+        ingrediënt = Ingrediënt.selecteren(
+            geef_id = False,
+            toestaan_nieuw = False,
             )
-    
-    @staticmethod
-    def velden() -> Dict[str, str]:
-        return {veld: veld_type for veld, veld_type in Ingrediënt.__annotations__.items() if not veld.startswith("_")}
+        if ingrediënt is commando.STOP or ingrediënt is None:
+            return commando.DOORGAAN
+        
+        ingrediënt.inspecteren()
+        return commando.DOORGAAN

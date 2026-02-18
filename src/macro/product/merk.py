@@ -52,7 +52,7 @@ class Merk(GeregistreerdObject):
     
     def bewerken(self) -> None:
         
-        menu_bewerken = Menu(f"MENU BEWERKEN ({f"{self}".upper()})", "MENU MERK PRODUCT", blijf_in_menu = True)
+        menu_bewerken = Menu(f"MENU BEWERKEN ({f"{self}".upper()})", "MENU MERK", blijf_in_menu = True)
         menu_bewerken.toevoegen_optie(self.bewerken_naam, "naam")
         
         menu_bewerken()
@@ -76,7 +76,7 @@ class Merk(GeregistreerdObject):
     
     def inspecteren(self) -> None:
         
-        menu_inspectie = Menu(f"MENU INSPECTEREN ({f"{self}".upper()})", "MENU MERK PRODUCT", blijf_in_menu = True)
+        menu_inspectie = Menu(f"MENU INSPECTEREN ({f"{self}".upper()})", "MENU MERK", blijf_in_menu = True)
         menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {self.merk_naam}"), "naam")
         
         menu_inspectie()

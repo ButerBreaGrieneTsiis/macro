@@ -21,7 +21,7 @@ menu_categorie_gerecht = Menu("MENU CATEGORIE GERECHT", menu_gegevens, True)
 menu_gegevens.toevoegen_optie(menu_product, "menu product")
 menu_gegevens.toevoegen_optie(menu_ingrediënt, "menu ingrediënt")
 # gerecht
-menu_gegevens.toevoegen_optie(menu_merk, "menu merk product")
+menu_gegevens.toevoegen_optie(menu_merk, "menu merk")
 menu_gegevens.toevoegen_optie(menu_hoofdcategorie, "menu hoofdcategorie product")
 menu_gegevens.toevoegen_optie(menu_categorie, "menu categorie product")
 menu_gegevens.toevoegen_optie(menu_hoofdcategorie_gerecht, "menu hoofdcategorie gerecht")
@@ -33,7 +33,8 @@ menu_product.toevoegen_optie(Product.verwijderen, "verwijderen product")
 menu_product.toevoegen_optie(Product.weergeven, "weergeven product")
 
 menu_ingrediënt.toevoegen_optie(Ingrediënt.nieuw, "nieuwe ingrediënt")
-menu_ingrediënt.toevoegen_optie(Ingrediënt.bewerken, "bewerken ingrediënt")
+menu_ingrediënt.toevoegen_optie(Ingrediënt.selecteren_en_bewerken, "bewerken ingrediënt")
+menu_ingrediënt.toevoegen_optie(Ingrediënt.selecteren_en_inspecteren, "inspecteren ingrediënt")
 menu_ingrediënt.toevoegen_optie(Ingrediënt.verwijderen, "verwijderen ingrediënt")
 menu_ingrediënt.toevoegen_optie(Ingrediënt.weergeven, "weergeven ingrediënt")
 
