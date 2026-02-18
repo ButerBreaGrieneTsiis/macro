@@ -44,7 +44,7 @@ class Hoofdcategorie(GeregistreerdObject):
             )
         
         if geef_id:
-            return getattr(hoofdcategorie, hoofdcategorie._ID_VELD)
+            return hoofdcategorie._id
         return hoofdcategorie
     
     # INSTANCE METHODS
@@ -70,7 +70,7 @@ class Hoofdcategorie(GeregistreerdObject):
             return commando.DOORGAAN
         
         self.hoofdcategorie_naam = hoofdcategorie_naam
-        print(f"\n>>> veld \"hoofdcategorie_naam\" veranderd van \"{waarde_oud}\" naar \"{self.hoofdcategorie_naam}\"")
+        print(f"\n>>> veld \"hoofdcategorienaam\" veranderd van \"{waarde_oud}\" naar \"{self.hoofdcategorie_naam}\"")
         return commando.DOORGAAN
     
     def inspecteren(self) -> None:

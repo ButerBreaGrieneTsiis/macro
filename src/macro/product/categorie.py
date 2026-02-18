@@ -57,7 +57,7 @@ class Categorie(GeregistreerdObject):
             )
         
         if geef_id:
-            return getattr(categorie, categorie._ID_VELD)
+            return categorie._id
         return categorie
     
     # INSTANCE METHODS
@@ -84,7 +84,7 @@ class Categorie(GeregistreerdObject):
             return commando.DOORGAAN
         
         self.categorie_naam = categorie_naam
-        print(f"\n>>> veld \"categorie_naam\" veranderd van \"{waarde_oud}\" naar \"{self.categorie_naam}\"")
+        print(f"\n>>> veld \"categorienaam\" veranderd van \"{waarde_oud}\" naar \"{self.categorie_naam}\"")
         return commando.DOORGAAN
     
     def bewerken_hoofdcategorie(self) -> commando.Doorgaan:
