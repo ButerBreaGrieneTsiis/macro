@@ -1,8 +1,9 @@
 """macro.categorie.hoofdcategorie_gerecht"""
 from __future__ import annotations
 from dataclasses import dataclass
+from typing import Dict
 
-from grienetsiis.opdrachtprompt import invoeren, commando
+from grienetsiis.opdrachtprompt import invoeren, commando, Menu
 from grienetsiis.register import Subregister, Register, GeregistreerdObject
 
 
@@ -38,13 +39,52 @@ class HoofdcategorieGerecht(GeregistreerdObject):
         
         print(f"\n>>> nieuwe hoofdcategorie gerecht \"{hoofdcategorie_naam}\" gemaakt")
         
-        hoofdcategorie = cls(
+        hoofdcategorie_gerecht = cls(
             hoofdcategorie_naam = hoofdcategorie_naam,
             )
         
         if geef_id:
-            return getattr(hoofdcategorie, hoofdcategorie._ID_VELD)
-        return hoofdcategorie
+            return hoofdcategorie_gerecht._id
+        return hoofdcategorie_gerecht
+    
+    # INSTANCE METHODS
+    
+    def bewerken(self) -> None:
+        
+        menu_bewerken = Menu(f"MENU BEWERKEN ({f"{self}".upper()})", "MENU HOOFDCATEGORIE GERECHT", blijf_in_menu = True)
+        menu_bewerken.toevoegen_optie(self.bewerken_naam, "naam")
+        
+        menu_bewerken()
+    
+    def bewerken_naam(self) -> commando.Doorgaan:
+        
+        waarde_oud = self.hoofdcategorie_naam
+        hoofdcategorie_naam = invoeren(
+            tekst_beschrijving = "hoofdcategorienaam",
+            invoer_type = "str",
+            uitsluiten_leeg = True,
+            valideren = True,
+            uitvoer_kleine_letters = True,
+            )
+        if hoofdcategorie_naam is commando.STOP:
+            return commando.DOORGAAN
+        
+        self.hoofdcategorie_naam = hoofdcategorie_naam
+        print(f"\n>>> veld \"hoofdcategorienaam\" veranderd van \"{waarde_oud}\" naar \"{self.hoofdcategorie_naam}\"")
+        return commando.DOORGAAN
+    
+    def inspecteren(self) -> None:
+        
+        menu_inspectie = Menu(f"MENU INSPECTEREN ({f"{self}".upper()})", "MENU HOOFDCATEGORIE GERECHT", blijf_in_menu = True)
+        menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {self.hoofdcategorie_naam}"), "naam")
+        
+        menu_inspectie()
+    
+    # PROPERTIES
+    
+    @property
+    def velden(self) -> Dict[str, str]:
+        return {veld: veld_type for veld, veld_type in HoofdcategorieGerecht.__annotations__.items() if not veld.startswith("_")}
     
     # STATIC METHODS
     
@@ -85,29 +125,27 @@ class HoofdcategorieGerecht(GeregistreerdObject):
         return commando.DOORGAAN
     
     @staticmethod
-    def bewerken() -> commando.Doorgaan | None:
+    def selecteren_en_bewerken() -> commando.Doorgaan:
         
-        hoofdcategorie_uuid = HoofdcategorieGerecht.selecteren(
-            geef_id = True,
+        hoofdcategorie_gerecht = HoofdcategorieGerecht.selecteren(
+            geef_id = False,
             toestaan_nieuw = False,
             )
-        if hoofdcategorie_uuid is commando.STOP or hoofdcategorie_uuid is None:
+        if hoofdcategorie_gerecht is commando.STOP or hoofdcategorie_gerecht is None:
             return commando.DOORGAAN
         
-        print(f"\nbewerken gegevens {HoofdcategorieGerecht.subregister()[hoofdcategorie_uuid]}\n")
+        hoofdcategorie_gerecht.bewerken()
+        return commando.DOORGAAN
+    
+    @staticmethod
+    def selecteren_en_inspecteren() -> commando.Doorgaan:
         
-        waarde_nieuw = invoeren(
-            tekst_beschrijving = "hoofdcategorienaam",
-            invoer_type = "str",
-            uitsluiten_leeg = True,
-            valideren = True,
-            uitvoer_kleine_letters = True,
+        hoofdcategorie_gerecht = HoofdcategorieGerecht.selecteren(
+            geef_id = False,
+            toestaan_nieuw = False,
             )
-        if waarde_nieuw is commando.STOP:
+        if hoofdcategorie_gerecht is commando.STOP or hoofdcategorie_gerecht is None:
             return commando.DOORGAAN
         
-        waarde_oud = HoofdcategorieGerecht.subregister()[hoofdcategorie_uuid].hoofdcategorie_naam
-        
-        print(f"\n>>> veld \"hoofdcategorie_naam\" veranderd van \"{waarde_oud}\" naar \"{waarde_nieuw}\"")
-        HoofdcategorieGerecht.subregister()[hoofdcategorie_uuid].hoofdcategorie_naam = waarde_nieuw
+        hoofdcategorie_gerecht.inspecteren()
         return commando.DOORGAAN
