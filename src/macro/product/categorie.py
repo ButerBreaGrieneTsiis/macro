@@ -251,8 +251,8 @@ class Categorie(GeregistreerdObject):
                 continue
             
             menu_inspectie = Menu(f"MENU INSPECTEREN ({f"{categorie}".upper()})", "MENU CATEGORIE PRODUCT", blijf_in_menu = True)
-            menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {categorie.categorie_naam}"), "naam")
-            menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {categorie.hoofdcategorie}"), "hoofdcategorie")
+            menu_inspectie.toevoegen_optie(lambda: print(f"\nnaam voor {categorie}:\n>>> {categorie.categorie_naam}"), "naam")
+            menu_inspectie.toevoegen_optie(lambda: print(f"\nhoofdcategorie voor {categorie}:\n>>> {categorie.hoofdcategorie}"), "hoofdcategorie")
             
             menu_inspectie()
             

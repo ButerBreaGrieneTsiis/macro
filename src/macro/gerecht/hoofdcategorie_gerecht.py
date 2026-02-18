@@ -128,7 +128,7 @@ class HoofdcategorieGerecht(GeregistreerdObject):
                 return commando.DOORGAAN
             
             menu_inspectie = Menu(f"MENU INSPECTEREN ({f"{hoofdcategorie_gerecht}".upper()})", "MENU HOOFDCATEGORIE GERECHT", blijf_in_menu = True)
-            menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {hoofdcategorie_gerecht.hoofdcategorie_naam}"), "naam")
+            menu_inspectie.toevoegen_optie(lambda: print(f"\nnaam voor {hoofdcategorie_gerecht}:\n>>> {hoofdcategorie_gerecht.hoofdcategorie_naam}"), "naam")
             
             menu_inspectie()
         

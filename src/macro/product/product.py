@@ -117,6 +117,21 @@ class Product(GeregistreerdObject):
         print(f"\n>>> veld \"productnaam\" veranderd van \"{waarde_oud}\" naar \"{self.product_naam}\"")
         return commando.DOORGAAN
     
+    def bewerken_ingrediënt(self) -> commando.Doorgaan:
+        
+        waarde_oud = self.ingrediënt
+        ingrediënt_uuid = Ingrediënt.selecteren(
+            geef_id = True,
+            toestaan_nieuw = True,
+            terug_naar = f"MENU BEWERKEN ({f"{self}".upper()})",
+            )
+        if ingrediënt_uuid is commando.STOP or ingrediënt_uuid is None:
+            return commando.DOORGAAN
+        
+        self.ingrediënt_uuid = ingrediënt_uuid
+        print(f"\n>>> veld \"ingrediënt\" veranderd van \"{waarde_oud}\" naar \"{self.ingrediënt}\"")
+        return commando.DOORGAAN
+    
     def bewerken_merk(self) -> commando.Doorgaan:
         
         waarde_oud = self.merk
@@ -132,19 +147,21 @@ class Product(GeregistreerdObject):
         print(f"\n>>> veld \"merk\" veranderd van \"{waarde_oud}\" naar \"{self.merk}\"")
         return commando.DOORGAAN
     
-    def bewerken_ingrediënt(self) -> commando.Doorgaan:
+    def bewerken_eenheden(self) -> commando.Doorgaan:
+        ...
+    
+    def bewerken_voedingswaarde(self) -> commando.Doorgaan:
         
-        waarde_oud = self.ingrediënt
-        ingrediënt_uuid = Ingrediënt.selecteren(
-            geef_id = True,
-            toestaan_nieuw = True,
-            terug_naar = f"MENU BEWERKEN ({f"{self}".upper()})",
-            )
-        if ingrediënt_uuid is commando.STOP or ingrediënt_uuid is None:
+        waarde_oud = self.voedingswaarde
+        voedingswaarde = Voedingswaarde.nieuw(self.basis_eenheid)
+        if voedingswaarde is commando.STOP:
             return commando.DOORGAAN
         
-        self.ingrediënt_uuid = ingrediënt_uuid
-        print(f"\n>>> veld \"ingrediënt\" veranderd van \"{waarde_oud}\" naar \"{self.ingrediënt}\"")
+        self.voedingswaarde = voedingswaarde
+        print(f"\n>>> voedingswaarde veranderd van:\n")
+        print(waarde_oud)
+        print(f"\n>>> naar:\n")
+        print(self.voedingswaarde)
         return commando.DOORGAAN
     
     def bewerken_opmerking(self) -> commando.Doorgaan:
@@ -387,8 +404,8 @@ class Product(GeregistreerdObject):
             menu_bewerken.toevoegen_optie(product.bewerken_naam, "naam")
             menu_bewerken.toevoegen_optie(product.bewerken_ingrediënt, "ingrediënt")
             menu_bewerken.toevoegen_optie(product.bewerken_merk, "merk")
-            # menu_bewerken.toevoegen_optie(self.bewerken_eenheden, "eenheden")
-            # menu_bewerken.toevoegen_optie(self.bewerken_voedingswaarde, "voedingswaarde")
+            menu_bewerken.toevoegen_optie(product.bewerken_eenheden, "eenheden")
+            menu_bewerken.toevoegen_optie(product.bewerken_voedingswaarde, "voedingswaarde")
             menu_bewerken.toevoegen_optie(product.bewerken_opmerking, "opmerking")
             
             menu_bewerken()
@@ -410,15 +427,15 @@ class Product(GeregistreerdObject):
                 continue
             
             menu_inspectie = Menu(f"MENU INSPECTEREN ({f"{product}".upper()})", "MENU INGREDIËNT", blijf_in_menu = True)
-            menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {product.product_naam}"), "naam")
-            menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {product.hoofdcategorie}"), "hoofdcategorie")
-            menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {product.categorie}"), "categorie")
-            menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {product.ingrediënt}"), "ingrediënt")
-            menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {product.merk}"), "merk")
-            menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {product.eenheden}"), "eenheden")
-            menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {product.voedingswaarde}"), "voedingswaarde")
-            menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {product.basis_eenheid}"), "basiseenheid")
-            menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {product.opmerking}"), "opmerking")
+            menu_inspectie.toevoegen_optie(lambda: print(f"\nproductnaam voor {product}:\n>>> {product.product_naam}"), "naam")
+            menu_inspectie.toevoegen_optie(lambda: print(f"\nhoofdcategorie voor {product}:\n>>> {product.hoofdcategorie}"), "hoofdcategorie")
+            menu_inspectie.toevoegen_optie(lambda: print(f"\ncategorie voor {product}:\n>>> {product.categorie}"), "categorie")
+            menu_inspectie.toevoegen_optie(lambda: print(f"\ningrediënt voor {product}:\n>>> {product.ingrediënt}"), "ingrediënt")
+            menu_inspectie.toevoegen_optie(lambda: print(f"\nmerk voor {product}:\n>>> {product.merk}"), "merk")
+            menu_inspectie.toevoegen_optie(lambda: print(f"\neenheden voor {product}:\n>>> {product.eenheden}"), "eenheden")
+            menu_inspectie.toevoegen_optie(lambda: print(f"\nvoedingswaarde voor {product}:\n{product.voedingswaarde}"), "voedingswaarde")
+            menu_inspectie.toevoegen_optie(lambda: print(f"\nbasiseenheid voor {product}:\n>>> {Hoeveelheid(100.0, product.basis_eenheid)}"), "basiseenheid")
+            menu_inspectie.toevoegen_optie(lambda: print(f"\nopmerking voor {product}:\n>>> {product.opmerking}"), "opmerking")
             
             menu_inspectie()
         

@@ -31,14 +31,14 @@ class Voedingswaarde(BasisType):
     def __repr__(self) -> str:
         
         return (
-            f"     {"calorieën":<21}{self.calorieën} ({self.kilojoule})\n"
-            f"     {"vetten":<21}{self.vetten}\n"
-            f"       {"waarvan verzadigd":<19}{self.verzadigd}\n"
-            f"     {"koolydraten":<21}{self.koolhydraten}\n"
-            f"       {"waarvan suikers":<19}{self.suikers}\n"
-            f"     {"eiwitten":<21}{self.eiwitten}\n"
-            f"     {"vezels":<21}{self.vezels}\n"
-            f"     {"zout":<21}{self.zout}"
+            f"{"calorieën":<21}{self.calorieën} ({self.kilojoule})\n"
+            f"{"vetten":<21}{f"{self.vetten}":>8}\n"
+            f"  {"waarvan verzadigd":<19}{f"{self.verzadigd}":>8}\n"
+            f"{"koolydraten":<21}{f"{self.koolhydraten}":>8}\n"
+            f"  {"waarvan suikers":<19}{f"{self.suikers}":>8}\n"
+            f"{"eiwitten":<21}{f"{self.eiwitten}":>8}\n"
+            f"{"vezels":<21}{f"{self.vezels}":>8}\n"
+            f"{"zout":<21}{f"{self.zout}":>8}"
             )
     
     def __mul__(

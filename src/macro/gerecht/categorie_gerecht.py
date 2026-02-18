@@ -251,8 +251,8 @@ class CategorieGerecht(GeregistreerdObject):
                 continue
             
             menu_inspectie = Menu(f"MENU INSPECTEREN ({f"{categorie_gerecht}".upper()})", "MENU CATEGORIE GERECHT", blijf_in_menu = True)
-            menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {categorie_gerecht.categorie_naam}"), "naam")
-            menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {categorie_gerecht.hoofdcategorie}"), "hoofdcategorie")
+            menu_inspectie.toevoegen_optie(lambda: print(f"\nnaam voor {categorie_gerecht}:\n>>> {categorie_gerecht.categorie_naam}"), "naam")
+            menu_inspectie.toevoegen_optie(lambda: print(f"\nhoofdcategorie voor {categorie_gerecht}:\n>>> {categorie_gerecht.hoofdcategorie}"), "hoofdcategorie")
             
             menu_inspectie()
             

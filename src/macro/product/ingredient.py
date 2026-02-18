@@ -293,9 +293,9 @@ class Ingrediënt(GeregistreerdObject):
                 continue
             
             menu_inspectie = Menu(f"MENU INSPECTEREN ({f"{ingrediënt}".upper()})", "MENU INGREDIËNT", blijf_in_menu = True)
-            menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {ingrediënt.ingrediënt_naam}"), "naam")
-            menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {ingrediënt.hoofdcategorie}"), "hoofdcategorie")
-            menu_inspectie.toevoegen_optie(lambda: print(f"\n>>> {ingrediënt.categorie}"), "categorie")
+            menu_inspectie.toevoegen_optie(lambda: print(f"\nnaam voor {ingrediënt}:\n>>> {ingrediënt.ingrediënt_naam}"), "naam")
+            menu_inspectie.toevoegen_optie(lambda: print(f"\nhoofdcategorie voor {ingrediënt}:\n>>> {ingrediënt.hoofdcategorie}"), "hoofdcategorie")
+            menu_inspectie.toevoegen_optie(lambda: print(f"\ncategorie voor {ingrediënt}:\n>>> {ingrediënt.categorie}"), "categorie")
             
             menu_inspectie()
             
