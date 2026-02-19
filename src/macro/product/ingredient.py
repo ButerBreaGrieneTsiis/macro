@@ -179,6 +179,7 @@ class Ingrediënt(GeregistreerdObject):
                 terug_naar = terug_naar,
                 )
         
+        print()
         return Ingrediënt.subregister().zoeken(
             veld = "ingrediënt_naam",
             veld_exact_overeenkomend = False,

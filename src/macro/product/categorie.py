@@ -174,6 +174,7 @@ class Categorie(GeregistreerdObject):
                 terug_naar = terug_naar,
                 )
         
+        print()
         return Categorie.subregister().zoeken(
             veld = "categorie_naam",
             veld_exact_overeenkomend = False,

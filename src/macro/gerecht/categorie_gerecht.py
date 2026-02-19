@@ -174,6 +174,7 @@ class CategorieGerecht(GeregistreerdObject):
                 terug_naar = terug_naar,
                 )
         
+        print()
         return CategorieGerecht.subregister().zoeken(
             veld = "categorie_naam",
             veld_exact_overeenkomend = False,

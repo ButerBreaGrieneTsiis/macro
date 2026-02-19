@@ -379,6 +379,7 @@ class Product(GeregistreerdObject):
                 terug_naar = terug_naar,
                 )
         
+        print()
         return Product.subregister().zoeken(
             veld = "product_naam",
             veld_exact_overeenkomend = False,
