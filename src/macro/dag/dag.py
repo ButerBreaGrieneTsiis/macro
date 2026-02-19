@@ -274,7 +274,7 @@ class Dag(GeregistreerdObject):
         keuze_product = dag.selecteren_product(
             terug_naar = Dag.titel(),
             tekst_beschrijving = "een product en hoeveelheid om aan te passen",
-            geef_id = False,
+            geef_id = True,
             geef_enum = True,
             keuze_meerdere = False,
             )
@@ -307,12 +307,13 @@ class Dag(GeregistreerdObject):
         print(f"\n>>> hoeveelheid {hoeveelheid_oud} aangepast naar {hoeveelheid_nieuw}")
         
         if eenheid_nieuw.enkelvoud in dag.producten[product_uuid]:
-            dag.producten[product_uuid][eenheid_nieuw.enkelvoud] += waarde_nieuw
+            if eenheid_nieuw.enkelvoud != eenheid_oud.enkelvoud:
+                dag.producten[product_uuid][eenheid_nieuw.enkelvoud] += waarde_nieuw
+                del dag.producten[product_uuid][eenheid_oud.enkelvoud]
+            else:
+                dag.producten[product_uuid][eenheid_nieuw.enkelvoud] = waarde_nieuw
         else:
             dag.producten[product_uuid][eenheid_nieuw.enkelvoud] = waarde_nieuw
-        
-        if eenheid_nieuw.enkelvoud != eenheid_oud.enkelvoud:
-            del dag.producten[product_uuid][eenheid_oud.enkelvoud]
         
         return commando.DOORGAAN
     
@@ -399,7 +400,8 @@ class Dag(GeregistreerdObject):
         
         product_selectie = dag.selecteren_product(
             terug_naar = Dag.titel(),
-            geef_id = False,
+            tekst_beschrijving = "een product en hoeveelheid om te verwijderen",
+            geef_id = True,
             geef_enum = True,
             )
         if product_selectie is commando.STOP:
