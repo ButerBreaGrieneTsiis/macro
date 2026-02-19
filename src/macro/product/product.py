@@ -388,7 +388,7 @@ class Product(GeregistreerdObject):
     @staticmethod
     def weergeven_alle() -> commando.Stop:
         
-        print()
+        print("\nALLE PRODUCTEN:\n")
         
         for hoofdcategorie_uuid, hoofdcategorie in Hoofdcategorie.subregister().items():
             
@@ -425,7 +425,8 @@ class Product(GeregistreerdObject):
         if hoofdcategorie_uuid is commando.STOP or hoofdcategorie_uuid is None:
             return commando.DOORGAAN
         
-        print()
+        hoofdcategorie = Hoofdcategorie.subregister()[hoofdcategorie_uuid]
+        print(f"\nALLE PRODUCTEN VOOR {f"{hoofdcategorie}".upper()}:\n")
         
         for categorie_uuid, categorie in Categorie.subregister().filter(
             hoofdcategorie_uuid = hoofdcategorie_uuid,
@@ -458,7 +459,8 @@ class Product(GeregistreerdObject):
         if categorie_uuid is commando.STOP or categorie_uuid is None:
             return commando.DOORGAAN
         
-        print()
+        categorie = Categorie.subregister()[categorie_uuid]
+        print(f"\nALLE PRODUCTEN VOOR {f"{categorie}".upper()}:\n")
         
         for ingrediënt_uuid, ingrediënt in Ingrediënt.subregister().filter(
             categorie_uuid = categorie_uuid,
@@ -485,7 +487,8 @@ class Product(GeregistreerdObject):
         if ingrediënt_uuid is commando.STOP or ingrediënt_uuid is None:
             return commando.DOORGAAN
         
-        print()
+        ingrediënt = Ingrediënt.subregister()[ingrediënt_uuid]
+        print(f"\nALLE PRODUCTEN VOOR {f"{ingrediënt}".upper()}:\n")
         
         for product in Product.subregister().filter(
             ingrediënt_uuid = ingrediënt_uuid,

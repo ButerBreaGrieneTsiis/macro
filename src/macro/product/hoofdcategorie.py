@@ -93,6 +93,9 @@ class Hoofdcategorie(GeregistreerdObject):
     
     @staticmethod
     def weergeven_alle() -> commando.Stop:
+        
+        print("\nALLE HOOFDCATEGORIEËN:\n")
+        
         Hoofdcategorie.subregister().weergeven()
         return commando.STOP
     

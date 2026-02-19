@@ -94,6 +94,9 @@ class Merk(GeregistreerdObject):
     
     @staticmethod
     def weergeven_alle() -> commando.Doorgaan:
+        
+        print("\nALLE MERKEN:\n")
+        
         Merk.subregister().weergeven()
         return commando.DOORGAAN
     

@@ -183,7 +183,7 @@ class Categorie(GeregistreerdObject):
     @staticmethod
     def weergeven_alle() -> commando.Stop:
         
-        print()
+        print("\nALLE CATEGORIEËN:\n")
         
         for hoofdcategorie_uuid, hoofdcategorie in Hoofdcategorie.subregister().items():
             
@@ -207,6 +207,9 @@ class Categorie(GeregistreerdObject):
             )
         if hoofdcategorie_uuid is commando.STOP or hoofdcategorie_uuid is None:
             return commando.DOORGAAN
+        
+        hoofdcategorie = Hoofdcategorie.subregister()[hoofdcategorie_uuid]
+        print(f"\nALLE CATEGORIEËN VOOR {f"{hoofdcategorie}".upper()}:\n")
         
         Categorie.subregister().filter(
             hoofdcategorie_uuid = hoofdcategorie_uuid,
