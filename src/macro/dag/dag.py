@@ -49,6 +49,10 @@ class Dag(GeregistreerdObject):
     # STATIC METHODS
     
     @staticmethod
+    def titel() -> str:
+        return f"MENU DAG {Dag._HUIDIGE_DAG.strftime("%A %d %B %Y").upper()}"
+    
+    @staticmethod
     def subregister() -> Subregister:
         return Register()[Dag._SUBREGISTER_NAAM]
     
@@ -128,7 +132,7 @@ class Dag(GeregistreerdObject):
             print(f"\n>>> {hoeveelheid} toegevoegd van {product}")
     
     @staticmethod
-    def weergeven_product():
+    def weergeven_product() -> commando.Doorgaan:
         
         dag = Dag.selecteren(datum = Dag._HUIDIGE_DAG)
         
@@ -171,3 +175,57 @@ class Dag(GeregistreerdObject):
         #         print(f"\n     {"SUBTOTAAL":<18} {f"{gerechten[gerecht_uuid].voedingswaarde(versie_uuid).calorieën}":>9} {f"{gerechten[gerecht_uuid].voedingswaarde(versie_uuid).eiwitten}":>8} ")
                 
         # print(f"\n\n     {"TOTAAL":<18} {f"{self.voedingswaarde.calorieën}":>9} {f"{self.voedingswaarde.eiwitten}":>8}")
+        
+        return commando.DOORGAAN
+        
+    @staticmethod
+    def veranderen_dag() -> commando.Doorgaan:
+        
+        opties = {
+            dt.date.today(): f"vandaag ({dt.date.today().strftime("%A %d %B %Y")})",
+            (dt.date.today() + dt.timedelta(days = 1)): f"morgen ({(dt.date.today() + dt.timedelta(days = 1)).strftime("%A %d %B %Y")})",
+            (dt.date.today() + dt.timedelta(days = 2)): f"overmorgen ({(dt.date.today() + dt.timedelta(days = 2)).strftime("%A %d %B %Y")})",
+            (dt.date.today() - dt.timedelta(days = 1)): f"gisteren ({(dt.date.today() - dt.timedelta(days = 1)).strftime("%A %d %B %Y")})",
+            (dt.date.today() - dt.timedelta(days = 2)): f"eergisteren ({(dt.date.today() - dt.timedelta(days = 2)).strftime("%A %d %B %Y")})",
+            "aangepast": f"aangepast ({(dt.date.today() - dt.timedelta(days = 2)).strftime("%A %d %B %Y")})",
+            }
+        
+        datum = kiezen(
+            opties = opties,
+            tekst_beschrijving = "dag",
+            tekst_annuleren = f"MENU DAG {Dag._HUIDIGE_DAG.strftime("%A %d %B %Y").upper()}",
+            )
+        if datum is commando.STOP:
+            return commando.DOORGAAN
+        
+        if datum == "aangepast":
+            
+            jaar = invoeren(
+                tekst_beschrijving = "jaar",
+                invoer_type = "int",
+                waardes_bereik = (1970, dt.datetime.today().year)
+                )
+            if jaar is commando.STOP:
+                return commando.DOORGAAN
+            
+            maand = invoeren(
+                tekst_beschrijving = "maand",
+                invoer_type = "int",
+                waardes_bereik = (1, 12)
+                )
+            if maand is commando.STOP:
+                return commando.DOORGAAN
+            
+            dag = invoeren(
+                tekst_beschrijving = "dag",
+                invoer_type = "int",
+                waardes_bereik = (1, 31)
+                )
+            if dag is commando.STOP:
+                return commando.DOORGAAN
+            
+            datum = dt.date(jaar, maand, dag)
+        
+        print(f"\n>>> datum veranderd van \"{Dag._HUIDIGE_DAG}\" naar \"{datum}\"")
+        Dag._HUIDIGE_DAG = datum
+        return commando.DOORGAAN
