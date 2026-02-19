@@ -1,5 +1,6 @@
 """macro.menu.submenus.menu_gegevens"""
 from grienetsiis.opdrachtprompt import Menu
+from grienetsiis.register import Register
 
 from macro.gerecht import  HoofdcategorieGerecht, CategorieGerecht
 from macro.product import Hoofdcategorie, Categorie, Ingrediënt, Merk, Product
@@ -26,6 +27,7 @@ menu_gegevens.toevoegen_optie(menu_hoofdcategorie, "hoofdcategorieën product")
 menu_gegevens.toevoegen_optie(menu_categorie, "categorieën product")
 menu_gegevens.toevoegen_optie(menu_hoofdcategorie_gerecht, "hoofdcategorieën gerecht")
 menu_gegevens.toevoegen_optie(menu_categorie_gerecht, "categorieën gerecht")
+menu_gegevens.toevoegen_optie(Register.kopie_opslaan, "kopie gegevens")
 
 menu_product.toevoegen_optie(Product.nieuw, "nieuw product")
 menu_product.toevoegen_optie(Product.bewerken, "bewerken product")

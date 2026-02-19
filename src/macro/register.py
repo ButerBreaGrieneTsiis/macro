@@ -15,6 +15,7 @@ def registreren(openen: bool = True) -> None:
     
     Register.instellen(
         bestandsmap = Path("gegevens"),
+        bestandsmap_kopie = Path("gegevens//kopie"),
         )
     
     ENUMS = {
