@@ -4,12 +4,13 @@ from dataclasses import dataclass
 from typing import ClassVar, List
 
 from grienetsiis.gereedschap import formatteer_getal
+from grienetsiis.types import BasisType
 
 from macro.voedingswaarde import Eenheid
 
 
 @dataclass
-class Hoeveelheid:
+class Hoeveelheid(BasisType):
     
     waarde: float
     eenheid: Eenheid

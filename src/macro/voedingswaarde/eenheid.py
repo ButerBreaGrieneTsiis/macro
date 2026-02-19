@@ -26,13 +26,19 @@ class Eenheid(Enum):
         enkelvoud: str,
         meervoud: str | None = None,
         ) -> Eenheid:
+        
         veld = object.__new__(cls)
         veld._value = enkelvoud
         veld._meervoud = meervoud
+        
         return veld
     
     def __repr__(self) -> str:
         return self.enkelvoud
+    
+    @classmethod
+    def van_tekst(cls, tekst: str) -> Eenheid:
+        return next(enum for enum in cls if enum.enkelvoud == tekst)
     
     @property
     def enkelvoud(self) -> str:
