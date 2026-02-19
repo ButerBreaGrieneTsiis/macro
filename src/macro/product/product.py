@@ -104,8 +104,9 @@ class Product(GeregistreerdObject):
     def selecteren_eenheid(
         self,
         terug_naar: str,
+        geef_enum: bool = True,
         toestaan_nieuw: bool = True,
-        ) -> Eenheid | commando.Stop:
+        ) -> Eenheid | str | commando.Stop:
         
         opties_eenheden = {self.basis_eenheid.enkelvoud: f"per \"{self.basis_eenheid.meervoud}\""}
         opties_eenheden |= {eenheid: f"per \"{eenheid}\"" for eenheid in self.eenheden.keys()}
@@ -122,12 +123,17 @@ class Product(GeregistreerdObject):
             return commando.STOP
         
         if keuze_eenheid == "nieuwe eenheid":
-            eenheid = self.bewerken_eenheden(terug_naar = terug_naar)
+            eenheid = self.bewerken_eenheden(
+                geef_enum = False,
+                terug_naar = terug_naar,
+                )
             if eenheid is commando.DOORGAAN:
                 return commando.STOP
         else:
-            eenheid = Eenheid.van_enkelvoud(keuze_eenheid)
+            eenheid = keuze_eenheid
         
+        if geef_enum:
+            return Eenheid.van_enkelvoud(eenheid)
         return eenheid
     
     def bewerken_naam(self) -> commando.Doorgaan:
@@ -179,8 +185,9 @@ class Product(GeregistreerdObject):
     
     def bewerken_eenheden(
         self,
+        geef_enum: bool = True,
         terug_naar: str | None = None,
-        ) -> Eenheid | commando.Doorgaan:
+        ) -> Eenheid | str | commando.Doorgaan:
         
         if terug_naar is None:
             terug_naar = f"MENU BEWERKEN ({f"{self}".upper()})"
@@ -203,14 +210,16 @@ class Product(GeregistreerdObject):
         if waarde is commando.STOP:
             return commando.DOORGAAN
         
+        hoeveelheid = Hoeveelheid(waarde, eenheid)
+        
         if self.eenheden is None:
             self.eenheden = {}
         
         if eenheid.enkelvoud in self.eenheden:
             if waarde == self.eenheden[eenheid.enkelvoud]:
-                print(f"\n>>> geen wijziging")
+                print(f"\n>>> hoeveelheid {hoeveelheid} reeds aanwezig")
+            
             else: 
-                
                 overschrijven = kiezen(
                     opties = {
                         False: "niet overschrijven",
@@ -220,7 +229,6 @@ class Product(GeregistreerdObject):
                     tekst_kies_een = False,
                     tekst_annuleren = "stop",
                     )
-                
                 if overschrijven is commando.STOP:
                     return commando.STOP
                 if overschrijven:
@@ -231,7 +239,9 @@ class Product(GeregistreerdObject):
             
             self.eenheden[eenheid.enkelvoud] = waarde
         
-        return eenheid
+        if geef_enum:
+            return eenheid
+        return eenheid.enkelvoud
     
     def bewerken_voedingswaarde(self) -> commando.Doorgaan:
         

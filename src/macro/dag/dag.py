@@ -1,9 +1,10 @@
 """macro.dag.dag"""
 from __future__ import annotations
+from calendar import monthrange
 from dataclasses import dataclass
 import datetime as dt
 import locale
-from typing import ClassVar, Dict, Tuple
+from typing import ClassVar, Dict, List, Tuple
 
 from grienetsiis.opdrachtprompt import invoeren, kiezen, commando
 from grienetsiis.register import Subregister, Register, GeregistreerdObject
@@ -33,15 +34,46 @@ class Dag(GeregistreerdObject):
     
     # INSTANCE METHODS
     
-    def selecteren_product(self) -> Tuple[str, str] | commando.Stop:
+    def selecteren_product(
+        self,
+        terug_naar: str,
+        tekst_beschrijving: str,
+        geef_id: bool = True,
+        geef_enum: bool = True,
+        keuze_meerdere: bool = False,
+        ) -> Tuple[str | Product, str | Eenheid] | List[Tuple[str | Product, str | Eenheid]] | commando.Stop:
         
         opties_product = {(product_uuid, eenheid_enkelvoud): f"{f"{Hoeveelheid(waarde, Eenheid.van_enkelvoud(eenheid_enkelvoud))}":<18} {Product.subregister()[product_uuid]}" for product_uuid, hoeveelheden in self.producten.items() for eenheid_enkelvoud, waarde in hoeveelheden.items()}
         
-        return kiezen(
+        keuze_product = kiezen(
             opties = opties_product,
-            tekst_beschrijving = "een product en hoeveelheid om aan te passen",
-            tekst_annuleren = self.titel(),
+            tekst_beschrijving = tekst_beschrijving,
+            tekst_annuleren = terug_naar,
+            keuze_meerdere = keuze_meerdere,
             )
+        if keuze_product is commando.STOP:
+            return commando.STOP
+        
+        if not keuze_meerdere:
+            
+            product_uuid = keuze_product[0]
+            eenheid_enkelvoud = keuze_product[1]
+            
+            return (
+                product_uuid if geef_id else Product.subregister()[product_uuid],
+                Eenheid.van_enkelvoud(eenheid_enkelvoud) if geef_enum else eenheid_enkelvoud,
+                )
+        
+        lijst = []
+        
+        for product_uuid, eenheid_enkelvoud in keuze_product:
+            
+            lijst.append((
+                product_uuid if geef_id else Product.subregister()[product_uuid],
+                Eenheid.van_enkelvoud(eenheid_enkelvoud) if geef_enum else eenheid_enkelvoud,
+                ))
+        
+        return lijst
     
     def selecteren_gerecht(self) -> Tuple[str, str] | commando.Stop:
         ...
@@ -95,7 +127,7 @@ class Dag(GeregistreerdObject):
         return Register()[Dag._SUBREGISTER_NAAM]
     
     @staticmethod
-    def selecteren(
+    def selecteren_dag(
         datum: dt.date = dt.date.today(),
         ) -> str | commando.Stop | None:
         
@@ -120,9 +152,65 @@ class Dag(GeregistreerdObject):
                     )
     
     @staticmethod
+    def selecteren_datum(
+        vandaag: bool = True,
+        morgen: bool = True,
+        overmorgen: bool = True,
+        gisteren: bool = True,
+        eergisteren: bool = True,
+        aangepast: bool = True,
+        ) -> dt.date | commando.Stop:
+        
+        opties = {}
+        
+        if vandaag: opties[dt.date.today()] = f"vandaag ({dt.date.today().strftime("%A %d %B %Y")})"
+        if morgen: opties[dt.date.today() + dt.timedelta(days = 1)] = f"morgen ({(dt.date.today() + dt.timedelta(days = 1)).strftime("%A %d %B %Y")})"
+        if overmorgen: opties[dt.date.today() + dt.timedelta(days = 2)] = f"overmorgen ({(dt.date.today() + dt.timedelta(days = 2)).strftime("%A %d %B %Y")})"
+        if gisteren: opties[dt.date.today() - dt.timedelta(days = 1)] = f"gisteren ({(dt.date.today() - dt.timedelta(days = 1)).strftime("%A %d %B %Y")})"
+        if eergisteren: opties[dt.date.today() - dt.timedelta(days = 2)] = f"eergisteren ({(dt.date.today() - dt.timedelta(days = 2)).strftime("%A %d %B %Y")})"
+        if aangepast: opties["aangepast"] = f"aangepast ({(dt.date.today() - dt.timedelta(days = 2)).strftime("%A %d %B %Y")})"
+        
+        keuze_datum = kiezen(
+            opties = opties,
+            tekst_beschrijving = "dag",
+            tekst_annuleren = f"MENU DAG {Dag._HUIDIGE_DAG.strftime("%A %d %B %Y").upper()}",
+            )
+        if keuze_datum is commando.STOP:
+            return commando.STOP
+        
+        if keuze_datum != "aangepast":
+            return keuze_datum
+        
+        jaar = invoeren(
+            tekst_beschrijving = "jaar",
+            invoer_type = "int",
+            waardes_bereik = (1970, dt.datetime.today().year)
+            )
+        if jaar is commando.STOP:
+            return commando.STOP
+        
+        maand = invoeren(
+            tekst_beschrijving = "maand",
+            invoer_type = "int",
+            waardes_bereik = (1, 12)
+            )
+        if maand is commando.STOP:
+            return commando.STOP
+        
+        dag = invoeren(
+            tekst_beschrijving = "dag",
+            invoer_type = "int",
+            waardes_bereik = (1, monthrange(jaar, maand)[1])
+            )
+        if dag is commando.STOP:
+            return commando.STOP
+        
+        return dt.date(jaar, maand, dag)
+    
+    @staticmethod
     def toevoegen_product() -> commando.Doorgaan:
         
-        dag = Dag.selecteren(datum = Dag._HUIDIGE_DAG)
+        dag = Dag.selecteren_dag(datum = Dag._HUIDIGE_DAG)
         
         while True:
             
@@ -138,6 +226,7 @@ class Dag(GeregistreerdObject):
             
             eenheid = product.selecteren_eenheid(
                 terug_naar = f"MENU DAG {Dag._HUIDIGE_DAG.strftime("%A %d %B %Y").upper()}",
+                geef_enum = True,
                 toestaan_nieuw = True,
                 )
             if eenheid is commando.STOP:
@@ -158,9 +247,9 @@ class Dag(GeregistreerdObject):
                 dag.producten = {}
             
             if product_uuid in dag.producten.keys():
-                for eenheid_aanwezig, waarde_aanwezig in dag.producten[product_uuid].items():
-                    if eenheid == eenheid_aanwezig:
-                        dag.producten[product_uuid][eenheid.enkelvoud] += waarde_aanwezig
+                for eenheid_aanwezig in dag.producten[product_uuid]:
+                    if eenheid.enkelvoud == eenheid_aanwezig:
+                        dag.producten[product_uuid][eenheid.enkelvoud] += waarde
                         break
                 else:
                     dag.producten[product_uuid][eenheid.enkelvoud] = waarde
@@ -176,46 +265,54 @@ class Dag(GeregistreerdObject):
     @staticmethod
     def aanpassen_product() -> commando.Doorgaan:
         
-        dag = Dag.selecteren(datum = Dag._HUIDIGE_DAG)
+        dag = Dag.selecteren_dag(datum = Dag._HUIDIGE_DAG)
         
         if len(dag.producten) == 0:
             print(f"\n>>> geen producten aanwezig om de hoeveelheid van aan te passen")
             return commando.Doorgaan
         
-        product_selectie = dag.selecteren_product()
-        if product_selectie is commando.STOP:
+        keuze_product = dag.selecteren_product(
+            terug_naar = Dag.titel(),
+            tekst_beschrijving = "een product en hoeveelheid om aan te passen",
+            geef_id = False,
+            geef_enum = True,
+            keuze_meerdere = False,
+            )
+        if keuze_product is commando.STOP:
             return commando.Doorgaan
         
-        product_uuid, eenheid_enkelvoud_oud = product_selectie
+        product_uuid, eenheid_oud = keuze_product
         product = Product.subregister()[product_uuid]
         
         eenheid_nieuw = product.selecteren_eenheid(
-            terug_naar = dag.titel(),
+            terug_naar = Dag.titel(),
+            geef_enum = True,
             toestaan_nieuw = True,
             )
         if eenheid_nieuw is commando.STOP:
             return commando.Doorgaan
         
-        waarde = invoeren(
+        waarde_nieuw = invoeren(
             tekst_beschrijving = f"hoeveel {eenheid_nieuw.meervoud}",
             invoer_type = "float",
             )
-        if waarde is commando.STOP:
+        if waarde_nieuw is commando.STOP:
             return commando.DOORGAAN
         
-        hoeveelheid_oud = Hoeveelheid(dag.producten[product_uuid][eenheid_enkelvoud_oud], Eenheid.van_enkelvoud(eenheid_enkelvoud_oud))
-        hoeveelheid_nieuw = Hoeveelheid(waarde, eenheid_nieuw)
-        eenheid_enkelvoud_nieuw = eenheid_nieuw.enkelvoud
+        waarde_oud = dag.producten[product_uuid][eenheid_oud.enkelvoud]
+        hoeveelheid_oud = Hoeveelheid(waarde_oud, eenheid_oud)
+        
+        hoeveelheid_nieuw = Hoeveelheid(waarde_nieuw, eenheid_nieuw)
         
         print(f"\n>>> hoeveelheid {hoeveelheid_oud} aangepast naar {hoeveelheid_nieuw}")
         
-        if eenheid_enkelvoud_nieuw in dag.producten[product_uuid]:
-            dag.producten[product_uuid][eenheid_enkelvoud_nieuw] += waarde
+        if eenheid_nieuw.enkelvoud in dag.producten[product_uuid]:
+            dag.producten[product_uuid][eenheid_nieuw.enkelvoud] += waarde_nieuw
         else:
-            dag.producten[product_uuid][eenheid_enkelvoud_nieuw] = waarde
+            dag.producten[product_uuid][eenheid_nieuw.enkelvoud] = waarde_nieuw
         
-        if eenheid_enkelvoud_nieuw != eenheid_enkelvoud_oud:
-            del dag.producten[product_uuid][eenheid_enkelvoud_oud]
+        if eenheid_nieuw.enkelvoud != eenheid_oud.enkelvoud:
+            del dag.producten[product_uuid][eenheid_oud.enkelvoud]
         
         return commando.DOORGAAN
     
@@ -226,7 +323,7 @@ class Dag(GeregistreerdObject):
     @staticmethod
     def weergeven_product() -> commando.Doorgaan:
         
-        dag = Dag.selecteren(datum = Dag._HUIDIGE_DAG)
+        dag = Dag.selecteren_dag(datum = Dag._HUIDIGE_DAG)
         
         if len(dag.producten) == 0 and len(dag.gerechten) == 0:
             print(f"\n>>> geen producten of gerechten aanwezig om te weergeven")
@@ -282,7 +379,7 @@ class Dag(GeregistreerdObject):
     @staticmethod
     def weergeven_voedingswaarde() -> commando.Doorgaan:
         
-        dag = Dag.selecteren(datum = Dag._HUIDIGE_DAG)
+        dag = Dag.selecteren_dag(datum = Dag._HUIDIGE_DAG)
         
         if len(dag.producten) == 0 and len(dag.gerechten) == 0:
             print(f"\n>>> geen producten of gerechten aanwezig om voedingswaarde voor te berekenen")
@@ -294,24 +391,28 @@ class Dag(GeregistreerdObject):
     @staticmethod
     def verwijderen_product() -> commando.Doorgaan:
         
-        dag = Dag.selecteren(datum = Dag._HUIDIGE_DAG)
+        dag = Dag.selecteren_dag(datum = Dag._HUIDIGE_DAG)
         
         if len(dag.producten) == 0:
             print(f"\n>>> geen producten aanwezig om te verwijderen")
             return commando.Doorgaan
         
-        product_selectie = dag.selecteren_product()
+        product_selectie = dag.selecteren_product(
+            terug_naar = Dag.titel(),
+            geef_id = False,
+            geef_enum = True,
+            )
         if product_selectie is commando.STOP:
             return commando.Doorgaan
         
-        product_uuid, eenheid_enkelvoud = product_selectie
+        product_uuid, eenheid = product_selectie
         product = Product.subregister()[product_uuid]
         
-        hoeveelheid = Hoeveelheid(dag.producten[product_uuid][eenheid_enkelvoud], Eenheid.van_enkelvoud(eenheid_enkelvoud))
+        hoeveelheid = Hoeveelheid(dag.producten[product_uuid][eenheid.enkelvoud], eenheid)
         
         print(f"\n>>> hoeveelheid {hoeveelheid} van {product} verwijderd")
         
-        del dag.producten[product_uuid][eenheid_enkelvoud]
+        del dag.producten[product_uuid][eenheid.enkelvoud]
         
         return commando.DOORGAAN
     
@@ -320,56 +421,64 @@ class Dag(GeregistreerdObject):
         ...
     
     @staticmethod
-    def kopiëren() -> commando.Doorgaan:
-        ...
+    def kopiëren_product() -> commando.Doorgaan:
+        
+        datum_ander = Dag.selecteren_datum(
+            vandaag = Dag._HUIDIGE_DAG != dt.date.today(),
+            morgen = False,
+            overmorgen = False,
+            gisteren = Dag._HUIDIGE_DAG != dt.date.today() - dt.timedelta(days = 1),
+            eergisteren = Dag._HUIDIGE_DAG != dt.date.today() - dt.timedelta(days = 2),
+            )
+        if datum_ander is commando.STOP:
+            return commando.DOORGAAN
+        
+        dag_huidig = Dag.selecteren_dag(datum = Dag._HUIDIGE_DAG)
+        dag_ander = Dag.selecteren_dag(datum = datum_ander)
+        
+        if len(dag_ander.producten) == 0:
+            print(f"\n>>> geen producten aanwezig bij {dag_ander}")
+            return commando.Doorgaan
+        
+        keuze_producten = dag_ander.selecteren_product(
+            terug_naar = Dag.titel(),
+            tekst_beschrijving = "één of meerdere product(en) om te kopiëren",
+            geef_id = True,
+            geef_enum = True,
+            keuze_meerdere = True,
+            )
+        if keuze_producten is commando.STOP:
+            return commando.Doorgaan
+        
+        if dag_huidig.producten is None:
+            dag_huidig.producten = {}
+        
+        print("")
+        for product_uuid, eenheid in keuze_producten:
+            
+            waarde = dag_ander.producten[product_uuid][eenheid.enkelvoud]
+            hoeveelheid = Hoeveelheid(waarde, eenheid)
+            
+            product = Product.subregister()[product_uuid]
+            
+            if product_uuid in dag_huidig.producten.keys():
+                for eenheid_huidig in dag_huidig.producten[product_uuid].keys():
+                    if eenheid.enkelvoud == eenheid_huidig:
+                        dag_huidig.producten[product_uuid][eenheid.enkelvoud] += waarde
+                        break
+                else:
+                    dag_huidig.producten[product_uuid][eenheid.enkelvoud] = waarde
+            else:
+                dag_huidig.producten[product_uuid] = {eenheid.enkelvoud: waarde}
+            
+            print(f">>> {hoeveelheid} toegevoegd van {product}")
     
     @staticmethod
     def veranderen_dag() -> commando.Doorgaan:
         
-        opties = {
-            dt.date.today(): f"vandaag ({dt.date.today().strftime("%A %d %B %Y")})",
-            (dt.date.today() + dt.timedelta(days = 1)): f"morgen ({(dt.date.today() + dt.timedelta(days = 1)).strftime("%A %d %B %Y")})",
-            (dt.date.today() + dt.timedelta(days = 2)): f"overmorgen ({(dt.date.today() + dt.timedelta(days = 2)).strftime("%A %d %B %Y")})",
-            (dt.date.today() - dt.timedelta(days = 1)): f"gisteren ({(dt.date.today() - dt.timedelta(days = 1)).strftime("%A %d %B %Y")})",
-            (dt.date.today() - dt.timedelta(days = 2)): f"eergisteren ({(dt.date.today() - dt.timedelta(days = 2)).strftime("%A %d %B %Y")})",
-            "aangepast": f"aangepast ({(dt.date.today() - dt.timedelta(days = 2)).strftime("%A %d %B %Y")})",
-            }
-        
-        datum = kiezen(
-            opties = opties,
-            tekst_beschrijving = "dag",
-            tekst_annuleren = f"MENU DAG {Dag._HUIDIGE_DAG.strftime("%A %d %B %Y").upper()}",
-            )
+        datum = Dag.selecteren_datum()
         if datum is commando.STOP:
             return commando.DOORGAAN
-        
-        if datum == "aangepast":
-            
-            jaar = invoeren(
-                tekst_beschrijving = "jaar",
-                invoer_type = "int",
-                waardes_bereik = (1970, dt.datetime.today().year)
-                )
-            if jaar is commando.STOP:
-                return commando.DOORGAAN
-            
-            maand = invoeren(
-                tekst_beschrijving = "maand",
-                invoer_type = "int",
-                waardes_bereik = (1, 12)
-                )
-            if maand is commando.STOP:
-                return commando.DOORGAAN
-            
-            dag = invoeren(
-                tekst_beschrijving = "dag",
-                invoer_type = "int",
-                waardes_bereik = (1, 31)
-                )
-            if dag is commando.STOP:
-                return commando.DOORGAAN
-            
-            datum = dt.date(jaar, maand, dag)
         
         print(f"\n>>> datum veranderd van \"{Dag._HUIDIGE_DAG}\" naar \"{datum}\"")
         Dag._HUIDIGE_DAG = datum
