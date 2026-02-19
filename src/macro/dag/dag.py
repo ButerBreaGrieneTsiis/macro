@@ -35,7 +35,7 @@ class Dag(GeregistreerdObject):
     
     def selecteren_product(self) -> Tuple[str, str] | commando.Stop:
         
-        opties_product = {(product_uuid, index_hoeveelheid): f"{f"{hoeveelheid}":<18} {Product.subregister()[product_uuid]}" for product_uuid, hoeveelheden in self.producten.items() for index_hoeveelheid, hoeveelheid in enumerate(hoeveelheden)}
+        opties_product = {(product_uuid, eenheid_enkelvoud): f"{f"{Hoeveelheid(waarde, Eenheid.van_enkelvoud(eenheid_enkelvoud))}":<18} {Product.subregister()[product_uuid]}" for product_uuid, hoeveelheden in self.producten.items() for eenheid_enkelvoud, waarde in hoeveelheden.items()}
         
         return kiezen(
             opties = opties_product,
@@ -186,28 +186,38 @@ class Dag(GeregistreerdObject):
         if product_selectie is commando.STOP:
             return commando.Doorgaan
         
-        product_uuid, index_hoeveelheid = product_selectie
+        product_uuid, eenheid_enkelvoud_oud = product_selectie
         product = Product.subregister()[product_uuid]
         
-        eenheid = product.selecteren_eenheid(
+        eenheid_nieuw = product.selecteren_eenheid(
             terug_naar = dag.titel(),
             toestaan_nieuw = True,
             )
-        if eenheid is commando.STOP:
+        if eenheid_nieuw is commando.STOP:
             return commando.Doorgaan
         
         waarde = invoeren(
-            tekst_beschrijving = f"hoeveel {eenheid.meervoud}",
+            tekst_beschrijving = f"hoeveel {eenheid_nieuw.meervoud}",
             invoer_type = "float",
             )
         if waarde is commando.STOP:
             return commando.DOORGAAN
         
-        hoeveelheid = Hoeveelheid(waarde, eenheid)
+        hoeveelheid_oud = Hoeveelheid(dag.producten[product_uuid][eenheid_enkelvoud_oud], Eenheid.van_enkelvoud(eenheid_enkelvoud_oud))
+        hoeveelheid_nieuw = Hoeveelheid(waarde, eenheid_nieuw)
+        eenheid_enkelvoud_nieuw = eenheid_nieuw.enkelvoud
         
-        print(f"\n>>> hoeveelheid {dag.producten[product_uuid][index_hoeveelheid]} aangepast naar {hoeveelheid}")
+        print(f"\n>>> hoeveelheid {hoeveelheid_oud} aangepast naar {hoeveelheid_nieuw}")
         
-        dag.producten[product_uuid][index_hoeveelheid] = hoeveelheid
+        if eenheid_enkelvoud_nieuw in dag.producten[product_uuid]:
+            dag.producten[product_uuid][eenheid_enkelvoud_nieuw] += waarde
+        else:
+            dag.producten[product_uuid][eenheid_enkelvoud_nieuw] = waarde
+        
+        if eenheid_enkelvoud_nieuw != eenheid_enkelvoud_oud:
+            del dag.producten[product_uuid][eenheid_enkelvoud_oud]
+        
+        return commando.DOORGAAN
     
     @staticmethod
     def aanpassen_gerecht() -> commando.Doorgaan:
@@ -283,7 +293,27 @@ class Dag(GeregistreerdObject):
     
     @staticmethod
     def verwijderen_product() -> commando.Doorgaan:
-        ...
+        
+        dag = Dag.selecteren(datum = Dag._HUIDIGE_DAG)
+        
+        if len(dag.producten) == 0:
+            print(f"\n>>> geen producten aanwezig om te verwijderen")
+            return commando.Doorgaan
+        
+        product_selectie = dag.selecteren_product()
+        if product_selectie is commando.STOP:
+            return commando.Doorgaan
+        
+        product_uuid, eenheid_enkelvoud = product_selectie
+        product = Product.subregister()[product_uuid]
+        
+        hoeveelheid = Hoeveelheid(dag.producten[product_uuid][eenheid_enkelvoud], Eenheid.van_enkelvoud(eenheid_enkelvoud))
+        
+        print(f"\n>>> hoeveelheid {hoeveelheid} van {product} verwijderd")
+        
+        del dag.producten[product_uuid][eenheid_enkelvoud]
+        
+        return commando.DOORGAAN
     
     @staticmethod
     def verwijderen_gerecht() -> commando.Doorgaan:
