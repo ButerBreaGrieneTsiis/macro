@@ -37,7 +37,7 @@ class Eenheid(Enum):
         return self.enkelvoud
     
     @classmethod
-    def van_tekst(cls, tekst: str) -> Eenheid:
+    def van_enkelvoud(cls, tekst: str) -> Eenheid:
         return next(enum for enum in cls if enum.enkelvoud == tekst)
     
     @property

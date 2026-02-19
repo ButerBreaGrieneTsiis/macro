@@ -3,13 +3,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 import datetime as dt
 import locale
-from typing import ClassVar, Dict, List, Literal
+from typing import ClassVar, Dict, Tuple
 
-from grienetsiis.opdrachtprompt import invoeren, kiezen, Menu, commando
+from grienetsiis.opdrachtprompt import invoeren, kiezen, commando
 from grienetsiis.register import Subregister, Register, GeregistreerdObject
-from grienetsiis.types import BasisType
 
-from macro.product import Hoofdcategorie, Categorie, Product
+from macro.product import Product
 from macro.voedingswaarde import Eenheid, Hoeveelheid, Voedingswaarde
 
 
@@ -19,7 +18,7 @@ locale.setlocale(locale.LC_ALL, "nl_NL.UTF-8")
 class Dag(GeregistreerdObject):
     
     datum: dt.date
-    producten: Dict[str, List[Hoeveelheid]] | None = None
+    producten: Dict[str, Dict[str, float]] | None = None
     gerechten: Dict[str, Hoeveelheid] | None = None
     
     _HUIDIGE_DAG: ClassVar[dt.date] = dt.date.today()
@@ -31,6 +30,21 @@ class Dag(GeregistreerdObject):
             return f"dag \"{self.dag}\""
         else:
             return f"dag \"{self.dag}\" van {self.voedingswaarde.calorieën}"
+    
+    # INSTANCE METHODS
+    
+    def selecteren_product(self) -> Tuple[str, str] | commando.Stop:
+        
+        opties_product = {(product_uuid, index_hoeveelheid): f"{f"{hoeveelheid}":<18} {Product.subregister()[product_uuid]}" for product_uuid, hoeveelheden in self.producten.items() for index_hoeveelheid, hoeveelheid in enumerate(hoeveelheden)}
+        
+        return kiezen(
+            opties = opties_product,
+            tekst_beschrijving = "een product en hoeveelheid om aan te passen",
+            tekst_annuleren = self.titel(),
+            )
+    
+    def selecteren_gerecht(self) -> Tuple[str, str] | commando.Stop:
+        ...
     
     # PROPERTIES
     
@@ -52,8 +66,15 @@ class Dag(GeregistreerdObject):
         dag_voedingswaarde = Voedingswaarde()
         
         for product_uuid, hoeveelheden in self.producten.items():
-            for hoeveelheid in hoeveelheden:
-                product_voedingswaarde = Product.subregister()[product_uuid].bereken_voedingswaarde(hoeveelheid)
+            
+            product = Product.subregister()[product_uuid]
+            
+            for eenheid_enkelvoud, waarde in hoeveelheden.items():
+                
+                eenheid = Eenheid.van_enkelvoud(eenheid_enkelvoud)
+                hoeveelheid = Hoeveelheid(waarde, eenheid)
+                
+                product_voedingswaarde = product.bereken_voedingswaarde(hoeveelheid)
                 dag_voedingswaarde += product_voedingswaarde
         
         # for gerecht_uuid, versie_dict in self.gerechten.items():
@@ -137,16 +158,60 @@ class Dag(GeregistreerdObject):
                 dag.producten = {}
             
             if product_uuid in dag.producten.keys():
-                for ihoeveelheid_aanwezig, hoeveelheid_aanwezig in enumerate(dag.producten[product_uuid]):
-                    if hoeveelheid.eenheid == hoeveelheid_aanwezig.eenheid:
-                        dag.producten[product_uuid][ihoeveelheid_aanwezig] = hoeveelheid + hoeveelheid_aanwezig
+                for eenheid_aanwezig, waarde_aanwezig in dag.producten[product_uuid].items():
+                    if eenheid == eenheid_aanwezig:
+                        dag.producten[product_uuid][eenheid.enkelvoud] += waarde_aanwezig
                         break
                 else:
-                    dag.producten[product_uuid].append(hoeveelheid)
+                    dag.producten[product_uuid][eenheid.enkelvoud] = waarde
             else:
-                dag.producten[product_uuid] = [hoeveelheid]
+                dag.producten[product_uuid] = {eenheid.enkelvoud: waarde}
             
             print(f"\n>>> {hoeveelheid} toegevoegd van {product}")
+    
+    @staticmethod
+    def toevoegen_gerecht() -> commando.Doorgaan:
+        ...
+    
+    @staticmethod
+    def aanpassen_product() -> commando.Doorgaan:
+        
+        dag = Dag.selecteren(datum = Dag._HUIDIGE_DAG)
+        
+        if len(dag.producten) == 0:
+            print(f"\n>>> geen producten aanwezig om de hoeveelheid van aan te passen")
+            return commando.Doorgaan
+        
+        product_selectie = dag.selecteren_product()
+        if product_selectie is commando.STOP:
+            return commando.Doorgaan
+        
+        product_uuid, index_hoeveelheid = product_selectie
+        product = Product.subregister()[product_uuid]
+        
+        eenheid = product.selecteren_eenheid(
+            terug_naar = dag.titel(),
+            toestaan_nieuw = True,
+            )
+        if eenheid is commando.STOP:
+            return commando.Doorgaan
+        
+        waarde = invoeren(
+            tekst_beschrijving = f"hoeveel {eenheid.meervoud}",
+            invoer_type = "float",
+            )
+        if waarde is commando.STOP:
+            return commando.DOORGAAN
+        
+        hoeveelheid = Hoeveelheid(waarde, eenheid)
+        
+        print(f"\n>>> hoeveelheid {dag.producten[product_uuid][index_hoeveelheid]} aangepast naar {hoeveelheid}")
+        
+        dag.producten[product_uuid][index_hoeveelheid] = hoeveelheid
+    
+    @staticmethod
+    def aanpassen_gerecht() -> commando.Doorgaan:
+        ...
     
     @staticmethod
     def weergeven_product() -> commando.Doorgaan:
@@ -159,20 +224,25 @@ class Dag(GeregistreerdObject):
         
         if len(dag.producten) > 0:
             print("\nlos toegevoegde producten")
-            print(f"\n{"HOEVEELHEID":<18} CALORIEËN EIWITTEN PRODUCT")
+            print(f"\n{"HOEVEELHEID":<20} CALORIEËN EIWITTEN PRODUCT")
         
         calorieën_totaal    =   Hoeveelheid(0, Eenheid.KILOCALORIE)
         eiwitten_totaal     =   Hoeveelheid(0, Eenheid.GRAM)
         
         for product_uuid, hoeveelheden in dag.producten.items():
             
-            for hoeveelheid in hoeveelheden:
+            product = Product.subregister()[product_uuid]
+            
+            for eenheid_enkelvoud, waarde in hoeveelheden.items():
                 
-                print(f"{f"{hoeveelheid}":<18} {f"{Product.subregister()[product_uuid].voedingswaarde.calorieën * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid._BASIS_EENHEDEN else hoeveelheid.waarde * Product.subregister()[product_uuid].eenheden[hoeveelheid.eenheid]) / 100}":>9} {f"{Product.subregister()[product_uuid].voedingswaarde.eiwitten * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid._BASIS_EENHEDEN else hoeveelheid.waarde * Product.subregister()[product_uuid].eenheden[hoeveelheid.eenheid]) / 100}":>8} {Product.subregister()[product_uuid]}")
-                calorieën_totaal += Product.subregister()[product_uuid].voedingswaarde.calorieën * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid._BASIS_EENHEDEN else hoeveelheid.waarde * Product.subregister()[product_uuid].eenheden[hoeveelheid.eenheid]) / 100
-                eiwitten_totaal += Product.subregister()[product_uuid].voedingswaarde.eiwitten * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid._BASIS_EENHEDEN else hoeveelheid.waarde * Product.subregister()[product_uuid].eenheden[hoeveelheid.eenheid]) / 100
+                eenheid = Eenheid.van_enkelvoud(eenheid_enkelvoud)
+                hoeveelheid = Hoeveelheid(waarde, eenheid)
+                
+                print(f"{f"{hoeveelheid}":<19} {f"{product.voedingswaarde.calorieën * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid._BASIS_EENHEDEN else hoeveelheid.waarde * product.eenheden[eenheid_enkelvoud]) / 100}":>10} {f"{product.voedingswaarde.eiwitten * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid._BASIS_EENHEDEN else hoeveelheid.waarde * product.eenheden[eenheid_enkelvoud]) / 100}":>8} {product}")
+                calorieën_totaal += product.voedingswaarde.calorieën * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid._BASIS_EENHEDEN else hoeveelheid.waarde * product.eenheden[eenheid_enkelvoud]) / 100
+                eiwitten_totaal += product.voedingswaarde.eiwitten * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid._BASIS_EENHEDEN else hoeveelheid.waarde * product.eenheden[eenheid_enkelvoud]) / 100
         
-        print(f"\n{"SUBTOTAAL":<18} {f"{calorieën_totaal}":>9} {f"{eiwitten_totaal}":>8} ")
+        print(f"\n{"SUBTOTAAL":<19} {f"{calorieën_totaal}":>10} {f"{eiwitten_totaal}":>8} ")
         
         # for gerecht_uuid, versie_dict in self.gerechten.items():
             
@@ -196,6 +266,10 @@ class Dag(GeregistreerdObject):
         return commando.DOORGAAN
     
     @staticmethod
+    def weergeven_gerecht() -> commando.Doorgaan:
+        ...
+    
+    @staticmethod
     def weergeven_voedingswaarde() -> commando.Doorgaan:
         
         dag = Dag.selecteren(datum = Dag._HUIDIGE_DAG)
@@ -206,6 +280,18 @@ class Dag(GeregistreerdObject):
         
         print(f"\nvoedingswaarde voor {dag}\n")
         print(dag.voedingswaarde)
+    
+    @staticmethod
+    def verwijderen_product() -> commando.Doorgaan:
+        ...
+    
+    @staticmethod
+    def verwijderen_gerecht() -> commando.Doorgaan:
+        ...
+    
+    @staticmethod
+    def kopiëren() -> commando.Doorgaan:
+        ...
     
     @staticmethod
     def veranderen_dag() -> commando.Doorgaan:

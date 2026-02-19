@@ -126,7 +126,7 @@ class Product(GeregistreerdObject):
             if eenheid is commando.DOORGAAN:
                 return commando.STOP
         else:
-            eenheid = Eenheid.van_tekst(keuze_eenheid)
+            eenheid = Eenheid.van_enkelvoud(keuze_eenheid)
         
         return eenheid
     

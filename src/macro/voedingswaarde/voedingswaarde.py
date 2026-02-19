@@ -31,7 +31,7 @@ class Voedingswaarde(BasisType):
     def __repr__(self) -> str:
         
         return (
-            f"{"calorieën":<21}{self.calorieën} ({self.kilojoule})\n"
+            f"{"calorieën":<22}{self.calorieën} ({self.kilojoule})\n"
             f"{"vetten":<21}{f"{self.vetten}":>8}\n"
             f"  {"waarvan verzadigd":<19}{f"{self.verzadigd}":>8}\n"
             f"{"koolydraten":<21}{f"{self.koolhydraten}":>8}\n"
