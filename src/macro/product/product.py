@@ -273,6 +273,13 @@ class Product(GeregistreerdObject):
             print(f"EENHEID          HOEVEELHEID CALORIEËN")
             [print(f"{f"{Hoeveelheid(1, Eenheid(eenheid))}":<18}{f"{Hoeveelheid(waarde, self.basis_eenheid)}":<11} {self.voedingswaarde.calorieën * waarde / 100.0}") for eenheid, waarde in self.eenheden.items()]
     
+    def bereken_voedingswaarde(
+        self,
+        hoeveelheid: Hoeveelheid,
+        ) -> Voedingswaarde:
+        
+        return self.voedingswaarde * (hoeveelheid.waarde/100.0) * (1.0 if hoeveelheid.eenheid in Hoeveelheid._BASIS_EENHEDEN else self.eenheden[hoeveelheid.eenheid.enkelvoud])
+    
     # PROPERTIES
     
     @property

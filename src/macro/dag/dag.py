@@ -46,6 +46,23 @@ class Dag(GeregistreerdObject):
     def dag(self) -> str:
         return f"{self.datum.strftime("%A %d %B %Y")}"
     
+    @property
+    def voedingswaarde(self) -> Voedingswaarde:
+        
+        dag_voedingswaarde = Voedingswaarde()
+        
+        for product_uuid, hoeveelheden in self.producten.items():
+            for hoeveelheid in hoeveelheden:
+                product_voedingswaarde = Product.subregister()[product_uuid].bereken_voedingswaarde(hoeveelheid)
+                dag_voedingswaarde += product_voedingswaarde
+        
+        # for gerecht_uuid, versie_dict in self.gerechten.items():
+        #     for versie_uuid, hoeveelheid in versie_dict.items():
+        #         gerecht_voedingswaarde = Gerecht.subregister()[gerecht_uuid].voedingswaarde(versie_uuid) * hoeveelheid.waarde
+        #         dag_voedingswaarde += gerecht_voedingswaarde
+        
+        return dag_voedingswaarde
+    
     # STATIC METHODS
     
     @staticmethod
@@ -177,7 +194,19 @@ class Dag(GeregistreerdObject):
         # print(f"\n\n     {"TOTAAL":<18} {f"{self.voedingswaarde.calorieën}":>9} {f"{self.voedingswaarde.eiwitten}":>8}")
         
         return commando.DOORGAAN
+    
+    @staticmethod
+    def weergeven_voedingswaarde() -> commando.Doorgaan:
         
+        dag = Dag.selecteren(datum = Dag._HUIDIGE_DAG)
+        
+        if len(dag.producten) == 0 and len(dag.gerechten) == 0:
+            print(f"\n>>> geen producten of gerechten aanwezig om voedingswaarde voor te berekenen")
+            return commando.Doorgaan
+        
+        print(f"\nvoedingswaarde voor {dag}\n")
+        print(dag.voedingswaarde)
+    
     @staticmethod
     def veranderen_dag() -> commando.Doorgaan:
         
