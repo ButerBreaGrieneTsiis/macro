@@ -1,4 +1,5 @@
-from .macro import uitvoeren
+"""macro main entry point"""
+from macro.menu import hoofdmenu
 
 
-uitvoeren()
+hoofdmenu()

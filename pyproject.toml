@@ -1,10 +1,10 @@
 [project]
 name = "macro"
-version = "0.3.4"
+version = "1.0.0-beta+001"
 authors = [
     {name = "Tom Scheeper", email = "tomscheeper@gmail.com"},
     ]
 
 dependencies = [
-    "grienetsiis @ git+https://github.com/ButerBreaGrieneTsiis/grienetsiis.git@v1.4.6",
+    "grienetsiis @ git+https://github.com/ButerBreaGrieneTsiis/grienetsiis.git@v2.0.0-rc5",
 ]
