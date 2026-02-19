@@ -6,13 +6,12 @@ from pathlib import Path
 from grienetsiis.json import Ontcijferaar, Vercijferaar
 from grienetsiis.register import Register
 
+from macro._version import __version__
 from macro.gerecht import HoofdcategorieGerecht, CategorieGerecht
 from macro.product import Hoofdcategorie, Categorie, Ingrediënt, Merk, Product
 from macro.voedingswaarde import Eenheid, Hoeveelheid, Voedingswaarde
 from macro.dag import Dag
 
-
-__version__ = "1.0.0-dev"
 
 ENUMS = {
     "Eenheid": Eenheid,
