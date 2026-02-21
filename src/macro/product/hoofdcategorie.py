@@ -76,7 +76,7 @@ class Hoofdcategorie(GeregistreerdObject):
     
     @staticmethod
     def subregister() -> Subregister:
-        return Register()[Hoofdcategorie._SUBREGISTER_NAAM]
+        return Register[Hoofdcategorie._SUBREGISTER_NAAM]
     
     @staticmethod
     def selecteren(

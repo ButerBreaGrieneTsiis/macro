@@ -124,7 +124,7 @@ class Dag(GeregistreerdObject):
     
     @staticmethod
     def subregister() -> Subregister:
-        return Register()[Dag._SUBREGISTER_NAAM]
+        return Register[Dag._SUBREGISTER_NAAM]
     
     @staticmethod
     def selecteren_dag(
@@ -139,7 +139,7 @@ class Dag(GeregistreerdObject):
         else:
             
             if datum_tekst in Dag.subregister().geregistreerde_instanties:
-                return Register().openen_instantie(
+                return Register.openen_instantie(
                     subregister_naam = Dag._SUBREGISTER_NAAM,
                     id = datum_tekst,
                     )

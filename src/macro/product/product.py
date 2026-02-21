@@ -312,7 +312,7 @@ class Product(GeregistreerdObject):
     
     @staticmethod
     def subregister() -> Subregister:
-        return Register()[Product._SUBREGISTER_NAAM]
+        return Register[Product._SUBREGISTER_NAAM]
     
     @staticmethod
     def selecteren(

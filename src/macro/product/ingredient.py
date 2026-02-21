@@ -112,7 +112,7 @@ class Ingrediënt(GeregistreerdObject):
     
     @staticmethod
     def subregister() -> Subregister:
-        return Register()[Ingrediënt._SUBREGISTER_NAAM]
+        return Register[Ingrediënt._SUBREGISTER_NAAM]
     
     @staticmethod
     def selecteren(

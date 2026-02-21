@@ -77,7 +77,7 @@ class Merk(GeregistreerdObject):
     
     @staticmethod
     def subregister() -> Subregister:
-        return Register()[Merk._SUBREGISTER_NAAM]
+        return Register[Merk._SUBREGISTER_NAAM]
     
     @staticmethod
     def selecteren(

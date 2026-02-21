@@ -108,7 +108,7 @@ class CategorieGerecht(GeregistreerdObject):
     
     @staticmethod
     def subregister() -> Subregister:
-        return Register()[CategorieGerecht._SUBREGISTER_NAAM]
+        return Register[CategorieGerecht._SUBREGISTER_NAAM]
     
     @staticmethod
     def selecteren(
