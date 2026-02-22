@@ -26,6 +26,12 @@ class Dag(GeregistreerdObject):
     
     # DUNDER METHODS
     
+    def __post_init__(self) -> None:
+        if self.producten is None:
+            self.producten = {}
+        if self.gerechten is None:
+            self.gerechten = {}
+    
     def __repr__(self) -> str:
         if len(self.producten) == 0:
             return f"dag \"{self.dag}\""
@@ -243,9 +249,6 @@ class Dag(GeregistreerdObject):
             
             product_uuid = product._id
             
-            if dag.producten is None:
-                dag.producten = {}
-            
             if product_uuid in dag.producten.keys():
                 for eenheid_aanwezig in dag.producten[product_uuid]:
                     if eenheid.enkelvoud == eenheid_aanwezig:
@@ -451,9 +454,6 @@ class Dag(GeregistreerdObject):
             )
         if keuze_producten is commando.STOP:
             return commando.Doorgaan
-        
-        if dag_huidig.producten is None:
-            dag_huidig.producten = {}
         
         print("")
         for product_uuid, eenheid in keuze_producten:
