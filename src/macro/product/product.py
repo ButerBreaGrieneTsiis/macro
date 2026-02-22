@@ -26,6 +26,10 @@ class Product(GeregistreerdObject):
     def __repr__(self) -> str:
         return f"product \"{self.product_naam}\""
     
+    def __post_init__(self) -> None:
+        if self.eenheden is None:
+            self.eenheden = {}
+    
     # CLASS METHODS
     
     @classmethod
@@ -33,7 +37,7 @@ class Product(GeregistreerdObject):
         cls,
         terug_naar: str = "terug naar MENU PRODUCT",
         geef_id: bool = False,
-        ) -> Product | commando.Doorgaan:
+        ) -> Product | str | commando.Doorgaan:
         
         print(f"\ninvullen gegevens nieuw product")
         
@@ -96,7 +100,7 @@ class Product(GeregistreerdObject):
             )
     
         if geef_id:
-            return getattr(product, product._ID_VELD)
+            return product._id
         return product
     
     # INSTANCE METHODS
@@ -112,7 +116,7 @@ class Product(GeregistreerdObject):
         opties_eenheden |= {eenheid: f"per \"{eenheid}\"" for eenheid in self.eenheden.keys()}
         
         if toestaan_nieuw:
-            opties_eenheden |= {"nieuwe eenheid": "nieuwe eenheid"}
+            opties_eenheden |= {"nieuw": "nieuwe eenheid"}
         
         keuze_eenheid = kiezen(
             opties = opties_eenheden,
@@ -122,7 +126,7 @@ class Product(GeregistreerdObject):
         if keuze_eenheid is commando.STOP:
             return commando.STOP
         
-        if keuze_eenheid == "nieuwe eenheid":
+        if keuze_eenheid == "nieuw":
             eenheid = self.bewerken_eenheden(
                 geef_enum = False,
                 terug_naar = terug_naar,
@@ -211,9 +215,6 @@ class Product(GeregistreerdObject):
             return commando.DOORGAAN
         
         hoeveelheid = Hoeveelheid(waarde, eenheid)
-        
-        if self.eenheden is None:
-            self.eenheden = {}
         
         if eenheid.enkelvoud in self.eenheden:
             if waarde == self.eenheden[eenheid.enkelvoud]:
@@ -504,7 +505,7 @@ class Product(GeregistreerdObject):
         
         while True:
             
-            product = Product.selecteren(
+            product: Product = Product.selecteren(
                 geef_id = False,
                 toestaan_nieuw = False,
                 )

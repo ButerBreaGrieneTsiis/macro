@@ -97,10 +97,6 @@ class Categorie(GeregistreerdObject):
     # PROPERTIES
     
     @property
-    def velden(self) -> Dict[str, str]:
-        return {veld: veld_type for veld, veld_type in Categorie.__annotations__.items() if not veld.startswith("_")}
-    
-    @property
     def hoofdcategorie(self) -> Hoofdcategorie:
         return Hoofdcategorie.subregister()[self.hoofdcategorie_uuid]
     
@@ -114,7 +110,7 @@ class Categorie(GeregistreerdObject):
     def selecteren(
         geef_id: bool = True,
         toestaan_nieuw: bool = True,
-        selectiemethode: Literal["nieuwe", "selecteren", "zoeken"] | None = None,
+        selectiemethode: Literal["nieuw", "selecteren", "zoeken"] | None = None,
         terug_naar: str = "terug naar MENU CATEGORIE PRODUCT",
         ) -> str | commando.Stop | commando.Doorgaan | None:
         

@@ -97,10 +97,6 @@ class Ingrediënt(GeregistreerdObject):
     # PROPERTIES
     
     @property
-    def velden(self) -> Dict[str, str]:
-        return {veld: veld_type for veld, veld_type in Ingrediënt.__annotations__.items() if not veld.startswith("_")}
-    
-    @property
     def hoofdcategorie(self) -> Hoofdcategorie:
         return Hoofdcategorie.subregister()[self.categorie.hoofdcategorie_uuid]
     

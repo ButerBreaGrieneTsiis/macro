@@ -67,12 +67,6 @@ class Merk(GeregistreerdObject):
         print(f"\n>>> veld \"merknaam\" veranderd van \"{waarde_oud}\" naar \"{self.merk_naam}\"")
         return commando.DOORGAAN
     
-    # PROPERTIES
-    
-    @property
-    def velden(self) -> Dict[str, str]:
-        return {veld: veld_type for veld, veld_type in Merk.__annotations__.items() if not veld.startswith("_")}
-    
     # STATIC METHODS
     
     @staticmethod
