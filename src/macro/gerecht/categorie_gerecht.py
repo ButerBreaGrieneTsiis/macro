@@ -18,7 +18,7 @@ class CategorieGerecht(GeregistreerdObject):
     # DUNDER METHODS
     
     def __repr__(self) -> str:
-        return f"categorie gerecht\"{self.categorie_naam}\""
+        return f"categorie gerecht \"{self.categorie_naam}\""
     
     # CLASS METHODS
     
@@ -97,10 +97,6 @@ class CategorieGerecht(GeregistreerdObject):
     # PROPERTIES
     
     @property
-    def velden(self) -> Dict[str, str]:
-        return {veld: veld_type for veld, veld_type in CategorieGerecht.__annotations__.items() if not veld.startswith("_")}
-    
-    @property
     def hoofdcategorie_gerecht(self) -> HoofdcategorieGerecht:
         return HoofdcategorieGerecht.subregister()[self.hoofdcategorie_uuid]
     
@@ -114,7 +110,7 @@ class CategorieGerecht(GeregistreerdObject):
     def selecteren(
         geef_id: bool = True,
         toestaan_nieuw: bool = True,
-        selectiemethode: Literal["nieuwe", "selecteren", "zoeken"] | None = None,
+        selectiemethode: Literal["nieuw", "selecteren", "zoeken"] | None = None,
         terug_naar: str = "terug naar MENU CATEGORIE GERECHT",
         ) -> str | commando.Stop | commando.Doorgaan | None:
         

@@ -1,0 +1,1 @@
+menu_gegevens.toevoegen_optie(Register.kopie_opslaan, "kopie gegevens")

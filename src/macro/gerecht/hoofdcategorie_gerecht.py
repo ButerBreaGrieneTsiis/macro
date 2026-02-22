@@ -66,12 +66,6 @@ class HoofdcategorieGerecht(GeregistreerdObject):
         print(f"\n>>> veld \"hoofdcategorienaam\" veranderd van \"{waarde_oud}\" naar \"{self.hoofdcategorie_naam}\"")
         return commando.DOORGAAN
     
-    # PROPERTIES
-    
-    @property
-    def velden(self) -> Dict[str, str]:
-        return {veld: veld_type for veld, veld_type in HoofdcategorieGerecht.__annotations__.items() if not veld.startswith("_")}
-    
     # STATIC METHODS
     
     @staticmethod
