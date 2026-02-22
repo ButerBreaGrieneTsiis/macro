@@ -1,7 +1,7 @@
 """macro.gerecht.gerecht"""
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Dict, List, Literal, Tuple
+from typing import Dict, Literal, Tuple
 
 from grienetsiis.opdrachtprompt import invoeren, kiezen, commando, Menu
 from grienetsiis.register import Subregister, Register, GeregistreerdObject
@@ -16,7 +16,7 @@ class Gerecht(GeregistreerdObject):
     
     gerecht_naam: str
     categorie_uuid: str
-    producten_standaard: Dict[str, Hoeveelheid]
+    producten_standaard: Dict[str, Dict[str, int]]
     porties: int
     varianten: Dict[str, Variant] | None = None
     recept: Recept | None = None
@@ -87,7 +87,7 @@ class Gerecht(GeregistreerdObject):
             product = Product.selecteren(
                 geef_id = False,
                 toestaan_nieuw = True,
-                terug_naar = "GERECHT KLAAR",
+                terug_naar = f"AFRONDEN GERECHT {gerecht_naam.upper()}",
                 )
             if product is commando.STOP:
                 break
@@ -159,7 +159,7 @@ class Gerecht(GeregistreerdObject):
         geef_enum: bool = True,
         ) -> Tuple[str | Product, str | Eenheid] | commando.Stop:
         
-        opties_product = {(product_uuid, eenheid_enkelvoud): f"{f"{Hoeveelheid(waarde, Eenheid.van_enkelvoud(eenheid_enkelvoud))}":<18} {Product.subregister()[product_uuid]}" for product_uuid, hoeveelheden in self.producten_standaard.items() for eenheid_enkelvoud, waarde in hoeveelheden.items()}
+        opties_product = {(product_uuid, eenheid_enkelvoud): f"{f"{Hoeveelheid(waarde, Eenheid.van_enkelvoud(eenheid_enkelvoud))}":<19} {Product.subregister()[product_uuid]}" for product_uuid, hoeveelheden in self.producten_standaard.items() for eenheid_enkelvoud, waarde in hoeveelheden.items()}
         
         keuze_product = kiezen(
             opties = opties_product,
@@ -184,7 +184,15 @@ class Gerecht(GeregistreerdObject):
         toestaan_nieuw: bool = True,
         ) -> Variant | str | commando.Stop:
         
-        opties_varianten = {variant_uuid: f"{Variant.subregister()[variant_uuid]}" for variant_uuid in self.varianten}
+        aantal_varianten = len(self.varianten)
+        
+        if aantal_varianten == 0:
+            print(f"\n>>> geen varianten aanwezig")
+            
+            if not toestaan_nieuw:
+                return commando.STOP
+        
+        opties_varianten = {variant_uuid: f"{variant}" for variant_uuid, variant in self.varianten.items()}
         
         if toestaan_nieuw:
             opties_varianten |= {"nieuw": "nieuwe variant"}
@@ -198,19 +206,19 @@ class Gerecht(GeregistreerdObject):
             return commando.STOP
         
         if keuze_variant == "nieuw":
-            variant = Variant.nieuw(
+            variant_uuid = Variant.nieuw(
                 terug_naar = terug_naar,
                 gerecht = self,
-                geef_id = False,
+                geef_id = True,
                 )
-            if variant is commando.DOORGAAN:
+            if variant_uuid is commando.DOORGAAN:
                 return commando.STOP
         else:
-            variant = keuze_variant
+            variant_uuid = keuze_variant
         
         if geef_id:
-            return variant._id
-        return variant
+            return variant_uuid
+        return self.varianten[variant_uuid]
     
     def bewerken_naam(self) -> commando.Doorgaan:
         
@@ -391,51 +399,136 @@ class Gerecht(GeregistreerdObject):
     
     def bewerken_varianten(self) -> commando.Doorgaan:
         
+        menu_bewerken_varianten = Menu(f"MENU BEWERKEN VARIANTEN ({f"{self}".upper()})", f"MENU BEWERKEN ({f"{self}".upper()})", blijf_in_menu = True)
+        menu_bewerken_varianten.toevoegen_optie(self.bewerken_variant_nieuw, "nieuwe variant")
+        menu_bewerken_varianten.toevoegen_optie(self.bewerken_variant_bewerken, "bewerken variant")
+        menu_bewerken_varianten.toevoegen_optie(self.bewerken_variant_verwijderen, "verwijderen variant")
+        
+        menu_bewerken_varianten()
+        
+        return commando.DOORGAAN
+    
+    def bewerken_variant_nieuw(self) -> commando.Doorgaan:
+        
+        variant = Variant.nieuw(
+            terug_naar = f"MENU BEWERKEN VARIANTEN ({f"{self}".upper()})",
+            gerecht = self,
+            geef_id = False,
+            )
+        if variant is commando.DOORGAAN:
+            return commando.STOP
+        
+        return commando.DOORGAAN
+        
+    def bewerken_variant_bewerken(self) -> commando.Doorgaan:
+        
         variant = self.selecteren_variant(
             terug_naar = f"MENU BEWERKEN ({f"{self}".upper()})",
             geef_id = False,
-            toestaan_nieuw = True,
+            toestaan_nieuw = False,
             )
         if variant is commando.STOP:
             return commando.DOORGAAN
         
         variant.bewerken(
             terug_naar = f"MENU BEWERKEN ({f"{self}".upper()})",
+            gerecht = self,
             )
         
         return commando.DOORGAAN
     
-    def bewerken_recept(self) -> commando.Doorgaan: ...
+    def bewerken_variant_verwijderen(self) -> commando.Doorgaan:
+        
+        variant_uuid = self.selecteren_variant(
+            terug_naar = f"MENU BEWERKEN ({f"{self}".upper()})",
+            geef_id = True,
+            toestaan_nieuw = False,
+            )
+        if variant_uuid is commando.STOP:
+            return commando.DOORGAAN
+        
+        print(f"\n>>> {self.varianten[variant_uuid]} van {self} verwijderd")
+        
+        del self.varianten[variant_uuid]
+        
+        return commando.DOORGAAN
+    
+    def bewerken_recept(self) -> commando.Doorgaan: ... # TODO
+    
+    def inspecteren_varianten(self) -> None:
+        
+        variant_uuid = self.selecteren_variant(
+            terug_naar = f"MENU INSPECTEREN ({f"{self}".upper()})",
+            geef_id = True,
+            toestaan_nieuw = False,
+            )
+        if variant_uuid is commando.STOP:
+            return commando.DOORGAAN
+        
+        variant = self.varianten[variant_uuid]
+        
+        inspecteer_opties = [
+            "toevoegingen",
+            "verwijderingen",
+            "aanpassingen",
+            "porties",
+            "resulterende producten",
+            "resulterende voedingswaarde",
+            ]
+        
+        while True:
+        
+            keuze_bewerken = kiezen(
+                opties = inspecteer_opties,
+                tekst_beschrijving = f"MENU INSPECTEREN VARIANT ({f"{variant}".upper()})",
+                tekst_annuleren = f"MENU INSPECTEREN ({f"{self}".upper()})",
+                )
+            
+            if keuze_bewerken is commando.STOP:
+                return commando.DOORGAAN
+            
+            elif keuze_bewerken == "toevoegingen":
+                variant.inspecteren_toevoeging()
+            
+            elif keuze_bewerken == "verwijderingen":
+                variant.inspecteren_verwijdering()
+            
+            elif keuze_bewerken == "aanpassingen":
+                variant.inspecteren_aanpassing(gerecht = self)
+            
+            elif keuze_bewerken == "porties":
+                variant.inspecteren_porties()
+            
+            elif keuze_bewerken == "resulterende producten":
+                self.inspecteren_producten(variant_uuid = variant_uuid)
+            
+            elif keuze_bewerken == "resulterende voedingswaarde":
+                self.inspecteren_voedingswaarde(variant_uuid = variant_uuid)
     
     def inspecteren_producten(
         self,
         variant_uuid: str = "standaard",
         ) -> None:
         
-        if variant_uuid == "standaard":
-            
-            variant_naam = "standaard"
-            print(f"\n{self} (variant \"{variant_naam}\")")
-            print(f"\n{"HOEVEELHEID":<20} CALORIEËN EIWITTEN PRODUCT")
-            
-            for product_uuid, hoeveelheden in self.producten_standaard.items():
-                
-                product = Product.subregister()[product_uuid]
-                
-                for eenheid_enkelvoud, waarde in hoeveelheden.items():
-                
-                    eenheid = Eenheid.van_enkelvoud(eenheid_enkelvoud)
-                    hoeveelheid = Hoeveelheid(waarde, eenheid)
-                    print(f"{f"{hoeveelheid}":<19} {f"{product.voedingswaarde.calorieën * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid._BASIS_EENHEDEN else hoeveelheid.waarde * product.eenheden[eenheid_enkelvoud]) / 100}":>10} {f"{product.voedingswaarde.eiwitten * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid._BASIS_EENHEDEN else hoeveelheid.waarde * product.eenheden[eenheid_enkelvoud]) / 100}":>8} {product}")
-            
-            aantal_porties = self.porties
-            print(f"\n{"TOTAAL":<19} {f"{self.bereken_voedingswaarde().calorieën*aantal_porties}":>10} {f"{self.bereken_voedingswaarde().eiwitten*aantal_porties}":>8} (voor {aantal_porties} porties)")
-            print(f"{"PER PORTIE":<19} {f"{self.bereken_voedingswaarde().calorieën}":>10} {f"{self.bereken_voedingswaarde().eiwitten}":>8}")
+        producten = self.producten(variant_uuid = variant_uuid)
         
-        else:
+        variant_naam = "standaard"
+        print(f"\n{self} (variant \"{variant_naam}\")")
+        print(f"\n{"HOEVEELHEID":<20} CALORIEËN EIWITTEN PRODUCT")
+        
+        for product_uuid, hoeveelheden in producten.items():
             
-            variant = self.varianten[variant_uuid]
-            variant.inspecteren_producten()
+            product = Product.subregister()[product_uuid]
+            
+            for eenheid_enkelvoud, waarde in hoeveelheden.items():
+            
+                eenheid = Eenheid.van_enkelvoud(eenheid_enkelvoud)
+                hoeveelheid = Hoeveelheid(waarde, eenheid)
+                print(f"{f"{hoeveelheid}":<19} {f"{product.voedingswaarde.calorieën * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid._BASIS_EENHEDEN else hoeveelheid.waarde * product.eenheden[eenheid_enkelvoud]) / 100}":>10} {f"{product.voedingswaarde.eiwitten * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid._BASIS_EENHEDEN else hoeveelheid.waarde * product.eenheden[eenheid_enkelvoud]) / 100}":>8} {product}")
+        
+        aantal_porties = self.porties
+        print(f"\n{"TOTAAL":<19} {f"{self.bereken_voedingswaarde().calorieën*aantal_porties}":>10} {f"{self.bereken_voedingswaarde().eiwitten*aantal_porties}":>8} (voor {aantal_porties} porties)")
+        print(f"{"PER PORTIE":<19} {f"{self.bereken_voedingswaarde().calorieën}":>10} {f"{self.bereken_voedingswaarde().eiwitten}":>8}")
     
     def inspecteren_voedingswaarde(
         self,
@@ -446,47 +539,63 @@ class Gerecht(GeregistreerdObject):
         
         if variant_uuid == "standaard":
             print(f"\nvoedingswaarde voor {self} per portie ({self.porties} porties):\n\n{voedingswaarde}")
+        
         else:
             variant = self.varianten[variant_uuid]
-            aantal_porties = variant.get("porties", self.porties)
+            aantal_porties = variant.porties if variant.porties else self.porties
             print(f"\nvoedingswaarde voor {variant} van {self} per portie ({aantal_porties} porties):\n\n{voedingswaarde}")
     
     def producten(
         self,
         variant_uuid: str = "standaard",
-        ) -> Dict[str, Hoeveelheid]:
+        ) -> Dict[str, Dict[str, float]]:
         
-        ...
+        producten = {**self.producten_standaard}
+        
+        if variant_uuid != "standaard":
+            
+            for product_uuid, hoeveelheden in self.varianten[variant_uuid].toevoeging.items():
+                for eenheid_enkelvoud, waarde in hoeveelheden.items():
+                    if product_uuid not in producten.keys():
+                        producten[product_uuid] = {eenheid_enkelvoud: waarde}
+                    else:
+                        producten[product_uuid][eenheid_enkelvoud] = waarde
+            
+            for product_uuid, hoeveelheden in self.varianten[variant_uuid].verwijdering.items():
+                for eenheid_enkelvoud in hoeveelheden:
+                    del producten[product_uuid][eenheid_enkelvoud]
+            
+            for product_uuid, hoeveelheden in self.varianten[variant_uuid].aanpassing.items():
+                for eenheid_enkelvoud, waarde in hoeveelheden.items():
+                    producten[product_uuid][eenheid_enkelvoud] = waarde
+        
+        return producten
     
     def bereken_voedingswaarde(
         self,
         variant_uuid: str = "standaard",
         ) -> Voedingswaarde:
         
+        producten = self.producten(variant_uuid = variant_uuid)
+        
         gerecht_voedingswaarde = Voedingswaarde()
         
-        if variant_uuid == "standaard":
+        for product_uuid, hoeveelheden in producten.items():
             
-            for product_uuid, hoeveelheden in self.producten_standaard.items():
-                
-                product = Product.subregister()[product_uuid]
-                
-                for eenheid_enkelvoud, waarde in hoeveelheden.items():
-                
-                    eenheid = Eenheid.van_enkelvoud(eenheid_enkelvoud)
-                    hoeveelheid = Hoeveelheid(waarde, eenheid)
-                    
-                    product_voedingswaarde = product.bereken_voedingswaarde(hoeveelheid)
-                    gerecht_voedingswaarde += product_voedingswaarde
+            product = Product.subregister()[product_uuid]
             
-            aantal_porties = self.porties
-            gerecht_voedingswaarde /= aantal_porties
+            for eenheid_enkelvoud, waarde in hoeveelheden.items():
             
-            return gerecht_voedingswaarde
+                eenheid = Eenheid.van_enkelvoud(eenheid_enkelvoud)
+                hoeveelheid = Hoeveelheid(waarde, eenheid)
+                
+                product_voedingswaarde = product.bereken_voedingswaarde(hoeveelheid)
+                gerecht_voedingswaarde += product_voedingswaarde
         
-        else:
-            
-            ...
+        aantal_porties = self.porties
+        gerecht_voedingswaarde /= aantal_porties
+        
+        return gerecht_voedingswaarde
     
     # PROPERTIES
     
@@ -669,7 +778,7 @@ class Gerecht(GeregistreerdObject):
             menu_bewerken.toevoegen_optie(gerecht.bewerken_producten, "producten")
             menu_bewerken.toevoegen_optie(gerecht.bewerken_porties, "porties")
             menu_bewerken.toevoegen_optie(gerecht.bewerken_varianten, "varianten")
-            # menu_bewerken.toevoegen_optie(gerecht.bewerken_recept, "recept")
+            menu_bewerken.toevoegen_optie(gerecht.bewerken_recept, "recept")
             
             menu_bewerken()
         
@@ -680,7 +789,7 @@ class Gerecht(GeregistreerdObject):
         
         while True:
             
-            gerecht = Gerecht.selecteren(
+            gerecht: Gerecht = Gerecht.selecteren(
                 geef_id = False,
                 toestaan_nieuw = False,
                 )
@@ -695,8 +804,8 @@ class Gerecht(GeregistreerdObject):
             menu_inspectie.toevoegen_optie(lambda: print(f"\ncategorie voor {gerecht}:\n>>> {gerecht.categorie}"), "categorie")
             menu_inspectie.toevoegen_optie(gerecht.inspecteren_producten, "producten")
             menu_inspectie.toevoegen_optie(gerecht.inspecteren_voedingswaarde, "voedingswaarde")
-            # menu_inspectie.toevoegen_optie(gerecht.inspecteren_varianten, "varianten")
-            # menu_inspectie.toevoegen_optie(lambda: print(f"\nrecept voor {gerecht}:\n>>> {gerecht.recept}"), "recept")
+            menu_inspectie.toevoegen_optie(gerecht.inspecteren_varianten, "varianten")
+            menu_inspectie.toevoegen_optie(lambda: print(f"\nrecept voor {gerecht}:\n>>> {gerecht.recept}"), "recept")
             
             menu_inspectie()
             

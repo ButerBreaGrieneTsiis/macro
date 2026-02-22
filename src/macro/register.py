@@ -5,7 +5,7 @@ from grienetsiis.json import Ontcijferaar, Vercijferaar
 from grienetsiis.register import Register
 
 from macro._version import __version__
-from macro.gerecht import HoofdcategorieGerecht, CategorieGerecht, Gerecht
+from macro.gerecht import HoofdcategorieGerecht, CategorieGerecht, Variant, Gerecht
 from macro.product import Hoofdcategorie, Categorie, Ingrediënt, Merk, Product
 from macro.voedingswaarde import Eenheid, Hoeveelheid, Voedingswaarde
 from macro.dag import Dag
@@ -122,6 +122,24 @@ def registreren(openen: bool = True) -> None:
         vercijfer_methode = "functie",
         vercijfer_functie_objecten = Gerecht.naar_json,
         ontcijfer_functie_objecten = Gerecht.van_json,
+        vercijfer_functie_subobjecten = [
+            Vercijferaar(
+                class_naam = "Variant",
+                vercijfer_functie_naam = "naar_json",
+                ),
+            ],
+        ontcijfer_functie_subobjecten = [
+            Ontcijferaar(
+                velden = frozenset((
+                    "variant_naam",
+                    "toevoeging",
+                    "aanpassing",
+                    "verwijdering",
+                    "porties",
+                    )),
+                ontcijfer_functie = Variant.van_json,
+                ),
+            ],
         )
     
     Register.registreer_type(
@@ -134,22 +152,6 @@ def registreren(openen: bool = True) -> None:
         vercijfer_methode = "functie",
         vercijfer_functie_objecten = Dag.naar_json,
         ontcijfer_functie_objecten = Dag.van_json,
-        vercijfer_functie_subobjecten = [
-            Vercijferaar(
-                class_naam = "Hoeveelheid",
-                vercijfer_functie_naam = "naar_json",
-                ),
-            ],
-        ontcijfer_functie_subobjecten = [
-            Ontcijferaar(
-                velden = frozenset((
-                    "waarde",
-                    "eenheid",
-                    )),
-                ontcijfer_functie = Hoeveelheid.van_json,
-                ),
-            ],
-        enums = ENUMS,
         )
     
     if openen: Register.openen()
