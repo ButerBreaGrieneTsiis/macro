@@ -197,6 +197,7 @@ class Dag(GeregistreerdObject):
     
     @staticmethod
     def selecteren_datum(
+        terug_naar: str,
         vandaag: bool = True,
         morgen: bool = True,
         overmorgen: bool = True,
@@ -223,7 +224,7 @@ class Dag(GeregistreerdObject):
         keuze_datum = kiezen(
             opties = opties,
             tekst_beschrijving = "dag",
-            tekst_annuleren = f"MENU DAG {Dag._HUIDIGE_DAG.strftime("%A %d %B %Y").upper()}",
+            tekst_annuleren = terug_naar,
             )
         if keuze_datum is commando.STOP:
             return commando.STOP
@@ -267,7 +268,7 @@ class Dag(GeregistreerdObject):
             product: Product = Product.selecteren(
                 geef_id = False,
                 toestaan_nieuw = True,
-                terug_naar = f"MENU DAG {Dag._HUIDIGE_DAG.strftime("%A %d %B %Y").upper()}",
+                terug_naar = f"MENU DAG {Dag._HUIDIGE_DAG.strftime("%A %d %B %Y").upper()} PRODUCTEN",
                 )
             if product is commando.STOP:
                 return commando.DOORGAAN
@@ -275,7 +276,7 @@ class Dag(GeregistreerdObject):
                 continue
             
             eenheid: Eenheid = product.selecteren_eenheid(
-                terug_naar = f"MENU DAG {Dag._HUIDIGE_DAG.strftime("%A %d %B %Y").upper()}",
+                terug_naar = f"MENU DAG {Dag._HUIDIGE_DAG.strftime("%A %d %B %Y").upper()} PRODUCTEN",
                 geef_enum = True,
                 toestaan_nieuw = True,
                 )
@@ -315,7 +316,7 @@ class Dag(GeregistreerdObject):
             gerecht: Gerecht = Gerecht.selecteren(
                 geef_id = False,
                 toestaan_nieuw = True,
-                terug_naar = f"MENU DAG {Dag._HUIDIGE_DAG.strftime("%A %d %B %Y").upper()}",
+                terug_naar = Dag.titel() + " GERECHTEN",
                 )
             if gerecht is commando.STOP:
                 return commando.DOORGAAN
@@ -323,7 +324,7 @@ class Dag(GeregistreerdObject):
                 continue
             
             variant_uuid = gerecht.selecteren_variant(
-                terug_naar = f"MENU DAG {Dag._HUIDIGE_DAG.strftime("%A %d %B %Y").upper()}",
+                terug_naar = Dag.titel() + " GERECHTEN",
                 inclusief_standaard = True,
                 geef_id = True,
                 toestaan_nieuw = True,
@@ -367,7 +368,7 @@ class Dag(GeregistreerdObject):
             return commando.Doorgaan
         
         keuze_product = dag.selecteren_product(
-            terug_naar = Dag.titel(),
+            terug_naar = Dag.titel() + " PRODUCTEN",
             tekst_beschrijving = "een product en hoeveelheid om aan te passen",
             geef_id = True,
             geef_enum = True,
@@ -380,7 +381,7 @@ class Dag(GeregistreerdObject):
         product = Product.subregister()[product_uuid]
         
         eenheid_nieuw: Eenheid = product.selecteren_eenheid(
-            terug_naar = Dag.titel(),
+            terug_naar = Dag.titel() + " PRODUCTEN",
             geef_enum = True,
             toestaan_nieuw = True,
             )
@@ -507,7 +508,7 @@ class Dag(GeregistreerdObject):
             return commando.Doorgaan
         
         product_selectie = dag.selecteren_product(
-            terug_naar = Dag.titel(),
+            terug_naar = Dag.titel() + " PRODUCTEN",
             tekst_beschrijving = "een product en hoeveelheid om te verwijderen",
             geef_id = True,
             geef_enum = True,
@@ -536,7 +537,7 @@ class Dag(GeregistreerdObject):
             return commando.Doorgaan
         
         gerecht_selectie = dag.selecteren_gerecht(
-            terug_naar = Dag.titel(),
+            terug_naar = Dag.titel() + " GERECHTEN",
             tekst_beschrijving = "een gerecht en variant om te verwijderen",
             geef_id = True,
             )
@@ -563,6 +564,7 @@ class Dag(GeregistreerdObject):
     def kopiëren_product() -> commando.Doorgaan:
         
         datum_ander = Dag.selecteren_datum(
+            terug_naar = Dag.titel() + " PRODUCTEN",
             vandaag = Dag._HUIDIGE_DAG != dt.date.today(),
             morgen = False,
             overmorgen = False,
@@ -580,7 +582,7 @@ class Dag(GeregistreerdObject):
             return commando.Doorgaan
         
         keuze_producten = dag_ander.selecteren_product(
-            terug_naar = Dag.titel(),
+            terug_naar = Dag.titel() + " PRODUCTEN",
             tekst_beschrijving = "één of meerdere product(en) om te kopiëren",
             geef_id = True,
             geef_enum = True,
@@ -612,7 +614,9 @@ class Dag(GeregistreerdObject):
     @staticmethod
     def veranderen_dag() -> commando.Doorgaan:
         
-        datum = Dag.selecteren_datum()
+        datum = Dag.selecteren_datum(
+            terug_naar = Dag.titel() + " PRODUCTEN",
+            )
         if datum is commando.STOP:
             return commando.DOORGAAN
         
