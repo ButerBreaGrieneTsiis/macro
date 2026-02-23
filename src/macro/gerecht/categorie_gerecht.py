@@ -27,17 +27,19 @@ class CategorieGerecht(GeregistreerdObject):
         cls,
         terug_naar: str = "terug naar MENU CATEGORIE GERECHT",
         geef_id: bool = False,
+        hoofdcategorie_uuid: str | None = None,
         ) -> CategorieGerecht | commando.Doorgaan:
         
         print(f"\ninvullen gegevens nieuwe categorie gerecht")
         
-        hoofdcategorie_uuid = HoofdcategorieGerecht.selecteren(
-            geef_id = True,
-            toestaan_nieuw = True,
-            terug_naar = terug_naar,
-            )
-        if hoofdcategorie_uuid is commando.STOP or hoofdcategorie_uuid is None:
-            return commando.DOORGAAN
+        if hoofdcategorie_uuid is None:
+            hoofdcategorie_uuid = HoofdcategorieGerecht.selecteren(
+                geef_id = True,
+                toestaan_nieuw = True,
+                terug_naar = terug_naar,
+                )
+            if hoofdcategorie_uuid is commando.STOP or hoofdcategorie_uuid is None:
+                return commando.DOORGAAN
         
         categorie_naam = invoeren(
             tekst_beschrijving = "categorienaam",
@@ -161,14 +163,28 @@ class CategorieGerecht(GeregistreerdObject):
                 )
             if hoofdcategorie_uuid is commando.STOP:
                 return commando.STOP
-            
-            return CategorieGerecht.subregister().filter(
+            categoriën = CategorieGerecht.subregister().filter(
                 hoofdcategorie_uuid = hoofdcategorie_uuid,
-            ).selecteren(
-                geef_id = geef_id,
-                toestaan_nieuw = toestaan_nieuw,
-                terug_naar = terug_naar,
                 )
+            
+            if len(categoriën) > 0:
+                return categoriën.selecteren(
+                    geef_id = geef_id,
+                    toestaan_nieuw = toestaan_nieuw,
+                    terug_naar = terug_naar,
+                    )
+            
+            if toestaan_nieuw:
+                hoofdcategorie = HoofdcategorieGerecht.subregister()[hoofdcategorie_uuid]
+                print(f"\n>>> geen categoriën aanwezig voor {hoofdcategorie}")
+                
+                return CategorieGerecht.nieuw(
+                    terug_naar = terug_naar,
+                    geef_id = geef_id,
+                    hoofdcategorie_uuid = hoofdcategorie_uuid,
+                    )
+            
+            return None
         
         print()
         return CategorieGerecht.subregister().zoeken(

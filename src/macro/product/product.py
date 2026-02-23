@@ -37,17 +37,19 @@ class Product(GeregistreerdObject):
         cls,
         terug_naar: str = "terug naar MENU PRODUCT",
         geef_id: bool = False,
+        ingrediënt_uuid: str | None = None,
         ) -> Product | str | commando.Doorgaan:
         
         print(f"\ninvullen gegevens nieuw product")
         
-        ingrediënt_uuid = Ingrediënt.selecteren(
-            geef_id = True,
-            toestaan_nieuw = True,
-            terug_naar = terug_naar,
-            )
-        if ingrediënt_uuid is commando.STOP or ingrediënt_uuid is commando.DOORGAAN or ingrediënt_uuid is None:
-            return commando.DOORGAAN
+        if ingrediënt_uuid is None:
+            ingrediënt_uuid = Ingrediënt.selecteren(
+                geef_id = True,
+                toestaan_nieuw = True,
+                terug_naar = terug_naar,
+                )
+            if ingrediënt_uuid is commando.STOP or ingrediënt_uuid is commando.DOORGAAN or ingrediënt_uuid is None:
+                return commando.DOORGAAN
         
         product_naam = invoeren(
             tekst_beschrijving = "productnaam",
@@ -372,13 +374,28 @@ class Product(GeregistreerdObject):
             if ingrediënt_uuid is commando.STOP:
                 return commando.STOP
             
-            return Product.subregister().filter(
+            producten = Product.subregister().filter(
                 ingrediënt_uuid = ingrediënt_uuid,
-            ).selecteren(
-                geef_id = geef_id,
-                toestaan_nieuw = toestaan_nieuw,
-                terug_naar = terug_naar,
                 )
+            
+            if len(producten) > 0:
+                return producten.selecteren(
+                    geef_id = geef_id,
+                    toestaan_nieuw = toestaan_nieuw,
+                    terug_naar = terug_naar,
+                    )
+            
+            if toestaan_nieuw:
+                ingrediënt = Ingrediënt.subregister()[ingrediënt_uuid]
+                print(f"\n>>> geen producten aanwezig voor {ingrediënt}")
+                
+                return Product.nieuw(
+                    terug_naar = terug_naar,
+                    geef_id = geef_id,
+                    ingrediënt_uuid = ingrediënt_uuid,
+                    )
+            
+            return None
         
         print()
         return Product.subregister().zoeken(

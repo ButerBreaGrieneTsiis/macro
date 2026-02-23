@@ -37,17 +37,19 @@ class Gerecht(GeregistreerdObject):
         cls,
         terug_naar: str = "terug naar MENU GERECHT",
         geef_id: bool = False,
+        categorie_uuid: str | None = None,
         ) -> Gerecht | commando.Doorgaan:
         
         print(f"\ninvullen gegevens nieuw gerecht")
         
-        categorie_uuid = CategorieGerecht.selecteren(
-            geef_id = True,
-            toestaan_nieuw = True,
-            terug_naar = terug_naar,
-            )
-        if categorie_uuid is commando.STOP or categorie_uuid is commando.DOORGAAN or categorie_uuid is None:
-            return commando.DOORGAAN
+        if categorie_uuid is None:
+            categorie_uuid = CategorieGerecht.selecteren(
+                geef_id = True,
+                toestaan_nieuw = True,
+                terug_naar = terug_naar,
+                )
+            if categorie_uuid is commando.STOP or categorie_uuid is commando.DOORGAAN or categorie_uuid is None:
+                return commando.DOORGAAN
         
         gerecht_naam = invoeren(
             tekst_beschrijving = "gerechtnaam",
@@ -644,7 +646,7 @@ class Gerecht(GeregistreerdObject):
                 return commando.STOP
             
             selectiemethode = "nieuw"
-            
+        
         if not selectiemethode:
             
             opties = {}
@@ -671,7 +673,7 @@ class Gerecht(GeregistreerdObject):
                 )
         
         if aantal_gerechten == 0:
-            return None
+            return None # TODO: wordt dit überhaupt ooit getriggerd?
         
         if selectiemethode == "selecteren":
             
@@ -684,13 +686,28 @@ class Gerecht(GeregistreerdObject):
             if categorie_uuid is commando.STOP:
                 return commando.STOP
             
-            return Gerecht.subregister().filter(
+            gerechten = Gerecht.subregister().filter(
                 categorie_uuid = categorie_uuid,
-            ).selecteren(
-                geef_id = geef_id,
-                toestaan_nieuw = toestaan_nieuw,
-                terug_naar = terug_naar,
                 )
+            
+            if len(gerechten) > 0:
+                return gerechten.selecteren(
+                    geef_id = geef_id,
+                    toestaan_nieuw = toestaan_nieuw,
+                    terug_naar = terug_naar,
+                    )
+            
+            if toestaan_nieuw:
+                categorie = CategorieGerecht.subregister()[categorie_uuid]
+                print(f"\n>>> geen gerechten aanwezig voor {categorie}")
+                
+                return Gerecht.nieuw(
+                    terug_naar = terug_naar,
+                    geef_id = geef_id,
+                    categorie_uuid = categorie_uuid,
+                    )
+            
+            return None
         
         print()
         return Gerecht.subregister().zoeken(

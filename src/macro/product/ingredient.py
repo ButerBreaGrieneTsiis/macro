@@ -27,17 +27,19 @@ class Ingrediënt(GeregistreerdObject):
         cls,
         terug_naar: str = "terug naar MENU INGREDIËNT",
         geef_id: bool = False,
+        categorie_uuid: str | None = None,
         ) -> Ingrediënt | commando.Doorgaan:
         
         print(f"\ninvullen gegevens nieuw ingrediënt")
         
-        categorie_uuid = Categorie.selecteren(
-            geef_id = True,
-            toestaan_nieuw = True,
-            terug_naar = terug_naar,
-            )
-        if categorie_uuid is commando.STOP or categorie_uuid is commando.DOORGAAN or categorie_uuid is None:
-            return commando.DOORGAAN
+        if categorie_uuid is None:
+            categorie_uuid = Categorie.selecteren(
+                geef_id = True,
+                toestaan_nieuw = True,
+                terug_naar = terug_naar,
+                )
+            if categorie_uuid is commando.STOP or categorie_uuid is commando.DOORGAAN or categorie_uuid is None:
+                return commando.DOORGAAN
         
         ingrediënt_naam = invoeren(
             tekst_beschrijving = "ingrediëntnaam",
@@ -167,13 +169,28 @@ class Ingrediënt(GeregistreerdObject):
             if categorie_uuid is commando.STOP:
                 return commando.STOP
             
-            return Ingrediënt.subregister().filter(
+            ingrediënten = Ingrediënt.subregister().filter(
                 categorie_uuid = categorie_uuid,
-            ).selecteren(
-                geef_id = geef_id,
-                toestaan_nieuw = toestaan_nieuw,
-                terug_naar = terug_naar,
                 )
+            
+            if len(ingrediënten) > 0:
+                return ingrediënten.selecteren(
+                    geef_id = geef_id,
+                    toestaan_nieuw = toestaan_nieuw,
+                    terug_naar = terug_naar,
+                    )
+            
+            if toestaan_nieuw:
+                categorie = Categorie.subregister()[categorie_uuid]
+                print(f"\n>>> geen ingrediënten aanwezig voor {categorie}")
+                
+                return Ingrediënt.nieuw(
+                    terug_naar = terug_naar,
+                    geef_id = geef_id,
+                    categorie_uuid = categorie_uuid,
+                    )
+            
+            return None
         
         print()
         return Ingrediënt.subregister().zoeken(
