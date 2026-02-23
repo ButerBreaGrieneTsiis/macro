@@ -9,7 +9,7 @@ menu_dag = Menu(Dag.titel, hoofdmenu)
 hoofdmenu.toevoegen_optie(menu_dag, "invullen dag")
 
 menu_dag.toevoegen_optie(Dag.toevoegen_product, "toevoegen product")
-# menu_dag.toevoegen_optie(Dag.toevoegen_gerecht, "toevoegen gerecht")
+menu_dag.toevoegen_optie(Dag.toevoegen_gerecht, "toevoegen gerecht")
 menu_dag.toevoegen_optie(Dag.aanpassen_product, "aanpassen hoeveelheid product")
 # menu_dag.toevoegen_optie(Dag.aanpassen_gerecht, "aanpassen porties gerecht")
 menu_dag.toevoegen_optie(Dag.weergeven_product, "weergeven product")

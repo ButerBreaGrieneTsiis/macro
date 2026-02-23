@@ -180,6 +180,7 @@ class Gerecht(GeregistreerdObject):
     def selecteren_variant(
         self,
         terug_naar: str,
+        inclusief_standaard: bool = True,
         geef_id: bool = True,
         toestaan_nieuw: bool = True,
         ) -> Variant | str | commando.Stop:
@@ -192,7 +193,11 @@ class Gerecht(GeregistreerdObject):
             if not toestaan_nieuw:
                 return commando.STOP
         
-        opties_varianten = {variant_uuid: f"{variant}" for variant_uuid, variant in self.varianten.items()}
+        if inclusief_standaard:
+            opties_varianten = {"standaard": "standaard"}
+            opties_varianten |= {variant_uuid: f"{variant}" for variant_uuid, variant in self.varianten.items()}
+        else:
+            opties_varianten = {variant_uuid: f"{variant}" for variant_uuid, variant in self.varianten.items()}
         
         if toestaan_nieuw:
             opties_varianten |= {"nieuw": "nieuwe variant"}
@@ -424,6 +429,7 @@ class Gerecht(GeregistreerdObject):
         
         variant = self.selecteren_variant(
             terug_naar = f"MENU BEWERKEN ({f"{self}".upper()})",
+            inclusief_standaard = False,
             geef_id = False,
             toestaan_nieuw = False,
             )
@@ -441,6 +447,7 @@ class Gerecht(GeregistreerdObject):
         
         variant_uuid = self.selecteren_variant(
             terug_naar = f"MENU BEWERKEN ({f"{self}".upper()})",
+            inclusief_standaard = False,
             geef_id = True,
             toestaan_nieuw = False,
             )
@@ -459,6 +466,7 @@ class Gerecht(GeregistreerdObject):
         
         variant_uuid = self.selecteren_variant(
             terug_naar = f"MENU INSPECTEREN ({f"{self}".upper()})",
+            inclusief_standaard = False,
             geef_id = True,
             toestaan_nieuw = False,
             )
@@ -526,7 +534,10 @@ class Gerecht(GeregistreerdObject):
                 hoeveelheid = Hoeveelheid(waarde, eenheid)
                 print(f"{f"{hoeveelheid}":<19} {f"{product.voedingswaarde.calorieën * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid._BASIS_EENHEDEN else hoeveelheid.waarde * product.eenheden[eenheid_enkelvoud]) / 100}":>10} {f"{product.voedingswaarde.eiwitten * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid._BASIS_EENHEDEN else hoeveelheid.waarde * product.eenheden[eenheid_enkelvoud]) / 100}":>8} {product}")
         
-        aantal_porties = self.porties
+        if variant_uuid != "standaard" and self.varianten[variant_uuid].porties is not None:
+            aantal_porties = self.varianten[variant_uuid].porties
+        else:
+            aantal_porties = self.porties
         print(f"\n{"TOTAAL":<19} {f"{self.bereken_voedingswaarde().calorieën*aantal_porties}":>10} {f"{self.bereken_voedingswaarde().eiwitten*aantal_porties}":>8} (voor {aantal_porties} porties)")
         print(f"{"PER PORTIE":<19} {f"{self.bereken_voedingswaarde().calorieën}":>10} {f"{self.bereken_voedingswaarde().eiwitten}":>8}")
     
@@ -592,7 +603,10 @@ class Gerecht(GeregistreerdObject):
                 product_voedingswaarde = product.bereken_voedingswaarde(hoeveelheid)
                 gerecht_voedingswaarde += product_voedingswaarde
         
-        aantal_porties = self.porties
+        if variant_uuid != "standaard" and self.varianten[variant_uuid].porties is not None:
+            aantal_porties = self.varianten[variant_uuid].porties
+        else:
+            aantal_porties = self.porties
         gerecht_voedingswaarde /= aantal_porties
         
         return gerecht_voedingswaarde

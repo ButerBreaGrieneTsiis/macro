@@ -18,7 +18,7 @@ class Product(GeregistreerdObject):
     merk_uuid: str
     voedingswaarde: Voedingswaarde
     basis_eenheid: Eenheid
-    eenheden: Dict[str, str] | None = None
+    eenheden: Dict[str, int] | None = None
     opmerking: str | None = None
     
     # DUNDER METHODS
