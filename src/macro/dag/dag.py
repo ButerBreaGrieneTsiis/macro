@@ -306,6 +306,8 @@ class Dag(GeregistreerdObject):
             if waarde is commando.STOP:
                 return commando.DOORGAAN
             
+            hoeveelheid = Hoeveelheid(waarde, eenheid)
+            
             gerecht_uuid = gerecht._id
             
             if gerecht_uuid in dag.gerechten.keys():
@@ -317,6 +319,9 @@ class Dag(GeregistreerdObject):
                     dag.gerecht[gerecht_uuid][variant_uuid] = waarde
             else:
                 dag.gerechten[gerecht_uuid] = {variant_uuid: waarde}
+            
+            variant_naam = "standaard" if variant_uuid == "standaard" else gerecht.varianten[variant_uuid].variant_naam
+            print(f"\n>>> {hoeveelheid} toegevoegd van {gerecht} (variant \"{variant_naam}\")")
     
     @staticmethod
     def aanpassen_product() -> commando.Doorgaan:
@@ -414,9 +419,11 @@ class Dag(GeregistreerdObject):
             
             for variant_uuid, porties_genomen  in variant_dict.items():
                 
-                versie_naam = "standaard" if variant_uuid == "standaard" else gerecht.varianten[variant_uuid].variant_naam
+                variant_naam = "standaard" if variant_uuid == "standaard" else gerecht.varianten[variant_uuid].variant_naam
                 
-                print(f"\n{porties_genomen} {Eenheid.PORTIE.meervoud} van {gerecht} (versie \"{versie_naam}\")")
+                hoeveelheid_porties = Hoeveelheid(porties_genomen, Eenheid.PORTIE)
+                
+                print(f"\n{hoeveelheid_porties} van {gerecht} (variant \"{variant_naam}\")")
                 print(f"\n{"HOEVEELHEID":<20} CALORIEËN EIWITTEN PRODUCT")
                 
                 if variant_uuid != "standaard" and gerecht.varianten[variant_uuid].porties is not None:
