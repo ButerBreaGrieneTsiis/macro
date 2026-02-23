@@ -25,7 +25,7 @@ def registreren(openen: bool = True) -> None:
     Register.registreer_type(
         geregistreerd_type = Hoofdcategorie,
         subregister_naam = "hoofdcategorie",
-        bestandsmap = Path("gegevens\\product"),
+        bestandsmap = Path("gegevens/product"),
         bestandsnaam = "hoofdcategorie",
         vercijfer_methode = "functie",
         vercijfer_functie_objecten = Hoofdcategorie.naar_json,
@@ -35,7 +35,7 @@ def registreren(openen: bool = True) -> None:
     Register.registreer_type(
         geregistreerd_type = HoofdcategorieGerecht,
         subregister_naam = "hoofdcategorie_gerecht",
-        bestandsmap = Path("gegevens\\gerecht"),
+        bestandsmap = Path("gegevens/gerecht"),
         bestandsnaam = "hoofdcategorie_gerecht",
         vercijfer_methode = "functie",
         vercijfer_functie_objecten = HoofdcategorieGerecht.naar_json,
@@ -45,7 +45,7 @@ def registreren(openen: bool = True) -> None:
     Register.registreer_type(
         geregistreerd_type = Categorie,
         subregister_naam = "categorie",
-        bestandsmap = Path("gegevens\\product"),
+        bestandsmap = Path("gegevens/product"),
         bestandsnaam = "categorie",
         vercijfer_methode = "functie",
         vercijfer_functie_objecten = Categorie.naar_json,
@@ -55,7 +55,7 @@ def registreren(openen: bool = True) -> None:
     Register.registreer_type(
         geregistreerd_type = CategorieGerecht,
         subregister_naam = "categorie_gerecht",
-        bestandsmap = Path("gegevens\\gerecht"),
+        bestandsmap = Path("gegevens/gerecht"),
         bestandsnaam = "categorie_gerecht",
         vercijfer_methode = "functie",
         vercijfer_functie_objecten = CategorieGerecht.naar_json,
@@ -65,7 +65,7 @@ def registreren(openen: bool = True) -> None:
     Register.registreer_type(
         geregistreerd_type = Ingrediënt,
         subregister_naam = "ingrediënt",
-        bestandsmap = Path("gegevens\\product"),
+        bestandsmap = Path("gegevens/product"),
         bestandsnaam = "ingrediënt",
         vercijfer_methode = "functie",
         vercijfer_functie_objecten = Ingrediënt.naar_json,
@@ -75,7 +75,7 @@ def registreren(openen: bool = True) -> None:
     Register.registreer_type(
         geregistreerd_type = Merk,
         subregister_naam = "merk",
-        bestandsmap = Path("gegevens\\product"),
+        bestandsmap = Path("gegevens/product"),
         bestandsnaam = "merk",
         vercijfer_methode = "functie",
         vercijfer_functie_objecten = Merk.naar_json,
@@ -85,7 +85,7 @@ def registreren(openen: bool = True) -> None:
     Register.registreer_type(
         geregistreerd_type = Product,
         subregister_naam = "product",
-        bestandsmap = Path("gegevens\\product"),
+        bestandsmap = Path("gegevens/product"),
         bestandsnaam = "product",
         vercijfer_methode = "functie",
         vercijfer_functie_objecten = Product.naar_json,
@@ -117,7 +117,7 @@ def registreren(openen: bool = True) -> None:
     Register.registreer_type(
         geregistreerd_type = Gerecht,
         subregister_naam = "gerecht",
-        bestandsmap = Path("gegevens\\gerecht"),
+        bestandsmap = Path("gegevens/gerecht"),
         bestandsnaam = "gerecht",
         vercijfer_methode = "functie",
         vercijfer_functie_objecten = Gerecht.naar_json,
@@ -147,7 +147,7 @@ def registreren(openen: bool = True) -> None:
         subregister_naam = "dag",
         registratie_methode = "property",
         opslaan = "instantie",
-        bestandsmap = Path("gegevens\\dagen"),
+        bestandsmap = Path("gegevens/dagen"),
         bestandsnaam = "dag",
         vercijfer_methode = "functie",
         vercijfer_functie_objecten = Dag.naar_json,
