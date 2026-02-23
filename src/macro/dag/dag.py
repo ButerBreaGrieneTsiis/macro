@@ -14,7 +14,7 @@ from macro.gerecht import Gerecht
 from macro.voedingswaarde import Eenheid, Hoeveelheid, Voedingswaarde
 
 
-locale.setlocale(locale.LC_ALL, "nl_NL.UTF-8")
+locale.setlocale(locale.LC_ALL, "fy_NL.UTF-8")
 
 @dataclass
 class Dag(GeregistreerdObject):
@@ -173,12 +173,18 @@ class Dag(GeregistreerdObject):
         
         opties = {}
         
-        if vandaag: opties[dt.date.today()] = f"vandaag ({dt.date.today().strftime("%A %d %B %Y")})"
-        if morgen: opties[dt.date.today() + dt.timedelta(days = 1)] = f"morgen ({(dt.date.today() + dt.timedelta(days = 1)).strftime("%A %d %B %Y")})"
-        if overmorgen: opties[dt.date.today() + dt.timedelta(days = 2)] = f"overmorgen ({(dt.date.today() + dt.timedelta(days = 2)).strftime("%A %d %B %Y")})"
-        if gisteren: opties[dt.date.today() - dt.timedelta(days = 1)] = f"gisteren ({(dt.date.today() - dt.timedelta(days = 1)).strftime("%A %d %B %Y")})"
-        if eergisteren: opties[dt.date.today() - dt.timedelta(days = 2)] = f"eergisteren ({(dt.date.today() - dt.timedelta(days = 2)).strftime("%A %d %B %Y")})"
-        if aangepast: opties["aangepast"] = f"aangepast ({(dt.date.today() - dt.timedelta(days = 2)).strftime("%A %d %B %Y")})"
+        if vandaag:
+            opties[dt.date.today()] = f"vandaag ({dt.date.today().strftime("%A %d %B %Y")})"
+        if morgen:
+            opties[dt.date.today() + dt.timedelta(days = 1)] = f"morgen ({(dt.date.today() + dt.timedelta(days = 1)).strftime("%A %d %B %Y")})"
+        if overmorgen:
+            opties[dt.date.today() + dt.timedelta(days = 2)] = f"overmorgen ({(dt.date.today() + dt.timedelta(days = 2)).strftime("%A %d %B %Y")})"
+        if gisteren:
+            opties[dt.date.today() - dt.timedelta(days = 1)] = f"gisteren ({(dt.date.today() - dt.timedelta(days = 1)).strftime("%A %d %B %Y")})"
+        if eergisteren:
+            opties[dt.date.today() - dt.timedelta(days = 2)] = f"eergisteren ({(dt.date.today() - dt.timedelta(days = 2)).strftime("%A %d %B %Y")})"
+        if aangepast:
+            opties["aangepast"] = f"aangepast ({(dt.date.today() - dt.timedelta(days = 2)).strftime("%A %d %B %Y")})"
         
         keuze_datum = kiezen(
             opties = opties,
@@ -220,11 +226,11 @@ class Dag(GeregistreerdObject):
     @staticmethod
     def toevoegen_product() -> commando.Doorgaan:
         
-        dag = Dag.selecteren_dag(datum = Dag._HUIDIGE_DAG)
+        dag: Dag = Dag.selecteren_dag(datum = Dag._HUIDIGE_DAG)
         
         while True:
             
-            product = Product.selecteren(
+            product: Product = Product.selecteren(
                 geef_id = False,
                 toestaan_nieuw = True,
                 terug_naar = f"MENU DAG {Dag._HUIDIGE_DAG.strftime("%A %d %B %Y").upper()}",
@@ -234,7 +240,7 @@ class Dag(GeregistreerdObject):
             if product is None:
                 continue
             
-            eenheid = product.selecteren_eenheid(
+            eenheid: Eenheid = product.selecteren_eenheid(
                 terug_naar = f"MENU DAG {Dag._HUIDIGE_DAG.strftime("%A %d %B %Y").upper()}",
                 geef_enum = True,
                 toestaan_nieuw = True,
@@ -268,11 +274,11 @@ class Dag(GeregistreerdObject):
     @staticmethod
     def toevoegen_gerecht() -> commando.Doorgaan:
         
-        dag = Dag.selecteren_dag(datum = Dag._HUIDIGE_DAG)
+        dag: Dag = Dag.selecteren_dag(datum = Dag._HUIDIGE_DAG)
         
         while True:
             
-            gerecht = Gerecht.selecteren(
+            gerecht: Gerecht = Gerecht.selecteren(
                 geef_id = False,
                 toestaan_nieuw = True,
                 terug_naar = f"MENU DAG {Dag._HUIDIGE_DAG.strftime("%A %d %B %Y").upper()}",
@@ -291,7 +297,7 @@ class Dag(GeregistreerdObject):
             if variant_uuid is commando.STOP:
                 return commando.DOORGAAN
             
-            eenheid = Eenheid.PORTIE
+            eenheid: Eenheid = Eenheid.PORTIE
             
             waarde = invoeren(
                 tekst_beschrijving = f"hoeveel {eenheid.meervoud}",
@@ -303,22 +309,22 @@ class Dag(GeregistreerdObject):
             gerecht_uuid = gerecht._id
             
             if gerecht_uuid in dag.gerechten.keys():
-                for variant_uuid_aanwezig in dag.gerecht:
+                for variant_uuid_aanwezig in dag.gerechten[gerecht_uuid]:
                     if variant_uuid == variant_uuid_aanwezig:
-                        dag.gerecht[variant_uuid] += waarde
+                        dag.gerechten[gerecht_uuid][variant_uuid] += waarde
                         break
                 else:
-                    dag.gerecht[variant_uuid] = waarde
+                    dag.gerecht[gerecht_uuid][variant_uuid] = waarde
             else:
-                dag.gerecht = {variant_uuid: waarde}
+                dag.gerechten[gerecht_uuid] = {variant_uuid: waarde}
     
     @staticmethod
     def aanpassen_product() -> commando.Doorgaan:
         
-        dag = Dag.selecteren_dag(datum = Dag._HUIDIGE_DAG)
+        dag: Dag = Dag.selecteren_dag(datum = Dag._HUIDIGE_DAG)
         
         if len(dag.producten) == 0:
-            print(f"\n>>> geen producten aanwezig om de hoeveelheid van aan te passen")
+            print("\n>>> geen producten aanwezig om de hoeveelheid van aan te passen")
             return commando.Doorgaan
         
         keuze_product = dag.selecteren_product(
@@ -334,7 +340,7 @@ class Dag(GeregistreerdObject):
         product_uuid, eenheid_oud = keuze_product
         product = Product.subregister()[product_uuid]
         
-        eenheid_nieuw = product.selecteren_eenheid(
+        eenheid_nieuw: Eenheid = product.selecteren_eenheid(
             terug_naar = Dag.titel(),
             geef_enum = True,
             toestaan_nieuw = True,
@@ -373,10 +379,10 @@ class Dag(GeregistreerdObject):
     @staticmethod
     def weergeven_product() -> commando.Doorgaan:
         
-        dag = Dag.selecteren_dag(datum = Dag._HUIDIGE_DAG)
+        dag: Dag = Dag.selecteren_dag(datum = Dag._HUIDIGE_DAG)
         
         if len(dag.producten) == 0 and len(dag.gerechten) == 0:
-            print(f"\n>>> geen producten of gerechten aanwezig om te weergeven")
+            print("\n>>> geen producten of gerechten aanwezig om te weergeven")
             return commando.Doorgaan
         
         if len(dag.producten) > 0:
@@ -399,15 +405,18 @@ class Dag(GeregistreerdObject):
                 calorieën_totaal += product.voedingswaarde.calorieën * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid._BASIS_EENHEDEN else hoeveelheid.waarde * product.eenheden[eenheid_enkelvoud]) / 100
                 eiwitten_totaal += product.voedingswaarde.eiwitten * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid._BASIS_EENHEDEN else hoeveelheid.waarde * product.eenheden[eenheid_enkelvoud]) / 100
         
-        print(f"\n{"SUBTOTAAL":<19} {f"{calorieën_totaal}":>10} {f"{eiwitten_totaal}":>8} ")
+        if len(dag.producten) > 0:
+            print(f"\n{"SUBTOTAAL":<19} {f"{calorieën_totaal}":>10} {f"{eiwitten_totaal}":>8} ")
         
         for gerecht_uuid, variant_dict in dag.gerechten.items():
             
-            gerecht = Gerecht.subregister()[gerecht_uuid]
+            gerecht: Gerecht = Gerecht.subregister()[gerecht_uuid]
             
-            for variant_uuid, waarde  in variant_dict.items():
+            for variant_uuid, porties_genomen  in variant_dict.items():
+                
                 versie_naam = "standaard" if variant_uuid == "standaard" else gerecht.varianten[variant_uuid].variant_naam
-                print(f"\n{waarde} van {gerecht} (versie \"{versie_naam}\")")
+                
+                print(f"\n{porties_genomen} {Eenheid.PORTIE.meervoud} van {gerecht} (versie \"{versie_naam}\")")
                 print(f"\n{"HOEVEELHEID":<20} CALORIEËN EIWITTEN PRODUCT")
                 
                 if variant_uuid != "standaard" and gerecht.varianten[variant_uuid].porties is not None:
@@ -417,18 +426,18 @@ class Dag(GeregistreerdObject):
                 
                 for product_uuid, hoeveelheden in gerecht.producten(variant_uuid = variant_uuid).items():
                     
-                    product = Product.subregister()[product_uuid]
+                    product: Product = Product.subregister()[product_uuid]
                     
                     for eenheid_enkelvoud, waarde in hoeveelheden.items():
                         
                         eenheid = Eenheid.van_enkelvoud(eenheid_enkelvoud)
                         hoeveelheid = Hoeveelheid(waarde, eenheid)
                         
-                        print(f"{f"{hoeveelheid * waarde/aantal_porties}":<19} {f"{product.voedingswaarde.calorieën * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid._BASIS_EENHEDEN else hoeveelheid.waarde * product.eenheden[eenheid_enkelvoud]) / 100 * waarde/aantal_porties}":>10} {f"{product.voedingswaarde.eiwitten * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid._BASIS_EENHEDEN else hoeveelheid.waarde * product.eenheden[eenheid_enkelvoud]) / 100 * waarde/aantal_porties}":>8} {product}")
+                        print(f"{f"{hoeveelheid * porties_genomen/aantal_porties}":<19} {f"{product.voedingswaarde.calorieën * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid._BASIS_EENHEDEN else hoeveelheid.waarde * product.eenheden[eenheid_enkelvoud]) / 100 * porties_genomen/aantal_porties}":>10} {f"{product.voedingswaarde.eiwitten * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid._BASIS_EENHEDEN else hoeveelheid.waarde * product.eenheden[eenheid_enkelvoud]) / 100 * porties_genomen/aantal_porties}":>8} {product}")
                 
-                print(f"\n{"SUBTOTAAL":<19} {f"{gerecht.bereken_voedingswaarde(variant_uuid = variant_uuid).calorieën}":>10} {f"{gerecht.bereken_voedingswaarde(variant_uuid = variant_uuid).eiwitten}":>8} ")
-                
-        print(f"\n\n{"TOTAAL":<18} {f"{dag.voedingswaarde.calorieën}":>9} {f"{dag.voedingswaarde.eiwitten}":>8}")
+                print(f"\n{"SUBTOTAAL":<19} {f"{gerecht.bereken_voedingswaarde(variant_uuid = variant_uuid).calorieën * porties_genomen}":>10} {f"{gerecht.bereken_voedingswaarde(variant_uuid = variant_uuid).eiwitten * porties_genomen}":>8} ")
+        
+        print(f"\n\n{"TOTAAL":<19} {f"{dag.voedingswaarde.calorieën}":>10} {f"{dag.voedingswaarde.eiwitten}":>8}")
         
         return commando.DOORGAAN
     
@@ -438,10 +447,10 @@ class Dag(GeregistreerdObject):
     @staticmethod
     def weergeven_voedingswaarde() -> commando.Doorgaan:
         
-        dag = Dag.selecteren_dag(datum = Dag._HUIDIGE_DAG)
+        dag: Dag = Dag.selecteren_dag(datum = Dag._HUIDIGE_DAG)
         
         if len(dag.producten) == 0 and len(dag.gerechten) == 0:
-            print(f"\n>>> geen producten of gerechten aanwezig om voedingswaarde voor te berekenen")
+            print("\n>>> geen producten of gerechten aanwezig om voedingswaarde voor te berekenen")
             return commando.Doorgaan
         
         print(f"\nvoedingswaarde voor {dag}\n")
@@ -450,10 +459,10 @@ class Dag(GeregistreerdObject):
     @staticmethod
     def verwijderen_product() -> commando.Doorgaan:
         
-        dag = Dag.selecteren_dag(datum = Dag._HUIDIGE_DAG)
+        dag: Dag = Dag.selecteren_dag(datum = Dag._HUIDIGE_DAG)
         
         if len(dag.producten) == 0:
-            print(f"\n>>> geen producten aanwezig om te verwijderen")
+            print("\n>>> geen producten aanwezig om te verwijderen")
             return commando.Doorgaan
         
         product_selectie = dag.selecteren_product(
@@ -492,8 +501,8 @@ class Dag(GeregistreerdObject):
         if datum_ander is commando.STOP:
             return commando.DOORGAAN
         
-        dag_huidig = Dag.selecteren_dag(datum = Dag._HUIDIGE_DAG)
-        dag_ander = Dag.selecteren_dag(datum = datum_ander)
+        dag_huidig: Dag = Dag.selecteren_dag(datum = Dag._HUIDIGE_DAG)
+        dag_ander: Dag = Dag.selecteren_dag(datum = datum_ander)
         
         if len(dag_ander.producten) == 0:
             print(f"\n>>> geen producten aanwezig bij {dag_ander}")
