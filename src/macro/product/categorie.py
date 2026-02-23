@@ -1,7 +1,7 @@
 """macro.categorie.categorie"""
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Dict, Literal
+from typing import Literal
 
 from grienetsiis.opdrachtprompt import invoeren, kiezen, commando, Menu
 from grienetsiis.register import Subregister, Register, GeregistreerdObject
@@ -30,7 +30,7 @@ class Categorie(GeregistreerdObject):
         hoofdcategorie_uuid: str | None = None,
         ) -> Categorie | commando.Doorgaan:
         
-        print(f"\ninvullen gegevens nieuwe categorie")
+        print("\ninvullen gegevens nieuwe categorie")
         
         if hoofdcategorie_uuid is None:
             hoofdcategorie_uuid = Hoofdcategorie.selecteren(
@@ -119,7 +119,7 @@ class Categorie(GeregistreerdObject):
         aantal_categorieën = len(Categorie.subregister())
         
         if aantal_categorieën == 0:
-            print(f"\n>>> geen categorieën aanwezig")
+            print("\n>>> geen categorieën aanwezig")
             
             if not toestaan_nieuw:
                 return commando.STOP
@@ -278,7 +278,7 @@ class Categorie(GeregistreerdObject):
     @staticmethod
     def weergeven() -> commando.Doorgaan:
         
-        menu_weergeven = Menu(f"MENU WEERGEVEN CATEGORIE PRODUCT", "MENU CATEGORIE PRODUCT", blijf_in_menu = True)
+        menu_weergeven = Menu("MENU WEERGEVEN CATEGORIE PRODUCT", "MENU CATEGORIE PRODUCT", blijf_in_menu = True)
         menu_weergeven.toevoegen_optie(Categorie.weergeven_alle, "alle categorieën")
         menu_weergeven.toevoegen_optie(Categorie.weergeven_voor_hoofdcategorie, "categorieën voor hoofdcategorie")
         

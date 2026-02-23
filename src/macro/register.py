@@ -4,10 +4,9 @@ from pathlib import Path
 from grienetsiis.json import Ontcijferaar, Vercijferaar
 from grienetsiis.register import Register
 
-from macro._version import __version__
 from macro.gerecht import HoofdcategorieGerecht, CategorieGerecht, Variant, Gerecht
 from macro.product import Hoofdcategorie, Categorie, Ingrediënt, Merk, Product
-from macro.voedingswaarde import Eenheid, Hoeveelheid, Voedingswaarde
+from macro.voedingswaarde import Eenheid, Voedingswaarde
 from macro.dag import Dag
 
 
@@ -154,4 +153,5 @@ def registreren(openen: bool = True) -> None:
         ontcijfer_functie_objecten = Dag.van_json,
         )
     
-    if openen: Register.openen()
+    if openen:
+        Register.openen()

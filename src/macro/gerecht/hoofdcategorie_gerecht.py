@@ -1,7 +1,6 @@
 """macro.categorie.hoofdcategorie_gerecht"""
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Dict
 
 from grienetsiis.opdrachtprompt import invoeren, commando, Menu
 from grienetsiis.register import Subregister, Register, GeregistreerdObject
@@ -25,7 +24,7 @@ class HoofdcategorieGerecht(GeregistreerdObject):
         geef_id: bool = False,
         ) -> HoofdcategorieGerecht | commando.Doorgaan:
         
-        print(f"\ninvullen gegevens nieuwe hoofdcategorie gerecht")
+        print("\ninvullen gegevens nieuwe hoofdcategorie gerecht")
         
         hoofdcategorie_naam = invoeren(
             tekst_beschrijving = "hoofdcategorienaam",

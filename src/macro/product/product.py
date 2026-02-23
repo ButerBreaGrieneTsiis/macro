@@ -40,7 +40,7 @@ class Product(GeregistreerdObject):
         ingrediënt_uuid: str | None = None,
         ) -> Product | str | commando.Doorgaan:
         
-        print(f"\ninvullen gegevens nieuw product")
+        print("\ninvullen gegevens nieuw product")
         
         if ingrediënt_uuid is None:
             ingrediënt_uuid = Ingrediënt.selecteren(
@@ -254,9 +254,9 @@ class Product(GeregistreerdObject):
             return commando.DOORGAAN
         
         self.voedingswaarde = voedingswaarde
-        print(f"\n>>> voedingswaarde veranderd van:\n")
+        print("\n>>> voedingswaarde veranderd van:\n")
         print(waarde_oud)
-        print(f"\n>>> naar:\n")
+        print("\n>>> naar:\n")
         print(self.voedingswaarde)
         return commando.DOORGAAN
     
@@ -283,7 +283,7 @@ class Product(GeregistreerdObject):
         if len(self.eenheden) == 0:
             print(">>> geen eenheden gedefinieerd")
         else:
-            print(f"EENHEID          HOEVEELHEID CALORIEËN")
+            print("EENHEID          HOEVEELHEID CALORIEËN")
             [print(f"{f"{Hoeveelheid(1, Eenheid(eenheid))}":<18}{f"{Hoeveelheid(waarde, self.basis_eenheid)}":<11} {self.voedingswaarde.calorieën * waarde / 100.0}") for eenheid, waarde in self.eenheden.items()]
     
     def bereken_voedingswaarde(
@@ -328,7 +328,7 @@ class Product(GeregistreerdObject):
         aantal_producten = len(Product.subregister())
         
         if aantal_producten == 0:
-            print(f"\n>>> geen producten aanwezig")
+            print("\n>>> geen producten aanwezig")
             
             if not toestaan_nieuw:
                 return commando.STOP
@@ -575,7 +575,7 @@ class Product(GeregistreerdObject):
     @staticmethod
     def weergeven() -> commando.Doorgaan:
         
-        menu_weergeven = Menu(f"MENU WEERGEVEN INGREDIËNT", "MENU INGREDIËNT", blijf_in_menu = True)
+        menu_weergeven = Menu("MENU WEERGEVEN INGREDIËNT", "MENU INGREDIËNT", blijf_in_menu = True)
         menu_weergeven.toevoegen_optie(Product.weergeven_alle, "alle producten")
         menu_weergeven.toevoegen_optie(Product.weergeven_voor_hoofdcategorie, "producten voor hoofdcategorie")
         menu_weergeven.toevoegen_optie(Product.weergeven_voor_categorie, "producten voor categorie")

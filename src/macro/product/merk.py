@@ -1,7 +1,6 @@
 """macro.product.merk"""
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Dict
 
 from grienetsiis.opdrachtprompt import invoeren, commando, Menu
 from grienetsiis.register import Subregister, Register, GeregistreerdObject
@@ -25,7 +24,7 @@ class Merk(GeregistreerdObject):
         geef_id: bool = False,
         ) -> Merk | commando.Doorgaan:
         
-        print(f"\ninvullen gegevens nieuw merk")
+        print("\ninvullen gegevens nieuw merk")
         
         merk_naam = invoeren(
             tekst_beschrijving = "merknaam",

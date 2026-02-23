@@ -2,7 +2,7 @@
 .vscode
 .venv
 build
-# dev
+dev
 gegevens
 
 # build files

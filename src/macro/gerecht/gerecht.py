@@ -40,7 +40,7 @@ class Gerecht(GeregistreerdObject):
         categorie_uuid: str | None = None,
         ) -> Gerecht | commando.Doorgaan:
         
-        print(f"\ninvullen gegevens nieuw gerecht")
+        print("\ninvullen gegevens nieuw gerecht")
         
         if categorie_uuid is None:
             categorie_uuid = CategorieGerecht.selecteren(
@@ -131,7 +131,7 @@ class Gerecht(GeregistreerdObject):
             return commando.DOORGAAN
         
         porties = invoeren(
-            tekst_beschrijving = f"hoeveel porties",
+            tekst_beschrijving = "hoeveel porties",
             invoer_type = "int",
             waardes_bereik = (1, 100),
             )
@@ -190,7 +190,7 @@ class Gerecht(GeregistreerdObject):
         aantal_varianten = len(self.varianten)
         
         if aantal_varianten == 0:
-            print(f"\n>>> geen varianten aanwezig")
+            print("\n>>> geen varianten aanwezig")
             
             if not toestaan_nieuw:
                 return commando.STOP
@@ -315,7 +315,7 @@ class Gerecht(GeregistreerdObject):
     def bewerken_producten_aanpassen(self) -> commando.Doorgaan:
         
         if len(self.producten_standaard) == 0:
-            print(f"\n>>> geen producten aanwezig om de hoeveelheid van aan te passen")
+            print("\n>>> geen producten aanwezig om de hoeveelheid van aan te passen")
             return commando.Doorgaan
         
         keuze_product = self.selecteren_product(
@@ -366,7 +366,7 @@ class Gerecht(GeregistreerdObject):
     def bewerken_producten_verwijderen(self) -> commando.Doorgaan:
         
         if len(self.producten_standaard) == 0:
-            print(f"\n>>> geen producten aanwezig om te verwijderen")
+            print("\n>>> geen producten aanwezig om te verwijderen")
             return commando.Doorgaan
         
         product_selectie = self.selecteren_product(
@@ -393,7 +393,7 @@ class Gerecht(GeregistreerdObject):
         
         waarde_oud = self.porties
         porties = invoeren(
-            tekst_beschrijving = f"hoeveel porties",
+            tekst_beschrijving = "hoeveel porties",
             invoer_type = "int",
             waardes_bereik = (1, 100),
             )
@@ -640,7 +640,7 @@ class Gerecht(GeregistreerdObject):
         aantal_gerechten = len(Gerecht.subregister())
         
         if aantal_gerechten == 0:
-            print(f"\n>>> geen gerechten aanwezig")
+            print("\n>>> geen gerechten aanwezig")
             
             if not toestaan_nieuw:
                 return commando.STOP
@@ -845,7 +845,7 @@ class Gerecht(GeregistreerdObject):
     @staticmethod
     def weergeven() -> commando.Doorgaan:
         
-        menu_weergeven = Menu(f"MENU WEERGEVEN GERECHT", "MENU GERECHT", blijf_in_menu = True)
+        menu_weergeven = Menu("MENU WEERGEVEN GERECHT", "MENU GERECHT", blijf_in_menu = True)
         menu_weergeven.toevoegen_optie(Gerecht.weergeven_alle, "alle gerechten")
         menu_weergeven.toevoegen_optie(Gerecht.weergeven_voor_hoofdcategorie, "gerechten voor hoofdcategorie")
         menu_weergeven.toevoegen_optie(Gerecht.weergeven_voor_categorie, "gerechten voor categorie")

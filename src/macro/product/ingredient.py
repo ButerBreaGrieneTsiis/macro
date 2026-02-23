@@ -1,7 +1,7 @@
 """macro.product.ingredient"""
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Dict, Literal
+from typing import Literal
 
 from grienetsiis.opdrachtprompt import invoeren, kiezen, commando, Menu
 from grienetsiis.register import Subregister, Register, GeregistreerdObject
@@ -30,7 +30,7 @@ class Ingrediënt(GeregistreerdObject):
         categorie_uuid: str | None = None,
         ) -> Ingrediënt | commando.Doorgaan:
         
-        print(f"\ninvullen gegevens nieuw ingrediënt")
+        print("\ninvullen gegevens nieuw ingrediënt")
         
         if categorie_uuid is None:
             categorie_uuid = Categorie.selecteren(
@@ -123,7 +123,7 @@ class Ingrediënt(GeregistreerdObject):
         aantal_ingrediënten = len(Ingrediënt.subregister())
         
         if aantal_ingrediënten == 0:
-            print(f"\n>>> geen ingrediënten aanwezig")
+            print("\n>>> geen ingrediënten aanwezig")
             
             if not toestaan_nieuw:
                 return commando.STOP
@@ -320,7 +320,7 @@ class Ingrediënt(GeregistreerdObject):
     @staticmethod
     def weergeven() -> commando.Doorgaan:
         
-        menu_weergeven = Menu(f"MENU WEERGEVEN INGREDIËNT", "MENU INGREDIËNT", blijf_in_menu = True)
+        menu_weergeven = Menu("MENU WEERGEVEN INGREDIËNT", "MENU INGREDIËNT", blijf_in_menu = True)
         menu_weergeven.toevoegen_optie(Ingrediënt.weergeven_alle, "alle ingrediënten")
         menu_weergeven.toevoegen_optie(Ingrediënt.weergeven_voor_hoofdcategorie, "ingrediënten voor hoofdcategorie")
         menu_weergeven.toevoegen_optie(Ingrediënt.weergeven_voor_categorie, "ingrediënten voor categorie")

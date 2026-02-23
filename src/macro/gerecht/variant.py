@@ -46,7 +46,7 @@ class Variant(BasisType):
         geef_id: bool = False,
         ) -> Variant | commando.Doorgaan:
         
-        print(f"\ninvullen gegevens nieuwe variant")
+        print("\ninvullen gegevens nieuwe variant")
         
         variant_naam = invoeren(
             tekst_beschrijving = "variantnaam",
