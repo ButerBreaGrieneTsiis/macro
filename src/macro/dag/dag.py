@@ -10,7 +10,7 @@ from grienetsiis.opdrachtprompt import invoeren, kiezen, commando
 from grienetsiis.register import Subregister, Register, GeregistreerdObject
 
 from macro.product import Product
-from macro.gerecht import Gerecht
+from macro.gerecht import Variant, Gerecht
 from macro.voedingswaarde import Eenheid, Hoeveelheid, Voedingswaarde
 
 
@@ -82,8 +82,41 @@ class Dag(GeregistreerdObject):
         
         return lijst
     
-    def selecteren_gerecht(self) -> Tuple[str, str] | commando.Stop:
-        ...
+    def selecteren_gerecht(
+        self,
+        terug_naar: str,
+        tekst_beschrijving: str,
+        geef_id: bool = True,
+        ) -> Tuple[str | Product, str | Variant] | commando.Stop:
+        
+        opties_gerecht = {}
+        
+        for gerecht_uuid, variant_dict in self.gerechten.items():
+            
+            gerecht: Gerecht = Gerecht.subregister()[gerecht_uuid]
+            
+            for variant_uuid, porties_genomen in variant_dict.items():
+                
+                variant_naam = "standaard" if variant_uuid == "standaard" else gerecht.varianten[variant_uuid].variant_naam
+                hoeveelheid_porties = Hoeveelheid(porties_genomen, Eenheid.PORTIE)
+                
+                opties_gerecht[(gerecht_uuid, variant_uuid)] = f"{hoeveelheid_porties} van {gerecht} (variant \"{variant_naam}\")"
+        
+        keuze_product = kiezen(
+            opties = opties_gerecht,
+            tekst_beschrijving = tekst_beschrijving,
+            tekst_annuleren = terug_naar,
+            )
+        if keuze_product is commando.STOP:
+            return commando.STOP
+        
+        gerecht_uuid = keuze_product[0]
+        variant_uuid = keuze_product[1]
+        
+        return (
+            gerecht_uuid if geef_id else Gerecht.subregister()[gerecht_uuid],
+            variant_uuid if geef_id else Gerecht.subregister()[gerecht_uuid].varianten[variant_uuid],
+            )
     
     # PROPERTIES
     
@@ -120,8 +153,9 @@ class Dag(GeregistreerdObject):
             
             gerecht = Gerecht.subregister()[gerecht_uuid]
             
-            for variant_uuid, waarde in variant_dict.items():
-                gerecht_voedingswaarde = gerecht.bereken_voedingswaarde(variant_uuid = variant_uuid) * waarde
+            for variant_uuid, porties_genomen in variant_dict.items():
+                
+                gerecht_voedingswaarde = gerecht.bereken_voedingswaarde(variant_uuid = variant_uuid) * porties_genomen
                 dag_voedingswaarde += gerecht_voedingswaarde
         
         return dag_voedingswaarde
@@ -316,12 +350,12 @@ class Dag(GeregistreerdObject):
                         dag.gerechten[gerecht_uuid][variant_uuid] += waarde
                         break
                 else:
-                    dag.gerecht[gerecht_uuid][variant_uuid] = waarde
+                    dag.gerechten[gerecht_uuid][variant_uuid] = waarde
             else:
                 dag.gerechten[gerecht_uuid] = {variant_uuid: waarde}
             
             variant_naam = "standaard" if variant_uuid == "standaard" else gerecht.varianten[variant_uuid].variant_naam
-            print(f"\n>>> {hoeveelheid} toegevoegd van {gerecht} (variant \"{variant_naam}\")")
+            print(f"\n>>> {hoeveelheid} verwijderd van {gerecht} (variant \"{variant_naam}\")")
     
     @staticmethod
     def aanpassen_product() -> commando.Doorgaan:
@@ -365,7 +399,7 @@ class Dag(GeregistreerdObject):
         
         hoeveelheid_nieuw = Hoeveelheid(waarde_nieuw, eenheid_nieuw)
         
-        print(f"\n>>> hoeveelheid {hoeveelheid_oud} aangepast naar {hoeveelheid_nieuw}")
+        print(f"\n>>> {hoeveelheid_oud} aangepast naar {hoeveelheid_nieuw}")
         
         if eenheid_nieuw.enkelvoud in dag.producten[product_uuid]:
             if eenheid_nieuw.enkelvoud != eenheid_oud.enkelvoud:
@@ -417,7 +451,7 @@ class Dag(GeregistreerdObject):
             
             gerecht: Gerecht = Gerecht.subregister()[gerecht_uuid]
             
-            for variant_uuid, porties_genomen  in variant_dict.items():
+            for variant_uuid, porties_genomen in variant_dict.items():
                 
                 variant_naam = "standaard" if variant_uuid == "standaard" else gerecht.varianten[variant_uuid].variant_naam
                 
@@ -486,14 +520,44 @@ class Dag(GeregistreerdObject):
         
         hoeveelheid = Hoeveelheid(dag.producten[product_uuid][eenheid.enkelvoud], eenheid)
         
-        print(f"\n>>> hoeveelheid {hoeveelheid} van {product} verwijderd")
+        print(f"\n>>> {hoeveelheid} van {product} verwijderd")
         
         del dag.producten[product_uuid][eenheid.enkelvoud]
         
         return commando.DOORGAAN
     
     @staticmethod
-    def verwijderen_gerecht() -> commando.Doorgaan: ... # TODO
+    def verwijderen_gerecht() -> commando.Doorgaan:
+        
+        dag: Dag = Dag.selecteren_dag(datum = Dag._HUIDIGE_DAG)
+        
+        if len(dag.gerechten) == 0:
+            print("\n>>> geen gerechten aanwezig om te verwijderen")
+            return commando.Doorgaan
+        
+        gerecht_selectie = dag.selecteren_gerecht(
+            terug_naar = Dag.titel(),
+            tekst_beschrijving = "een gerecht en variant om te verwijderen",
+            geef_id = True,
+            )
+        if gerecht_selectie is commando.STOP:
+            return commando.Doorgaan
+        
+        gerecht_uuid, variant_uuid = gerecht_selectie
+        gerecht = Gerecht.subregister()[gerecht_uuid]
+        
+        porties_genomen = dag.gerechten[gerecht_uuid][variant_uuid]
+        hoeveelheid_porties = Hoeveelheid(porties_genomen, Eenheid.PORTIE)
+        
+        variant_naam = "standaard" if variant_uuid == "standaard" else gerecht.varianten[variant_uuid].variant_naam
+        print(f"\n>>> {hoeveelheid_porties} toegevoegd van {gerecht} (variant \"{variant_naam}\")")
+        
+        del dag.gerechten[gerecht_uuid][variant_uuid]
+        
+        if len(dag.gerechten[gerecht_uuid]) == 0:
+            del dag.gerechten[gerecht_uuid]
+        
+        return commando.DOORGAAN
     
     @staticmethod
     def kopiëren_product() -> commando.Doorgaan:
