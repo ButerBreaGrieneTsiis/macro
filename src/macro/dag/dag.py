@@ -450,23 +450,23 @@ class Dag(GeregistreerdObject):
                     CALORIEËN = calorieën,
                     EIWITTEN = eiwitten,
                     PRODUCT = product,
+                    GERECHT = "",
                     )
         
+        tabel_producten.toevoegen_leeg()
         tabel_producten.toevoegen_rij(
             HOEVEELHEID = "SUBTOTAAL",
             CALORIEËN = calorieën_totaal,
             EIWITTEN = eiwitten_totaal,
             PRODUCT = "",
+            GERECHT = "",
             )
+        tabel_producten.toevoegen_leeg()
         
         tabel_producten.kolommen["HOEVEELHEID"].kolom_breedte = 17
         tabel_producten.kolommen["CALORIEËN"].kolom_breedte = 10
         tabel_producten.kolommen["CALORIEËN"].uitlijning = "rechts"
         tabel_producten.kolommen["EIWITTEN"].uitlijning = "rechts"
-        
-        if len(dag.producten) > 0:
-            print("\nlos toegevoegde producten\n")
-            tabel_producten.weergeven()
         
         for gerecht_uuid, variant_dict in dag.gerechten.items():
             
@@ -474,10 +474,7 @@ class Dag(GeregistreerdObject):
             
             for variant_uuid, porties_genomen in variant_dict.items():
                 
-                tabel_gerechten = Tabel(tussen_breedte = 3)
-                
                 variant_naam = "standaard" if variant_uuid == "standaard" else gerecht.varianten[variant_uuid].variant_naam
-                hoeveelheid_porties = Hoeveelheid(porties_genomen, Eenheid.PORTIE)
                 
                 if variant_uuid != "standaard" and gerecht.varianten[variant_uuid].porties is not None:
                     aantal_porties = gerecht.varianten[variant_uuid].porties
@@ -496,37 +493,59 @@ class Dag(GeregistreerdObject):
                         calorieën = product.voedingswaarde.calorieën * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid._BASIS_EENHEDEN else hoeveelheid.waarde * product.eenheden[eenheid_enkelvoud]) / 100 * porties_genomen/aantal_porties
                         eiwitten = product.voedingswaarde.eiwitten * (hoeveelheid.waarde if hoeveelheid.eenheid in Hoeveelheid._BASIS_EENHEDEN else hoeveelheid.waarde * product.eenheden[eenheid_enkelvoud]) / 100 * porties_genomen/aantal_porties
                         
-                        calorieën_totaal += calorieën
-                        eiwitten_totaal += eiwitten
-                        
-                        tabel_gerechten.toevoegen_rij(
+                        tabel_producten.toevoegen_rij(
                             HOEVEELHEID = hoeveelheid * porties_genomen/aantal_porties,
                             CALORIEËN = calorieën,
                             EIWITTEN = eiwitten,
                             PRODUCT = product,
+                            GERECHT = f"{gerecht} (variant {variant_naam})",
                             )
                 
-                tabel_gerechten.toevoegen_rij(
+                tabel_producten.toevoegen_rij(
                     HOEVEELHEID = "SUBTOTAAL",
                     CALORIEËN = gerecht.bereken_voedingswaarde(variant_uuid = variant_uuid).calorieën,
                     EIWITTEN = gerecht.bereken_voedingswaarde(variant_uuid = variant_uuid).eiwitten,
                     PRODUCT = "",
+                    GERECHT = "",
                     )
-                
-                tabel_gerechten.kolommen["HOEVEELHEID"].kolom_breedte = 17
-                tabel_gerechten.kolommen["CALORIEËN"].kolom_breedte = 10
-                tabel_gerechten.kolommen["CALORIEËN"].uitlijning = "rechts"
-                tabel_gerechten.kolommen["EIWITTEN"].uitlijning = "rechts"
-                
-                print(f"\n{hoeveelheid_porties} van {gerecht} (variant \"{variant_naam}\")\n")
-                tabel_gerechten.weergeven()
         
-        print(f"\n{"TOTAAL":<17}   {f"{dag.voedingswaarde.calorieën}":>10}   {f"{dag.voedingswaarde.eiwitten}":>8}")
+        tabel_producten.toevoegen_leeg()
+        tabel_producten.toevoegen_rij(
+            HOEVEELHEID = "TOTAAL",
+            CALORIEËN = dag.voedingswaarde.calorieën,
+            EIWITTEN = dag.voedingswaarde.eiwitten,
+            PRODUCT = "",
+            GERECHT = "",
+            )
+        
+        print()
+        tabel_producten.weergeven()
         
         return commando.DOORGAAN
     
     @staticmethod
-    def weergeven_gerecht() -> commando.Doorgaan: ... # TODO
+    def weergeven_gerecht() -> commando.Doorgaan:
+        
+        dag: Dag = Dag.selecteren_dag(datum = Dag._HUIDIGE_DAG)
+        
+        if len(dag.gerechten) == 0:
+            print("\n>>> geen gerechten aanwezig om te weergeven")
+            return commando.Doorgaan
+        
+        print(f"\nHOEVEELHEID    GERECHT")
+        
+        for gerecht_uuid, variant_dict in dag.gerechten.items():
+            
+            gerecht: Gerecht = Gerecht.subregister()[gerecht_uuid]
+            
+            for variant_uuid, porties_genomen in variant_dict.items():
+                
+                variant_naam = "standaard" if variant_uuid == "standaard" else gerecht.varianten[variant_uuid].variant_naam
+                
+                hoeveelheid_porties = Hoeveelheid(porties_genomen, Eenheid.PORTIE)
+                
+                print(f"{f"{hoeveelheid_porties}":<14} {gerecht} (variant \"{variant_naam}\")")
+        
     
     @staticmethod
     def weergeven_voedingswaarde() -> commando.Doorgaan:
